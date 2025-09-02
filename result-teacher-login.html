@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Login - Result Analysis System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, white 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .teacher-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #45b7d1, #96c93d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 35px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(69, 183, 209, 0.3);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #45b7d1;
+            box-shadow: 0 0 0 3px rgba(69, 183, 209, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            font-size: 1.1rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #45b7d1;
+        }
+
+        .login-button {
+            width: 100%;
+            background: linear-gradient(135deg, #45b7d1, #96c93d);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(69, 183, 209, 0.3);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c0392b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .demo-credentials {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+
+        .demo-credentials h4 {
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .demo-credentials p {
+            color: #6c757d;
+            margin: 3px 0;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .back-button {
+                top: 15px;
+                left: 15px;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="teacher-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h1>Teacher Login</h1>
+            <p class="subtitle">Result Management Access</p>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <form id="teacherLoginForm">
+            <div class="form-group">
+                <label for="department">Department</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-building input-icon"></i>
+                    <select id="department" name="department" required>
+                        <option value="">Select Department</option>
+                        <option value="CT">Computer Technology</option>
+                        <option value="IT">Information Technology</option>
+                        <option value="ME">Mechanical Engineering</option>
+                        <option value="CE">Civil Engineering</option>
+                        <option value="EE">Electrical Engineering</option>
+                        <option value="ET">Electronics & Telecommunication</option>
+                        <option value="AI">Artificial Intelligence</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="teacherId">Teacher ID</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="teacherId" name="teacherId" placeholder="Enter Teacher ID" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                    <i class="fas fa-eye password-toggle" id="passwordToggle" onclick="togglePassword()"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="login-button" id="loginButton">
+                <i class="fas fa-spinner loading-spinner" id="loadingSpinner"></i>
+                <span id="buttonText">Login to Dashboard</span>
+            </button>
+        </form>
+
+        <div class="demo-credentials">
+            <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+            <p><strong>Department:</strong> Computer Technology</p>
+            <p><strong>Teacher ID:</strong> CT001</p>
+            <p><strong>Password:</strong> teacher123</p>
+        </div>
+    </div>
+
+    <script>
+        // Demo teacher credentials
+        const teacherCredentials = {
+            'CT': { 'CT001': 'teacher123', 'CT002': 'teacher456' },
+            'IT': { 'IT001': 'teacher123', 'IT002': 'teacher456' },
+            'ME': { 'ME001': 'teacher123', 'ME002': 'teacher456' },
+            'CE': { 'CE001': 'teacher123', 'CE002': 'teacher456' },
+            'EE': { 'EE001': 'teacher123', 'EE002': 'teacher456' },
+            'ET': { 'ET001': 'teacher123', 'ET002': 'teacher456' },
+            'AI': { 'AI001': 'teacher123', 'AI002': 'teacher456' }
+        };
+
+        const departmentNames = {
+            'CT': 'Computer Technology',
+            'IT': 'Information Technology',
+            'ME': 'Mechanical Engineering',
+            'CE': 'Civil Engineering',
+            'EE': 'Electrical Engineering',
+            'ET': 'Electronics & Telecommunication',
+            'AI': 'Artificial Intelligence'
+        };
+
+        function goBack() {
+            window.location.href = 'result-analysis.html';
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Add shake animation
+            document.querySelector('.login-container').classList.add('shake');
+            setTimeout(() => {
+                document.querySelector('.login-container').classList.remove('shake');
+            }, 500);
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            const button = document.getElementById('loginButton');
+            const spinner = document.getElementById('loadingSpinner');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (loading) {
+                button.disabled = true;
+                spinner.style.display = 'inline-block';
+                buttonText.textContent = 'Logging in...';
+            } else {
+                button.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Login to Dashboard';
+            }
+        }
+
+        document.getElementById('teacherLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideError();
+            
+            const department = document.getElementById('department').value;
+            const teacherId = document.getElementById('teacherId').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!department || !teacherId || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            setLoading(true);
+            
+            // Simulate authentication delay
+            setTimeout(() => {
+                if (teacherCredentials[department] && 
+                    teacherCredentials[department][teacherId] && 
+                    teacherCredentials[department][teacherId] === password) {
+                    
+                    // Store teacher session
+                    sessionStorage.setItem('teacherData', JSON.stringify({
+                        teacherId: teacherId,
+                        department: department,
+                        departmentName: departmentNames[department],
+                        role: 'teacher',
+                        loginTime: new Date().toISOString(),
+                        name: `Teacher - ${departmentNames[department]}`
+                    }));
+                    
+                    // Redirect to teacher dashboard
+                    window.location.href = 'result-teacher-dashboard.html';
+                } else {
+                    setLoading(false);
+                    showError('Invalid credentials for selected department');
+                }
+            }, 1500);
+        });
+
+        // Auto-focus on department select
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('department').focus();
+        });
+    </script>
+</body>
+</html>

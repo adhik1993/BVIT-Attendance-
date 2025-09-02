@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Password Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --text-dark: #1F2937;
+            --text-medium: #4B5563;
+            --text-light: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f6f7ff 0%, #ffffff 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            color: var(--text-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .password-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .card-header i {
+            font-size: 32px;
+            margin-right: 20px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-medium);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-input input,
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .password-input input:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: white;
+        }
+
+        .password-input i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .password-input i:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert i {
+            margin-right: 15px;
+            font-size: 1.4rem;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--text-medium);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-btn i {
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-5px);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .card-header i {
+                font-size: 24px;
+                padding: 12px;
+            }
+
+            .card-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            z-index: 1;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="admin-dashboard.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <div class="header">
+            <h1>Password Management</h1>
+            <p>Update admin and teacher passwords securely</p>
+        </div>
+
+        <div class="password-cards">
+            <!-- Admin Password Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-shield"></i>
+                    <h2>Admin Password</h2>
+                </div>
+                <form id="adminPasswordForm">
+                    <div class="form-group">
+                        <label for="adminEmail">Admin Email</label>
+                        <input type="email" id="adminEmail" placeholder="Enter admin email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminCurrentPassword">Current Password</label>
+                        <div class="password-input">
+                            <input type="password" id="adminCurrentPassword" placeholder="Enter current password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminNewPassword">New Password</label>
+                        <div class="password-input">
+                            <input type="password" id="adminNewPassword" placeholder="Enter new password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminConfirmPassword">Confirm New Password</label>
+                        <div class="password-input">
+                            <input type="password" id="adminConfirmPassword" placeholder="Confirm new password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i>
+                        Update Admin Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Teacher Password Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h2>Teacher Password</h2>
+                </div>
+                <form id="teacherPasswordForm">
+                    <div class="form-group">
+                        <label for="teacherEmail">Teacher Email</label>
+                        <input type="email" id="teacherEmail" placeholder="Enter teacher email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacherCurrentPassword">Current Password</label>
+                        <div class="password-input">
+                            <input type="password" id="teacherCurrentPassword" placeholder="Enter current password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacherNewPassword">New Password</label>
+                        <div class="password-input">
+                            <input type="password" id="teacherNewPassword" placeholder="Enter new password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacherConfirmPassword">Confirm New Password</label>
+                        <div class="password-input">
+                            <input type="password" id="teacherConfirmPassword" placeholder="Confirm new password" required>
+                            <i class="fas fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i>
+                        Update Teacher Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        // Wait for Firebase to be initialized
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                const checkFirebase = () => {
+                    if (window.auth && window.db) {
+                        resolve();
+                    } else {
+                        setTimeout(checkFirebase, 100);
+                    }
+                };
+                checkFirebase();
+            });
+        }
+
+        // Check authentication
+        async function checkAuth() {
+            await waitForFirebase();
+            window.auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = 'welcome.html';
+                    return;
+                }
+            });
+        }
+        
+        // Initialize authentication check
+        checkAuth();
+
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            // Remove existing alert
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create new alert
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                ${message}
+            `;
+
+            // Insert alert before the form
+            const form = document.querySelector(`#${type === 'success' ? 'adminPasswordForm' : 'teacherPasswordForm'}`);
+            form.parentNode.insertBefore(alert, form);
+
+            // Remove alert after 3 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Handle Admin Password Change
+        document.getElementById('adminPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value;
+            const currentPassword = document.getElementById('adminCurrentPassword').value;
+            const newPassword = document.getElementById('adminNewPassword').value;
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showAlert('New passwords do not match!', 'error');
+                return;
+            }
+
+            try {
+                // Sign in with current credentials
+                const userCredential = await auth.signInWithEmailAndPassword(email, currentPassword);
+                
+                // Verify if user is admin
+                const adminSnapshot = await db.ref('admins').child(userCredential.user.uid).once('value');
+                if (!adminSnapshot.exists()) {
+                    showAlert('This user is not an admin!', 'error');
+                    return;
+                }
+
+                // Update password
+                await userCredential.user.updatePassword(newPassword);
+                
+                showAlert('Admin password updated successfully!', 'success');
+                document.getElementById('adminPasswordForm').reset();
+            } catch (error) {
+                console.error('Error updating admin password:', error);
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Handle Teacher Password Change
+        document.getElementById('teacherPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('teacherEmail').value;
+            const currentPassword = document.getElementById('teacherCurrentPassword').value;
+            const newPassword = document.getElementById('teacherNewPassword').value;
+            const confirmPassword = document.getElementById('teacherConfirmPassword').value;
+
+                    if (newPassword !== confirmPassword) {
+                showAlert('New passwords do not match!', 'error');
+                        return;
+                    }
+
+            try {
+                // Sign in with current credentials
+                const userCredential = await auth.signInWithEmailAndPassword(email, currentPassword);
+                
+                // Verify if user is teacher
+                const teacherSnapshot = await db.ref('teachers').child(userCredential.user.uid).once('value');
+                if (!teacherSnapshot.exists()) {
+                    showAlert('This user is not a teacher!', 'error');
+                    return;
+                }
+
+                // Update password
+                await userCredential.user.updatePassword(newPassword);
+                
+                showAlert('Teacher password updated successfully!', 'success');
+                document.getElementById('teacherPasswordForm').reset();
+            } catch (error) {
+                console.error('Error updating teacher password:', error);
+                showAlert(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html> 

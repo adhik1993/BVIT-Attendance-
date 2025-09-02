@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Result Analysis System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .admin-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .admin-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 35px;
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-right: 4px solid white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .menu-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-sidebar {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-color);
+        }
+
+        .stat-card.students::before { --card-color: #3498db; }
+        .stat-card.teachers::before { --card-color: #2ecc71; }
+        .stat-card.results::before { --card-color: #f39c12; }
+        .stat-card.departments::before { --card-color: #e74c3c; }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.students { background: #3498db; }
+        .stat-icon.teachers { background: #2ecc71; }
+        .stat-icon.results { background: #f39c12; }
+        .stat-icon.departments { background: #e74c3c; }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: #27ae60;
+        }
+
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="admin-name">System Admin</div>
+                <div class="admin-role">Administrator</div>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="menu-text">Dashboard</span>
+                </button>
+                <button class="menu-item" onclick="showSection('students')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="menu-text">Student Management</span>
+                </button>
+                <button class="menu-item" onclick="showSection('teachers')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span class="menu-text">Teacher Management</span>
+                </button>
+                <button class="menu-item" onclick="showSection('results')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="menu-text">Result Management</span>
+                </button>
+                <button class="menu-item" onclick="showSection('reports')">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="menu-text">Reports & Analytics</span>
+                </button>
+                <button class="menu-item" onclick="showSection('departments')">
+                    <i class="fas fa-building"></i>
+                    <span class="menu-text">Departments</span>
+                </button>
+                <button class="menu-item" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-text">System Settings</span>
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <h1>Admin Dashboard</h1>
+                    <p>Result Analysis System - BHARAT Diploma Engineering College</p>
+                </div>
+                <div class="header-right">
+                    <button class="toggle-sidebar" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div class="content-section active" id="dashboard">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card students">
+                        <div class="stat-header">
+                            <div class="stat-title">Total Students</div>
+                            <div class="stat-icon students">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="totalStudents">1,245</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12% from last semester</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card teachers">
+                        <div class="stat-header">
+                            <div class="stat-title">Total Teachers</div>
+                            <div class="stat-icon teachers">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="totalTeachers">85</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+5 new this month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card results">
+                        <div class="stat-header">
+                            <div class="stat-title">Results Published</div>
+                            <div class="stat-icon results">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="totalResults">342</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+28 this week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card departments">
+                        <div class="stat-header">
+                            <div class="stat-title">Departments</div>
+                            <div class="stat-icon departments">
+                                <i class="fas fa-building"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="totalDepartments">7</div>
+                        <div class="stat-change">
+                            <i class="fas fa-minus"></i>
+                            <span>No change</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">Department-wise Student Distribution</div>
+                        <canvas id="departmentChart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">Monthly Result Trends</div>
+                        <canvas id="resultTrendChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div class="content-section" id="students">
+                <div class="section-header">
+                    <div class="section-title">Student Management</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Student
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload"></i> Import Students
+                        </button>
+                        <button class="btn btn-warning">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading student data...</p>
+                </div>
+            </div>
+
+            <!-- Teachers Section -->
+            <div class="content-section" id="teachers">
+                <div class="section-header">
+                    <div class="section-title">Teacher Management</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Teacher
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload"></i> Import Teachers
+                        </button>
+                        <button class="btn btn-warning">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading teacher data...</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="content-section" id="results">
+                <div class="section-header">
+                    <div class="section-title">Result Management</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Results
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload"></i> Bulk Upload
+                        </button>
+                        <button class="btn btn-warning">
+                            <i class="fas fa-eye"></i> View All Results
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading result data...</p>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="content-section" id="reports">
+                <div class="section-header">
+                    <div class="section-title">Reports & Analytics</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i> Generate Report
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-download"></i> Export PDF
+                        </button>
+                        <button class="btn btn-warning">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading analytics data...</p>
+                </div>
+            </div>
+
+            <!-- Departments Section -->
+            <div class="content-section" id="departments">
+                <div class="section-header">
+                    <div class="section-title">Department Management</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Department
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-edit"></i> Manage HODs
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading department data...</p>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="content-section" id="settings">
+                <div class="section-header">
+                    <div class="section-title">System Settings</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-undo"></i> Reset to Default
+                        </button>
+                    </div>
+                </div>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading system settings...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const adminData = sessionStorage.getItem('adminData');
+            if (!adminData) {
+                window.location.href = 'result-admin-login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            if (!checkAuth()) return;
+            
+            // Initialize charts
+            initCharts();
+            
+            // Load initial data
+            loadDashboardData();
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        // Show section
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked menu item
+            event.target.closest('.menu-item').classList.add('active');
+            
+            // Load section-specific data
+            loadSectionData(sectionName);
+        }
+
+        // Load section data
+        function loadSectionData(section) {
+            // Simulate data loading
+            console.log(`Loading data for ${section} section`);
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Department Chart
+            const deptCtx = document.getElementById('departmentChart').getContext('2d');
+            new Chart(deptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Computer Technology', 'Information Technology', 'Mechanical Engineering', 'Civil Engineering', 'Electrical Engineering', 'Electronics & Telecom', 'Artificial Intelligence'],
+                    datasets: [{
+                        data: [245, 198, 167, 143, 132, 89, 67],
+                        backgroundColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#f39c12',
+                            '#e74c3c',
+                            '#9b59b6',
+                            '#1abc9c',
+                            '#34495e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Result Trend Chart
+            const trendCtx = document.getElementById('resultTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Results Published',
+                        data: [45, 52, 48, 67, 73, 89],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            // Simulate API calls
+            setTimeout(() => {
+                // Update stats with animation
+                animateCounter('totalStudents', 1245);
+                animateCounter('totalTeachers', 85);
+                animateCounter('totalResults', 342);
+                animateCounter('totalDepartments', 7);
+            }, 500);
+        }
+
+        // Animate counter
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 2000;
+            const startTime = performance.now();
+            
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentValue = Math.floor(progress * targetValue);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('adminData');
+                window.location.href = 'result-admin-login.html';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

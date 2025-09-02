@@ -1,0 +1,2633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management - Attendance System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="mobile-fixes.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Function to check if user is authenticated
+        function isUserAuthenticated() {
+                const isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
+                const isTeacherLoggedIn = sessionStorage.getItem('isTeacherLoggedIn');
+            const adminData = sessionStorage.getItem('adminData');
+            const teacherData = sessionStorage.getItem('teacherData');
+            const adminToken = localStorage.getItem('adminToken');
+            
+            console.log('Checking authentication:', {
+                isAdminLoggedIn,
+                isTeacherLoggedIn,
+                hasAdminData: !!adminData,
+                hasTeacherData: !!teacherData,
+                hasAdminToken: !!adminToken
+            });
+            
+            return (isAdminLoggedIn === 'true' && (adminData || adminToken)) || 
+                   (isTeacherLoggedIn === 'true' && teacherData);
+        }
+
+        // Function to check session and initialize
+        async function initializeSession() {
+            console.log('Initializing session...');
+            
+            try {
+                // Check authentication first
+                if (!isUserAuthenticated()) {
+                    console.log('Not authenticated, redirecting to welcome');
+                    window.location.href = 'welcome.html';
+                        return;
+                    }
+                
+                // Wait for Firebase to initialize
+                await waitForFirebase();
+                console.log('Firebase initialized');
+                
+                // Start auto logout timer
+                const userType = sessionStorage.getItem('isAdminLoggedIn') === 'true' ? 'admin' : 'teacher';
+                startAutoLogoutTimer(userType);
+                
+                // Load students
+                loadStudents();
+                
+            } catch (error) {
+                console.error('Error initializing session:', error);
+                    sessionStorage.clear();
+                window.location.href = 'welcome.html';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeSession);
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && isUserAuthenticated()) {
+                console.log('Page visible, checking session');
+                const userType = sessionStorage.getItem('isAdminLoggedIn') === 'true' ? 'admin' : 'teacher';
+                startAutoLogoutTimer(userType);
+            }
+        });
+
+        // Handle page focus
+        window.addEventListener('focus', function() {
+            if (isUserAuthenticated()) {
+                console.log('Page focused, checking session');
+                const userType = sessionStorage.getItem('isAdminLoggedIn') === 'true' ? 'admin' : 'teacher';
+                startAutoLogoutTimer(userType);
+            }
+        });
+
+        // Load students when page loads
+        window.onload = async function() {
+            console.log('Student management loading...');
+            
+            try {
+                // Start session check
+                // startSessionCheck(); // Removed: this function is not defined and causes logout
+                
+                // Wait for Firebase to initialize
+                await waitForFirebase();
+                console.log('Firebase initialized');
+                    
+                // Start auto logout timer
+                if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                    startAutoLogoutTimer('admin');
+                } else if (sessionStorage.getItem('isTeacherLoggedIn') === 'true') {
+                    startAutoLogoutTimer('teacher');
+                    }
+                    
+                // Load students
+                loadStudents();
+                
+            } catch (error) {
+                console.error('Error in onload:', error);
+                sessionStorage.clear();
+                window.location.href = 'welcome.html';
+            }
+        };
+        
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps.length) {
+            firebase.initializeApp(window.firebaseConfig);
+        }
+
+        // Get references to Firebase services
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Function to generate class code
+        function generateClassCode(year, department, division) {
+            console.log('Generating class code for:', { year, department, division });
+            
+            // Convert department to short code
+            const deptMap = {
+                'Computer Technology': 'CT',
+                'Information Technology': 'IT',
+                'Electronics & Telecommunication': 'ET',
+                'Mechanical Engineering': 'ME',
+                'Civil Engineering': 'CE',
+                'Electrical Engineering': 'EE',
+                'Artificial Intelligence': 'AI',
+                'CT': 'CT',
+                'IT': 'IT',
+                'ET': 'ET',
+                'ME': 'ME',
+                'CE': 'CE',
+                'EE': 'EE',
+                'AI': 'AI'
+            };
+            
+            // Get department code - handle both department and branch fields
+            let deptCode = deptMap[department] || department;
+            if (!deptCode || deptCode === 'undefined') {
+                console.error('Invalid department:', department);
+                deptCode = 'ME'; // Default to ME since these are mechanical students
+            }
+            
+            // Clean up year code
+            let yearCode = year;
+            if (!yearCode || yearCode === 'undefined') {
+                console.error('Invalid year:', year);
+                yearCode = 'SY'; // Default to SY since these are second year students
+            }
+            
+            // Create class code - format: FYME, SYME, TYME, BEME
+            const classCode = yearCode + deptCode + (division ? '-' + division : '');
+            console.log('Generated class code:', classCode);
+            
+            return classCode;
+        }
+
+        // Function to update existing students' class codes
+        function updateExistingStudentsClass() {
+            console.log('Updating existing students class codes...');
+            
+            db.ref('students').once('value')
+                .then((snapshot) => {
+                    const updates = {};
+                    snapshot.forEach((childSnapshot) => {
+                        const student = childSnapshot.val();
+                        const studentId = childSnapshot.key;
+                        
+                        console.log('Processing student:', student);
+                        
+                        // Use department or branch field
+                        const department = student.department || student.branch;
+                        let year = student.year || 'SY';
+                        
+                        // Convert year to correct format if needed
+                        if (year === '1' || year === 'First' || year === 'First Year') year = 'FY';
+                        else if (year === '2' || year === 'Second' || year === 'Second Year') year = 'SY';
+                        else if (year === '3' || year === 'Third' || year === 'Third Year') year = 'TY';
+                        else if (year === '4' || year === 'Fourth' || year === 'Fourth Year') year = 'BE';
+                        
+                        const division = student.division || '';
+                        
+                        // Generate new class code
+                        const classCode = generateClassCode(year, department, division);
+                        console.log('Current class:', student.class, 'New class:', classCode);
+                        
+                        // Update if class code is missing or incorrect
+                        if (!student.class || 
+                            student.class === 'N/A' || 
+                            student.class === 'undefined' ||
+                            student.class.includes('undefined') ||
+                            student.class.includes('Second') ||  // Match SecondME
+                            student.class.includes('second') ||
+                            student.class !== classCode) {  // Also update if different from generated code
+                            
+                            if (classCode && !classCode.includes('undefined')) {
+                                updates[`students/${studentId}/class`] = classCode;
+                                // Also update year and department fields
+                                updates[`students/${studentId}/year`] = year;
+                                if (!student.department && student.branch) {
+                                    updates[`students/${studentId}/department`] = student.branch;
+                                }
+                                console.log(`Will update student ${studentId}:`, {
+                                    oldClass: student.class,
+                                    newClass: classCode,
+                                    year: year,
+                                    department: department
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Apply all updates at once
+                    if (Object.keys(updates).length > 0) {
+                        console.log('Applying updates:', updates);
+                        return db.ref().update(updates).then(() => {
+                            console.log('Successfully applied updates');
+                            return updates;  // Return updates for confirmation
+                        });
+                    } else {
+                        console.log('No updates needed');
+                        return null;
+                    }
+                })
+                .then((updates) => {
+                    if (updates) {
+                        console.log('Updated these students:', updates);
+                        // Show success message
+                        alert('Successfully updated class codes for ' + Object.keys(updates).length + ' students');
+                    }
+                    loadStudents(); // Reload the table
+                })
+                .catch((error) => {
+                    console.error('Error updating class codes:', error);
+                    alert('Error updating class codes. Please try again.');
+                });
+        }
+
+        // Add student to Firebase
+        function addStudent(event) {
+            event.preventDefault();
+            
+            const department = document.getElementById('department').value;
+            const year = document.getElementById('year').value;
+            
+            const division = department === 'Computer Technology' 
+                ? Array.from(document.querySelectorAll('input[name="division"]:checked')).map(cb => cb.value)[0] || ''
+                : '';
+            
+            const classCode = generateClassCode(year, department, division);
+            console.log('Adding student with class code:', classCode);
+            
+            const studentData = {
+                rollNo: document.getElementById('rollNo').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                department: department,
+                year: year,
+                
+                class: classCode,
+                division: division,
+                lastUpdated: new Date().toISOString()
+            };
+
+            
+            
+            
+            console.log('Adding student with data:', studentData);
+
+            // Validate division for Computer Engineering
+            if (department === 'Computer Engineering' && !division) {
+                alert('Please select a division for Computer Engineering');
+                return;
+            }
+
+            // First check if roll number already exists
+            db.ref('students').orderByChild('rollNo').equalTo(studentData.rollNo).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert('Roll number already exists!');
+                        return;
+                    }
+
+                    // Add student to Firebase
+                    db.ref('students').push(studentData, (error) => {
+                        if (error) {
+                            alert('Failed to add student. Please try again.');
+                        } else {
+                            document.getElementById('addStudentForm').reset();
+                            loadStudents();
+                            alert('Student added successfully!');
+                        }
+                    });
+                });
+        }
+
+        // Add these styles to improve table UI
+        const tableStyles = document.createElement('style');
+        tableStyles.textContent = `
+            .student-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+            }
+
+            .student-table th {
+                background: var(--primary);
+                color: white;
+                font-weight: 600;
+                padding: 16px;
+                text-align: left;
+                font-size: 0.95rem;
+                white-space: nowrap;
+            }
+
+            .student-table td {
+                padding: 16px;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 0.95rem;
+                vertical-align: middle;
+            }
+
+            .student-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .student-table tr:hover:not(.branch-header):not(.year-header) {
+                background: var(--bg-light);
+            }
+
+            .branch-header td {
+                background: var(--primary-light) !important;
+                color: var(--primary) !important;
+                font-weight: 700 !important;
+                font-size: 1.1rem !important;
+                padding: 20px 16px !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .year-header td {
+                background: rgba(243, 244, 246, 0.8) !important;
+                color: var(--text-dark) !important;
+                font-weight: 600 !important;
+                font-size: 1rem !important;
+                padding: 12px 16px !important;
+                font-style: normal !important;
+            }
+
+            .student-name {
+                font-weight: 600;
+                color: var(--text-dark);
+                margin-bottom: 4px;
+            }
+
+            .student-email {
+                color: var(--text-light);
+                font-size: 0.85rem;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            .btn-edit, .btn-delete {
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .btn-edit {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+
+            .btn-edit:hover {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-delete {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--danger);
+            }
+
+            .btn-delete:hover {
+                background: var(--danger);
+                color: white;
+            }
+
+            .student-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .roll-number {
+                width: 40px;
+                height: 40px;
+                background: var(--primary-light);
+                color: var(--primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            .branch-badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+
+            .year-badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+            }
+
+            .division-badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                background: rgba(245, 158, 11, 0.1);
+                color: var(--warning);
+            }
+
+            .phone-number {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                color: var(--text-medium);
+            }
+
+            .phone-number i {
+                font-size: 0.9rem;
+                color: var(--text-light);
+            }
+
+            @media (max-width: 1024px) {
+                .student-table {
+                    display: block;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+            }
+        `;
+        document.head.appendChild(tableStyles);
+
+        // Department colors mapping
+        const departmentColors = {
+            'Computer Technology': { bg: '#E8F5E9', text: '#2E7D32', icon: '#43A047' },  // Green shades
+            'Information Technology': { bg: '#E3F2FD', text: '#1565C0', icon: '#1E88E5' },  // Blue shades
+            'Mechanical Engineering': { bg: '#FFF3E0', text: '#E65100', icon: '#F57C00' },  // Orange shades
+            'Civil Engineering': { bg: '#F3E5F5', text: '#6A1B9A', icon: '#8E24AA' },  // Purple shades
+            'Electrical Engineering': { bg: '#FFEBEE', text: '#C62828', icon: '#EF5350' },  // Red shades
+            'Electronics & Telecommunication': { bg: '#E0F7FA', text: '#00838F', icon: '#00ACC1' },  // Cyan shades
+            'Artificial Intelligence': { bg: '#F3E5F5', text: '#4A148C', icon: '#6A1B9A' }  // Deep Purple shades
+        };
+
+        // Default colors for departments not in the mapping
+        const defaultColors = { bg: '#F5F5F5', text: '#616161', icon: '#757575' };  // Grey shades
+
+        // Function to get department colors
+        function getDepartmentColor(dept) {
+            return departmentColors[dept] || defaultColors;
+        }
+
+        // Department mapping
+        const departmentFullNames = {
+            'CT': 'Computer Technology',
+            'IT': 'Information Technology',
+            'ME': 'Mechanical Engineering',
+            'CE': 'Civil Engineering',
+            'EE': 'Electrical Engineering',
+            'ET': 'Electronics & Telecommunication',
+            'AI': 'Artificial Intelligence'
+        };
+
+        // Function to get department full name
+        function getDepartmentFullName(code) {
+            return departmentFullNames[code] || code;
+        }
+
+        // Add event listeners for filters
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const departmentFilter = document.getElementById('departmentFilter');
+            const classFilter = document.getElementById('classFilter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    loadStudents();
+                });
+            }
+            
+            if (departmentFilter) {
+                departmentFilter.addEventListener('change', function() {
+                    loadStudents();
+                });
+            }
+
+            if (classFilter) {
+                classFilter.addEventListener('change', function() {
+                    loadStudents();
+                });
+            }
+        });
+
+        // Function to load and display students
+        async function loadStudents() {
+            const tableBody = document.getElementById('studentTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const departmentFilter = document.getElementById('departmentFilter');
+            const classFilter = document.getElementById('classFilter');
+            const emptyState = document.getElementById('emptyState');
+            const table = document.getElementById('studentTable');
+            
+            try {
+                const snapshot = await firebase.database().ref('students').once('value');
+                const students = snapshot.val();
+                
+                if (!students) {
+                    if (table) table.style.display = 'none';
+                    if (emptyState) {
+                        emptyState.style.display = 'block';
+                        emptyState.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-user-graduate"></i>
+                                <p>No students found</p>
+                                <div class="subtitle">Add students using the form or import from Excel</div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Convert to array and add IDs
+                let studentArray = Object.entries(students).map(([id, student]) => {
+                    // Get department from either department or branch field
+                    const department = student.department || student.branch || 'N/A';
+                    
+                    // Get year and ensure it's in correct format
+                    let year = student.year || 'N/A';
+                    if (year === '1' || year === 'First' || year === 'First Year') year = 'FY';
+                    else if (year === '2' || year === 'Second' || year === 'Second Year') year = 'SY';
+                    else if (year === '3' || year === 'Third' || year === 'Third Year') year = 'TY';
+                    else if (year === '4' || year === 'Fourth' || year === 'Fourth Year') year = 'BE';
+                    
+                    // Generate class code if missing or invalid
+                    let classCode = student.class;
+                    if (!classCode || classCode === 'N/A' || classCode === 'undefined') {
+                        classCode = generateClassCode(year, department, student.division || '');
+                    }
+
+                    return {
+                        id,
+                        ...student,
+                        department: department,
+                        firstName: student.firstName || (student.name ? student.name.split(' ')[0] : 'N/A'),
+                        lastName: student.lastName || (student.name ? student.name.split(' ').slice(1).join(' ') : ''),
+                        email: student.email || 'N/A',
+                        phone: student.phone || 'N/A',
+                        year: year,
+                        class: classCode
+                    };
+                });
+
+                // Apply search filter
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                if (searchTerm) {
+                    studentArray = studentArray.filter(student => 
+                        (student.firstName + ' ' + student.lastName).toLowerCase().includes(searchTerm) ||
+                        student.email.toLowerCase().includes(searchTerm) ||
+                        student.rollNo?.toString().toLowerCase().includes(searchTerm) ||
+                        student.department.toLowerCase().includes(searchTerm) ||
+                        student.class.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Apply department filter
+                const selectedDepartment = departmentFilter ? departmentFilter.value : '';
+                if (selectedDepartment) {
+                    studentArray = studentArray.filter(student => 
+                        student.department === selectedDepartment
+                    );
+                }
+
+                // Apply class filter
+                const selectedClass = classFilter ? classFilter.value : '';
+                if (selectedClass) {
+                    studentArray = studentArray.filter(student => 
+                        student.year === selectedClass
+                    );
+                }
+
+                // Show/hide empty state
+                if (studentArray.length === 0) {
+                    if (table) table.style.display = 'none';
+                    if (emptyState) {
+                        emptyState.style.display = 'block';
+                        emptyState.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <p>No students found matching your search</p>
+                                <button class="btn" onclick="clearSearch()">
+                                    <i class="fas fa-sync"></i>
+                                    Clear Search
+                                </button>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Show table and hide empty state
+                if (table) table.style.display = 'table';
+                if (emptyState) emptyState.style.display = 'none';
+
+                // Group by department
+                const studentsByDept = {};
+                studentArray.forEach(student => {
+                    const dept = student.department;
+                    if (!studentsByDept[dept]) {
+                        studentsByDept[dept] = [];
+                    }
+                    studentsByDept[dept].push(student);
+                });
+
+                // Clear table and reset checkboxes
+                if (tableBody) tableBody.innerHTML = '';
+                
+                // Reset select all checkbox and bulk delete button
+                const selectAllCheckbox = document.getElementById('selectAllStudents');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+                updateBulkDeleteButton();
+
+                // Sort departments
+                const sortedDepts = Object.keys(studentsByDept).sort((a, b) => {
+                    if (a === 'N/A') return 1;
+                    if (b === 'N/A') return -1;
+                    return a.localeCompare(b);
+                });
+
+                // Add students by department
+                sortedDepts.forEach(dept => {
+                    // Add department header
+                    const headerRow = document.createElement('tr');
+                    headerRow.className = 'department-header';
+                    headerRow.innerHTML = `
+                        <td colspan="8">
+                            <div class="department-header-content" style="
+                                background: ${getDepartmentColor(dept).bg};
+                                color: ${getDepartmentColor(dept).text};
+                                padding: 15px 20px;
+                                border-radius: 8px;
+                                margin: 10px 0;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                            ">
+                                <i class="fas fa-building" style="color: ${getDepartmentColor(dept).icon}"></i>
+                                <span style="font-weight: 600;">${dept}</span>
+                                <span class="student-count" style="
+                                    background: ${getDepartmentColor(dept).text};
+                                    color: white;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    font-size: 0.85rem;
+                                    margin-left: 10px;
+                                ">${studentsByDept[dept].length} Students</span>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(headerRow);
+
+                    // Sort students by roll number within department
+                    studentsByDept[dept].sort((a, b) => {
+                        const rollA = parseInt(a.rollNo) || 0;
+                        const rollB = parseInt(b.rollNo) || 0;
+                        return rollA - rollB;
+                    });
+
+                    // Add students for this department
+                    studentsByDept[dept].forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <input type="checkbox" class="student-checkbox" value="${student.id}" onchange="updateBulkDeleteButton()">
+                            </td>
+                            <td>${student.rollNo || 'N/A'}</td>
+                            <td>${student.firstName} ${student.lastName}</td>
+                            <td>${student.email}</td>
+                            <td>${student.phone}</td>
+                            <td>${student.department}</td>
+                            <td>${student.year}</td>
+                            <td>${student.class}</td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="editStudent('${student.id}')">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteStudent('${student.id}')">
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+
+} catch (error) {
+    console.error('Error loading students:', error);
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Error loading students: ${error.message}
+                </td>
+            </tr>
+         `;
+    }
+}
+}
+
+        // Edit student
+        function editStudent(studentId) {
+            console.log('Edit button clicked for student ID:', studentId);
+            // Get student data
+            firebase.database().ref('students/' + studentId).once('value')
+                .then((snapshot) => {
+                    const student = snapshot.val();
+                    console.log('Student data fetched:', student);
+                    console.log('Student object keys:', Object.keys(student));
+                    console.log('Detailed student data:', JSON.stringify(student, null, 2));
+                    
+                    // Check for different possible field names
+                    console.log('Checking field variations:');
+                    console.log('firstName:', student.firstName);
+                    console.log('first_name:', student.first_name);
+                    console.log('name:', student.name);
+                    console.log('lastName:', student.lastName);
+                    console.log('last_name:', student.last_name);
+                    console.log('surname:', student.surname);
+                    if (!student) {
+                        alert('विद्यार्थी सापडला नाही!');
+                        return;
+                    }
+
+                    // Get modal elements
+                    const modal = document.getElementById('editStudentModal');
+                    const closeBtn = modal.querySelector('.close');
+
+                    // Fill form with current data
+                    console.log('Populating form fields with data:', {
+                        rollNo: student.rollNo,
+                        firstName: student.firstName,
+                        lastName: student.lastName,
+                        email: student.email,
+                        phone: student.phone,
+                        department: student.department,
+                        year: student.year
+                    });
+                    
+                    // Check if form elements exist before setting values
+                    const editStudentId = document.getElementById('editStudentId');
+                    const editRollNo = document.getElementById('editRollNo');
+                    const editFirstName = document.getElementById('editFirstName');
+                    const editLastName = document.getElementById('editLastName');
+                    const editEmail = document.getElementById('editEmail');
+                    const editPhone = document.getElementById('editPhone');
+                    const editDepartment = document.getElementById('editDepartment');
+                    const editYear = document.getElementById('editYear');
+                    
+                    // Handle name field - split full name into first and last name
+                    let firstName = '';
+                    let lastName = '';
+                    if (student.name) {
+                        const nameParts = student.name.trim().split(' ');
+                        firstName = nameParts[0] || '';
+                        lastName = nameParts.slice(1).join(' ') || '';
+                    }
+                    
+                    if (editStudentId) editStudentId.value = studentId;
+                    if (editRollNo) editRollNo.value = student.rollNo || '';
+                    if (editFirstName) editFirstName.value = firstName;
+                    if (editLastName) editLastName.value = lastName;
+                    if (editEmail) editEmail.value = student.email || '';
+                    if (editPhone) editPhone.value = student.phone || '';
+                    if (editDepartment) editDepartment.value = student.department || '';
+                    if (editYear) editYear.value = student.year || '';
+                    
+                    console.log('Form fields populated. Checking values:');
+                    console.log('Roll No field value:', editRollNo ? editRollNo.value : 'Element not found');
+                    console.log('First Name field value:', editFirstName ? editFirstName.value : 'Element not found');
+                    console.log('Last Name field value:', editLastName ? editLastName.value : 'Element not found');
+                    
+
+                    // Handle division checkboxes
+                    const divisionGroup = document.getElementById('editDivisionGroup');
+                    if (student.department === 'Computer Technology') {
+                        divisionGroup.style.display = 'block';
+                        document.querySelectorAll('input[name="editDivision"]').forEach(checkbox => {
+                            checkbox.checked = student.division === checkbox.value;
+                        });
+                    } else {
+                        divisionGroup.style.display = 'none';
+                    }
+
+                    // Update class options and set value
+                    updateEditClassOptions();
+                    setTimeout(() => {
+                        document.getElementById('editStudentClass').value = student.class || '';
+                    }, 100);
+
+                    // Show modal
+                    modal.style.display = 'block';
+
+                    // Close modal when clicking (x)
+                    closeBtn.onclick = function() {
+                        modal.style.display = 'none';
+                    }
+
+                    // Close modal when clicking outside
+                    window.onclick = function(event) {
+                        if (event.target == modal) {
+                            modal.style.display = 'none';
+                        }
+                    }
+
+                    // Handle form submission
+                    const form = document.getElementById('editStudentForm');
+                    form.onsubmit = function(e) {
+                        e.preventDefault();
+                        updateStudent();
+                    };
+                })
+                .catch((error) => {
+                    console.error('Error loading student:', error);
+                    alert('Error: ' + error.message);
+                });
+        }
+
+        // Update student
+        function updateStudent() {
+            const studentId = document.getElementById('editStudentId').value;
+            const newRollNo = document.getElementById('editRollNo').value;
+
+            // Check if roll number exists (except for this student)
+            db.ref('students').orderByChild('rollNo').equalTo(newRollNo).once('value')
+                .then((snapshot) => {
+                    let canUpdate = true;
+                    snapshot.forEach(child => {
+                        if (child.key !== studentId) {
+                            canUpdate = false;
+                        }
+                    });
+
+                    if (!canUpdate) {
+                        alert('हा रोल नंबर दुसऱ्या विद्यार्थ्याचा आहे! कृपया वेगळा रोल नंबर वापरा.');
+                        return;
+                    }
+
+                    // Get form data
+                    const department = document.getElementById('editDepartment').value;
+                    const year = document.getElementById('editYear').value;
+                    
+                    const division = department === 'Computer Technology'
+                        ? Array.from(document.querySelectorAll('input[name="editDivision"]:checked')).map(cb => cb.value)[0] || ''
+                        : '';
+
+                    // Generate class code
+                    const classCode = generateClassCode(year, department, division);
+
+                    // Get form data and combine first/last name into single name field
+                    const firstName = document.getElementById('editFirstName').value.trim();
+                    const lastName = document.getElementById('editLastName').value.trim();
+                    const fullName = (firstName + ' ' + lastName).trim();
+                    
+                    // Create student data object
+                    const studentData = {
+                        rollNo: newRollNo,
+                        name: fullName,
+                        email: document.getElementById('editEmail').value,
+                        phone: document.getElementById('editPhone').value,
+                        department: department,
+                        year: year,
+                        division: division,
+                        class: classCode,
+                        lastUpdated: new Date().toISOString()
+                    };
+
+                    // Validate data
+                    if (!firstName || !lastName) {
+                        alert('कृपया नाव भरा');
+                        return;
+                    }
+
+                    if (!studentData.email) {
+                        alert('कृपया ईमेल भरा');
+                        return;
+                    }
+
+                    if (!studentData.phone) {
+                        alert('कृपया फोन नंबर भरा');
+                        return;
+                    }
+
+                    if (!studentData.department) {
+                        alert('कृपया विभाग निवडा');
+                        return;
+                    }
+
+                    if (!studentData.year) {
+                        alert('कृपया वर्ष निवडा');
+                        return;
+                    }
+
+
+
+                    if (department === 'Computer Technology' && !division) {
+                        alert('कृपया विभाग निवडा');
+                        return;
+                    }
+
+                    // Update in database
+                    db.ref('students/' + studentId).update(studentData)
+                        .then(() => {
+                            // Hide modal
+                            document.getElementById('editStudentModal').style.display = 'none';
+                            
+                            // Show success message
+                            alert('विद्यार्थ्याची माहिती यशस्वीरित्या अपडेट केली!');
+                            
+                            // Reload students list
+                            loadStudents();
+                        })
+                        .catch((error) => {
+                            console.error('Error updating student:', error);
+                            alert('Error: ' + error.message);
+                        });
+                });
+        }
+
+        // Handle department change in edit form
+        function handleEditDepartmentChange() {
+            const department = document.getElementById('editDepartment');
+            const divisionGroup = document.getElementById('editDivisionGroup');
+            
+            if (!department || !divisionGroup) return;
+            
+            // Show/hide division checkboxes based on department
+            if (department.value === 'Computer Technology') {
+                divisionGroup.style.display = 'block';
+            } else {
+                divisionGroup.style.display = 'none';
+                // Uncheck all division checkboxes
+                document.querySelectorAll('input[name="editDivision"]').forEach(cb => cb.checked = false);
+            }
+            
+            updateEditClassOptions();
+        }
+
+        // Update class options in edit form
+        function updateEditClassOptions() {
+            const department = document.getElementById('editDepartment');
+            const year = document.getElementById('editYear');
+            const classSelect = document.getElementById('editStudentClass');
+            
+            if (!department || !year || !classSelect) {
+                console.error('Required elements not found');
+                return;
+            }
+
+            // Clear existing options
+            classSelect.innerHTML = '<option value="">Select Class</option>';
+            
+            if (!department.value || !year.value) return;
+
+            let yearCode = '';
+            if (year.value === 'FY') yearCode = 'FY';
+            else if (year.value === 'SY') yearCode = 'SY';
+            else if (year.value === 'TY') yearCode = 'TY';
+            else if (year.value === 'BE') yearCode = 'BE';
+
+            let deptCode = '';
+            let options = [];
+
+            switch(department.value) {
+                case 'Computer Technology':
+                    deptCode = 'CT';
+                    // Get selected divisions
+                    const selectedDivisions = Array.from(document.querySelectorAll('input[name="editDivision"]:checked')).map(cb => cb.value);
+                    
+                    // If no divisions selected, show all divisions
+                    if (selectedDivisions.length === 0) {
+                        ['A', 'B', 'C'].forEach(div => {
+                            options.push({
+                                code: `${yearCode}${deptCode}-${div}`,
+                                name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
+                            });
+                        });
+                    } else {
+                        // Show only selected divisions
+                        selectedDivisions.forEach(div => {
+                            options.push({
+                                code: `${yearCode}${deptCode}-${div}`,
+                                name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
+                            });
+                        });
+                    }
+                    break;
+                case 'Information Technology':
+                    deptCode = 'IT';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Electronics & Telecommunication':
+                    deptCode = 'ET';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Mechanical Engineering':
+                    deptCode = 'ME';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Civil Engineering':
+                    deptCode = 'CE';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Electrical Engineering':
+                    deptCode = 'EE';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Artificial Intelligence':
+                    deptCode = 'AI';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+            }
+
+            // Add options to select
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.code;
+                optionElement.textContent = option.name;
+                classSelect.appendChild(optionElement);
+            });
+        }
+
+        // Delete student
+        function deleteStudent(studentId) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                db.ref('students/' + studentId).remove((error) => {
+                    if (error) {
+                        alert('Failed to delete student. Please try again.');
+                    } else {
+                        loadStudents();
+                        alert('Student deleted successfully!');
+                    }
+                });
+            }
+        }
+
+        // Clear search and filters
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const departmentFilter = document.getElementById('departmentFilter');
+            const classFilter = document.getElementById('classFilter');
+            
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (departmentFilter) {
+                departmentFilter.value = '';
+            }
+            if (classFilter) {
+                classFilter.value = '';
+            }
+            loadStudents();
+        }
+
+        // Handle department change
+        function handleDepartmentChange() {
+            const department = document.getElementById('department');
+            const divisionGroup = document.getElementById('divisionGroup');
+            
+            if (!department || !divisionGroup) return;
+            
+            // Show/hide division checkboxes based on department
+            if (department.value === 'Computer Engineering') {
+                divisionGroup.style.display = 'block';
+            } else {
+                divisionGroup.style.display = 'none';
+                // Uncheck all division checkboxes
+                document.querySelectorAll('input[name="division"]').forEach(cb => cb.checked = false);
+            }
+            
+            updateClassOptions();
+        }
+
+        // Update class options based on department and year
+        function updateClassOptions() {
+            const department = document.getElementById('department');
+            const year = document.getElementById('year');
+            const classSelect = document.getElementById('studentClass');
+            
+            if (!department || !year || !classSelect) {
+                console.error('Required elements not found');
+                return;
+            }
+
+            // Clear existing options
+            classSelect.innerHTML = '<option value="">Select Class</option>';
+            
+            if (!department.value || !year.value) return;
+
+            let yearCode = '';
+            if (year.value === 'FY') yearCode = 'FY';
+            else if (year.value === 'SY') yearCode = 'SY';
+            else if (year.value === 'TY') yearCode = 'TY';
+            else if (year.value === 'BE') yearCode = 'BE';
+
+            let deptCode = '';
+            let options = [];
+
+            switch(department.value) {
+                case 'Computer Engineering':
+                    deptCode = 'CM';
+                    // Get selected divisions
+                    const selectedDivisions = Array.from(document.querySelectorAll('input[name="division"]:checked')).map(cb => cb.value);
+                    
+                    // If no divisions selected, show all divisions
+                    if (selectedDivisions.length === 0) {
+                        ['A', 'B', 'C'].forEach(div => {
+                            options.push({
+                                code: `${yearCode}${deptCode} (${div})`,
+                                name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
+                            });
+                        });
+                    } else {
+                        // Show only selected divisions
+                        selectedDivisions.forEach(div => {
+                            options.push({
+                                code: `${yearCode}${deptCode} (${div})`,
+                                name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
+                            });
+                        });
+                    }
+                    break;
+                case 'Mechanical Engineering':
+                    deptCode = 'ME';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Information Technology':
+                    deptCode = 'IT';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Electronics & Communication':
+                    deptCode = 'EJ';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Electrical Engineering':
+                    deptCode = 'EE';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Civil Engineering':
+                    deptCode = 'CE';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+                case 'Artificial Intelligence':
+                    deptCode = 'AI';
+                    options.push({
+                        code: `${yearCode}${deptCode}`,
+                        name: `${yearCode}${deptCode} - ${yearCode} ${department.value}`
+                    });
+                    break;
+            }
+
+            // Add options to select
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.code;
+                optionElement.textContent = option.name;
+                classSelect.appendChild(optionElement);
+            });
+        }
+
+
+
+        // Function to generate a secure random password
+        function generatePassword() {
+            const length = 8;
+            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let password = '';
+            // Add at least one uppercase letter
+            password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
+            // Add at least one lowercase letter
+            password += 'abcdefghijklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 26));
+            // Add at least one number
+            password += '0123456789'.charAt(Math.floor(Math.random() * 10));
+            // Add at least one special character
+            password += '!@#$%^&*'.charAt(Math.floor(Math.random() * 8));
+            // Fill the rest with random characters
+            for (let i = password.length; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            // Shuffle the password
+            return password.split('').sort(() => Math.random() - 0.5).join('');
+        }
+
+        // Function to generate and set passwords for all students
+        async function generateStudentPasswords() {
+            console.log('Starting password generation...');
+            
+            try {
+                const snapshot = await firebase.database().ref('students').once('value');
+                const students = snapshot.val();
+                
+                if (!students) {
+                    throw new Error('No students found in database');
+                }
+
+                const updates = {};
+                const passwordList = [];
+                let studentCount = 0;
+
+                // Generate and set password for each student
+                Object.entries(students).forEach(([id, student]) => {
+                    const password = generatePassword();
+                    updates[`students/${id}/password`] = password;
+                    passwordList.push({
+                        rollNo: student.rollNo || '',
+                        name: (student.firstName || '') + ' ' + (student.lastName || ''),
+                        password: password
+                    });
+                    studentCount++;
+                });
+
+                console.log(`Generated passwords for ${studentCount} students`);
+
+                // Update all passwords in Firebase
+                console.log('Updating passwords in Firebase...');
+                await firebase.database().ref().update(updates);
+                console.log('Firebase update completed');
+
+                // Create CSV content
+                let csvContent = 'Roll No,Name,Password\n';
+                passwordList.forEach(student => {
+                    csvContent += `${student.rollNo},"${student.name}",${student.password}\n`;
+                });
+
+                // Download CSV file
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'student_passwords.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                alert(`Passwords generated and saved successfully for ${studentCount} students! Downloading password list...`);
+
+            } catch (error) {
+                console.error('Error in generateStudentPasswords:', error);
+                throw error; // Re-throw to be handled by button click handler
+            }
+        }
+
+        // Add button to generate passwords (ADMIN ONLY)
+        const actionButtons = document.querySelector('.header-actions');
+        if (actionButtons) {
+            // Check if current user is admin
+            const isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
+            
+            if (isAdminLoggedIn === 'true') {
+                const generatePasswordsButton = document.createElement('button');
+                generatePasswordsButton.className = 'btn btn-secondary';
+                generatePasswordsButton.innerHTML = '<i class="fas fa-key"></i> Generate Student Passwords';
+                generatePasswordsButton.title = 'Generate random passwords for all students (Admin Only)';
+                
+                generatePasswordsButton.onclick = async function() {
+                    // Show confirmation first
+                    if (!confirm('This will generate new passwords for ALL students and download a CSV file with the passwords.\n\nAre you sure you want to continue?')) {
+                        return;
+                    }
+                    
+                    // Show loading state
+                    generatePasswordsButton.disabled = true;
+                    generatePasswordsButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                    
+                    try {
+                        await generateStudentPasswords();
+                    } catch (error) {
+                        console.error('Password generation failed:', error);
+                        if (error.code === 'PERMISSION_DENIED') {
+                            alert('Permission denied: Only administrators can generate student passwords.');
+                        } else {
+                            alert('Error generating passwords: ' + error.message);
+                        }
+                    } finally {
+                        // Reset button state
+                        generatePasswordsButton.disabled = false;
+                        generatePasswordsButton.innerHTML = '<i class="fas fa-key"></i> Generate Student Passwords';
+                    }
+                };
+                
+                actionButtons.appendChild(generatePasswordsButton);
+            } else {
+                console.log('Generate Passwords button hidden - User is not admin');
+            }
+        }
+        
+        // Function to toggle select all checkboxes
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllStudents');
+            const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+            
+            studentCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            updateBulkDeleteButton();
+        }
+        
+        // Function to update bulk delete button visibility
+        function updateBulkDeleteButton() {
+            const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            const selectAllCheckbox = document.getElementById('selectAllStudents');
+            
+            if (selectedCheckboxes.length > 0) {
+                bulkDeleteBtn.style.display = 'inline-flex';
+                bulkDeleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Delete Selected (${selectedCheckboxes.length})`;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+            
+            // Update select all checkbox state
+            const allCheckboxes = document.querySelectorAll('.student-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+            
+            if (checkedCheckboxes.length === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (checkedCheckboxes.length === allCheckboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
+        }
+        
+        // Function to bulk delete selected students
+        async function bulkDeleteStudents() {
+            console.log('Bulk delete function called');
+            const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+            console.log('Selected checkboxes:', selectedCheckboxes.length);
+            
+            if (selectedCheckboxes.length === 0) {
+                alert('Please select students to delete');
+                return;
+            }
+            
+            const studentIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+            console.log('Student IDs to delete:', studentIds);
+            const confirmMessage = `Are you sure you want to delete ${studentIds.length} selected student(s)? This action cannot be undone.`;
+            
+            if (!confirm(confirmMessage)) {
+                console.log('User cancelled deletion');
+                return;
+            }
+            
+            console.log('Starting bulk delete process...');
+            
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            const originalText = bulkDeleteBtn.innerHTML;
+            
+            try {
+                // Disable button and show loading
+                bulkDeleteBtn.disabled = true;
+                bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                
+                // Delete students one by one
+                let successCount = 0;
+                let errorCount = 0;
+                
+                console.log('Firebase database reference:', db);
+                
+                // Use Promise.all to delete all students
+                const deletePromises = studentIds.map(studentId => {
+                    return new Promise((resolve) => {
+                        console.log('Attempting to delete student:', studentId);
+                        db.ref('students/' + studentId).remove((error) => {
+                            if (error) {
+                                console.error('Error deleting student:', studentId, error);
+                                errorCount++;
+                            } else {
+                                console.log('Successfully deleted student:', studentId);
+                                successCount++;
+                            }
+                            resolve();
+                        });
+                    });
+                });
+                
+                // Wait for all deletions to complete
+                await Promise.all(deletePromises);
+                
+                // Show result message
+                if (errorCount === 0) {
+                    alert(`Successfully deleted ${successCount} student(s)`);
+                } else {
+                    alert(`Deleted ${successCount} student(s). Failed to delete ${errorCount} student(s).`);
+                }
+                
+                // Reload students list
+                await loadStudents();
+                
+                // Reset checkboxes
+                document.getElementById('selectAllStudents').checked = false;
+                updateBulkDeleteButton();
+                
+            } catch (error) {
+                console.error('Error in bulk delete:', error);
+                alert('Error deleting students. Please try again.');
+            } finally {
+                // Reset button state
+                bulkDeleteBtn.disabled = false;
+                bulkDeleteBtn.innerHTML = originalText;
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --bg-light: #F3F4F6;
+            --white: #FFFFFF;
+            --danger: #EF4444;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding: 40px 0;
+            line-height: 1.6;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%),
+                linear-gradient(-45deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+            z-index: -1;
+        }
+
+        /* Add animated shapes in the background */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 30%);
+            animation: float 15s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05),
+                       0 0 100px rgba(99, 102, 241, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1),
+                       0 0 120px rgba(99, 102, 241, 0.15);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .section-title i {
+            font-size: 1.8rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn i {
+            font-size: 1.2rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #0EA271;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: var(--white);
+        }
+
+        .student-list {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05),
+                       0 0 100px rgba(99, 102, 241, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .student-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .bulk-delete-btn {
+            background: #dc2626;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .bulk-delete-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+        
+        .bulk-delete-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .student-list-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .student-list-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .student-list-title i {
+            font-size: 1.8rem;
+        }
+
+        .import-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .import-btn:hover {
+            background: #0EA271;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .filter-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            flex: 1;
+            border: none;
+            padding: 8px 12px;
+            font-size: 16px;
+            background: transparent;
+            color: var(--text-dark);
+        }
+
+        .search-container input::placeholder {
+            color: var(--text-light);
+        }
+
+        .search-container i {
+            color: var(--text-light);
+            font-size: 18px;
+        }
+
+        .student-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 16px;
+            text-align: left;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .student-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .student-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .student-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 4px;
+        }
+
+        .edit-btn {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .edit-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .student-list-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .import-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filter-container {
+                grid-template-columns: 1fr;
+            }
+
+            .action-btn {
+                width: 100%;
+                margin: 4px 0;
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                margin: 0 -10px;
+                width: calc(100% + 20px);
+                overflow-x: auto;
+            }
+
+            .student-table {
+                min-width: 800px;
+            }
+
+            .student-table th,
+            .student-table td {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .action-buttons button {
+                width: 100%;
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .filter-section {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            /* Make modal responsive */
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .modal-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .modal-body {
+                padding: 15px 0;
+            }
+
+            /* Improve touch targets */
+            select, input, button {
+                min-height: 44px;
+            }
+
+            .checkbox-label {
+                padding: 10px;
+            }
+
+            /* Fix table scrolling */
+            .table-wrapper {
+                position: relative;
+                margin: 0 -10px;
+                padding: 0 10px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 15px;
+                background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+                pointer-events: none;
+            }
+
+            /* Improve filter visibility */
+            .filter-group {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .filter-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+
+            /* Make import section more compact */
+            .import-section {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .import-btn {
+                position: static;
+                transform: none;
+                width: 100%;
+            }
+
+            /* Add back to dashboard button */
+            .back-button {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+
+            .back-button i {
+                font-size: 20px;
+            }
+        }
+
+        /* Small screens */
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .modal-content {
+                padding: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Add floating back button */
+        .back-to-dashboard {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-dashboard {
+                display: flex;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+                cursor: pointer;
+            }
+
+            .back-to-dashboard i {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="page-title">
+                <i class="fas fa-user-graduate"></i>
+                Student Management
+            </h1>
+            <div class="header-actions">
+                
+                
+                <button class="btn btn-secondary" onclick="exportToExcel()">
+                    <i class="fas fa-file-export"></i>
+                    Export to Excel
+                </button>
+                <button class="btn btn-secondary" onclick="generateStudentPasswords()">
+                    <i class="fas fa-key"></i>
+                    Generate Passwords
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <h2 class="section-title">
+                <i class="fas fa-user-plus"></i>
+                Add New Student
+            </h2>
+            <form id="addStudentForm" onsubmit="addStudent(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rollNo">Roll Number</label>
+                        <input type="text" id="rollNo" name="rollNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department" required onchange="handleDepartmentChange()">
+                            <option value="">Select Department</option>
+                            <option value="Computer Technology">Computer Technology</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <select id="year" name="year" required onchange="updateClassOptions()">
+                            <option value="">Select Year</option>
+                            <option value="FY">First Year (FY)</option>
+                            <option value="SY">Second Year (SY)</option>
+                            <option value="TY">Third Year (TY)</option>
+                            <option value="BE">Fourth Year (BE)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="divisionGroup" style="display: none;">
+                        <label>Division (For Computer Engineering)</label>
+                        <div class="division-checkboxes">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="division" value="A" onchange="updateClassOptions()">
+                                <span class="checkbox-text">Division A</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="division" value="B" onchange="updateClassOptions()">
+                                <span class="checkbox-text">Division B</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="division" value="C" onchange="updateClassOptions()">
+                                <span class="checkbox-text">Division C</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentClass">Class</label>
+                        <select id="studentClass" name="studentClass" required>
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Student
+                </button>
+            </form>
+        </div>
+
+        <div class="student-list">
+            <div class="student-list-header">
+                <div class="student-list-title">
+                    <i class="fas fa-users"></i>
+                    <span>Student List</span>
+                </div>
+                <div class="header-actions">
+                    <button id="bulkDeleteBtn" class="bulk-delete-btn" onclick="bulkDeleteStudents()" style="display: none;">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Selected
+                    </button>
+                    <a href="import-students.html" class="import-btn">
+                        <i class="fas fa-file-import"></i>
+                        Import Students
+                    </a>
+                </div>
+            </div>
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="departmentFilter">
+                        <i class="fas fa-building"></i>
+                        Filter by Department
+                    </label>
+                    <select id="departmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="Computer Technology">Computer Technology</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="classFilter">
+                        <i class="fas fa-graduation-cap"></i>
+                        Filter by Year
+                    </label>
+                    <select id="classFilter">
+                        <option value="">All Years</option>
+                        <option value="FY">First Year (FY)</option>
+                        <option value="SY">Second Year (SY)</option>
+                        <option value="TY">Third Year (TY)</option>
+                        <option value="BE">Final Year (BE)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+
+                        <i class="fas fa-calendar-alt"></i>
+
+                    </label>
+
+
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </select>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search students by name, roll number, or email...">
+            </div>
+
+            <div class="student-table-container">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="selectAllStudents" onchange="toggleSelectAll()" title="Select All">
+                            </th>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Year</th>
+
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        <!-- Student rows will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div id="editStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="form-section-title">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Student
+                </h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId">
+                <!-- Basic Info -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editRollNo">Roll Number</label>
+                        <input type="text" id="editRollNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFirstName">First Name</label>
+                        <input type="text" id="editFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLastName">Last Name</label>
+                        <input type="text" id="editLastName" required>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone">Phone Number</label>
+                        <input type="tel" id="editPhone" required>
+                    </div>
+                </div>
+
+                <!-- Academic Info -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editDepartment">Department</label>
+                        <select id="editDepartment" required onchange="handleEditDepartmentChange()">
+                            <option value="">Select Department</option>
+                            <option value="Computer Technology">Computer Technology</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Telecommunication">Electronics & Telecommunication</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editYear">Year</label>
+                        <select id="editYear" required onchange="updateEditClassOptions()">
+                            <option value="">Select Year</option>
+                            <option value="FY">First Year (FY)</option>
+                            <option value="SY">Second Year (SY)</option>
+                            <option value="TY">Third Year (TY)</option>
+                            <option value="BE">Fourth Year (BE)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Division Selection -->
+                <div class="form-row">
+                    <div class="form-group" id="editDivisionGroup" style="display: none;">
+                        <label>Division (For Computer Engineering)</label>
+                        <div class="division-checkboxes">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="editDivision" value="A" onchange="updateEditClassOptions()">
+                                <span class="checkbox-text">Division A</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="editDivision" value="B" onchange="updateEditClassOptions()">
+                                <span class="checkbox-text">Division B</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="editDivision" value="C" onchange="updateEditClassOptions()">
+                                <span class="checkbox-text">Division C</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Selection -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStudentClass">Class</label>
+                        <select id="editStudentClass" required>
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="editSubmitBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Save Changes</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Modal Styles -->
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+</body>
+</html>

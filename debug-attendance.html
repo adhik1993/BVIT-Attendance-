@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Attendance - BVIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .debug-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .debug-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .save-btn {
+            background: #2196F3;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        .console-output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .student-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .attendance-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .present {
+            background: #4CAF50;
+            color: white;
+        }
+        .absent {
+            background: #f44336;
+            color: white;
+        }
+        .active {
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🐛 Attendance Debug Tool</h1>
+        <p>This page will help debug the attendance saving issue.</p>
+        
+        <div class="debug-section">
+            <h3>📋 Console Output</h3>
+            <div id="consoleOutput" class="console-output">Console messages will appear here...\n</div>
+            <button onclick="clearConsole()" class="test-button">Clear Console</button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🎯 Test Students</h3>
+            <div class="student-row">
+                <span>Student 1 (ID: test-student-1)</span>
+                <button class="attendance-btn present" onclick="markAttendance('test-student-1', true)">Present</button>
+                <button class="attendance-btn absent" onclick="markAttendance('test-student-1', false)">Absent</button>
+            </div>
+            <div class="student-row">
+                <span>Student 2 (ID: test-student-2)</span>
+                <button class="attendance-btn present" onclick="markAttendance('test-student-2', true)">Present</button>
+                <button class="attendance-btn absent" onclick="markAttendance('test-student-2', false)">Absent</button>
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>💾 Save Controls</h3>
+            <button id="saveBtn" class="save-btn" onclick="saveAttendance()">Save Attendance</button>
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Click Present/Absent buttons above</li>
+                <li>Watch console output for debug messages</li>
+                <li>Save button should appear when you make changes</li>
+                <li>Check if attendance saves automatically (it shouldn't!)</li>
+            </ol>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔍 Local Attendance Data</h3>
+            <div id="localAttendanceDisplay">No local attendance data</div>
+            <button onclick="showLocalAttendance()" class="test-button">Refresh Local Data</button>
+        </div>
+    </div>
+
+    <script>
+        // Object to store local attendance changes
+        let localAttendance = {};
+        
+        // Console logging function
+        function logToConsole(message) {
+            const consoleOutput = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.textContent += `[${timestamp}] ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            console.log(message);
+        }
+        
+        // Clear console
+        function clearConsole() {
+            document.getElementById('consoleOutput').textContent = 'Console cleared...\n';
+        }
+        
+        // Function to mark attendance (only updates UI locally)
+        function markAttendance(studentId, isPresent) {
+            logToConsole(`🎯 markAttendance called: ${studentId} = ${isPresent ? 'Present' : 'Absent'}`);
+            logToConsole('⚠️ This should NOT save to Firebase automatically');
+            
+            // Store attendance locally
+            localAttendance[studentId] = isPresent;
+            logToConsole(`📝 Local attendance updated: ${JSON.stringify(localAttendance)}`);
+            
+            // Update UI
+            updateButtonStates(studentId, isPresent);
+            
+            // Show save button
+            showSaveButton();
+            
+            // Update local attendance display
+            showLocalAttendance();
+        }
+        
+        // Update button visual states
+        function updateButtonStates(studentId, isPresent) {
+            const studentRow = document.querySelector(`[onclick*="${studentId}"]`).closest('.student-row');
+            const presentBtn = studentRow.querySelector('.present');
+            const absentBtn = studentRow.querySelector('.absent');
+            
+            if (isPresent) {
+                presentBtn.classList.add('active');
+                absentBtn.classList.remove('active');
+            } else {
+                presentBtn.classList.remove('active');
+                absentBtn.classList.add('active');
+            }
+        }
+        
+        // Function to show save button
+        function showSaveButton() {
+            logToConsole('🟢 SHOWING SAVE BUTTON - Attendance changes detected');
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.style.display = 'inline-block';
+                logToConsole('✅ Save button is now visible');
+            } else {
+                logToConsole('❌ Save button not found in DOM');
+            }
+        }
+        
+        // Function to hide save button
+        function hideSaveButton() {
+            logToConsole('🔴 HIDING SAVE BUTTON - No changes or after save');
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.style.display = 'none';
+                logToConsole('✅ Save button is now hidden');
+            } else {
+                logToConsole('❌ Save button not found in DOM');
+            }
+        }
+        
+        // Function to save attendance
+        function saveAttendance() {
+            logToConsole('=== 🔥 SAVE ATTENDANCE FUNCTION CALLED ===');
+            logToConsole('This function should ONLY be called when Save button is clicked');
+            
+            // Check if there are any attendance changes to save
+            if (Object.keys(localAttendance).length === 0) {
+                logToConsole('⚠️ No attendance changes to save');
+                alert('No attendance changes to save');
+                return;
+            }
+            
+            logToConsole(`💾 Saving attendance data: ${JSON.stringify(localAttendance)}`);
+            
+            // Simulate Firebase save (without actually saving)
+            logToConsole('🔥 SIMULATING FIREBASE SAVE (not actually saving)');
+            logToConsole('In real system, this would save to Firebase');
+            
+            // Clear local attendance after "successful save"
+            localAttendance = {};
+            logToConsole('🧹 Local attendance cleared after save');
+            
+            // Hide save button
+            hideSaveButton();
+            
+            // Update display
+            showLocalAttendance();
+            
+            alert('Attendance saved successfully! (simulated)');
+        }
+        
+        // Show local attendance data
+        function showLocalAttendance() {
+            const display = document.getElementById('localAttendanceDisplay');
+            if (Object.keys(localAttendance).length === 0) {
+                display.textContent = 'No local attendance data';
+                display.style.background = '#f0f0f0';
+            } else {
+                display.textContent = JSON.stringify(localAttendance, null, 2);
+                display.style.background = '#e8f5e8';
+                display.style.fontFamily = 'monospace';
+                display.style.padding = '10px';
+                display.style.borderRadius = '5px';
+            }
+        }
+        
+        // Initialize
+        logToConsole('🚀 Debug page loaded');
+        logToConsole('Click Present/Absent buttons to test attendance marking');
+        showLocalAttendance();
+    </script>
+</body>
+</html>

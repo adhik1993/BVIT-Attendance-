@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Applications - Clerk Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f5f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --lighter: #F9FAFB;
+            --border: #E5E7EB;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --sidebar-width: 280px;
+            --white: #FFFFFF;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--darker);
+            min-height: 100vh;
+            padding: 1.5rem;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .nav-link.active {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-section {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #e74c3c;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .applications-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .applications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .applications-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .applications-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .applications-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .applications-table th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .applications-table th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .applications-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e8ed;
+            color: #555;
+        }
+
+        .applications-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .no-applications {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-applications i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .no-applications h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .applications-table {
+                font-size: 0.8rem;
+            }
+
+            .applications-table th,
+            .applications-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Clerk Panel</h2>
+            <p id="clerkName">Welcome, Clerk</p>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="clerk-panel.html" class="nav-link" id="dashboardNav">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Certificate Management</div>
+                <a href="bonafide-applications.html" class="nav-link active" id="viewApplicationsNav">
+                    <i class="fas fa-list-alt"></i>
+                    View Applications
+                </a>
+                <a href="approve-certificates.html" class="nav-link" id="approveCertificatesNav">
+                    <i class="fas fa-check-circle"></i>
+                    Approve Certificates
+                </a>
+                <a href="print-certificates.html" class="nav-link" id="printCertificatesNav">
+                    <i class="fas fa-print"></i>
+                    Print Certificates
+                </a>
+                <a href="certificate-history.html" class="nav-link" id="certificateHistoryNav">
+                    <i class="fas fa-history"></i>
+                    Certificate History
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-link" id="changePasswordNav" onclick="alert('Redirecting to clerk panel for password change')">
+                    <i class="fas fa-key"></i>
+                    Change Password
+                </a>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <a href="#" class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-list-alt"></i> View Applications</h1>
+            <p>Manage and review all bonafide certificate applications</p>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter" onchange="filterApplications()">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="departmentFilter">Department</label>
+                    <select id="departmentFilter" onchange="filterApplications()">
+                        <option value="all">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Electrical">Electrical</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="dateFilter">Date Range</label>
+                    <input type="date" id="dateFilter" onchange="filterApplications()">
+                </div>
+
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="refresh-btn" onclick="loadApplications()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Container -->
+        <div class="applications-container">
+            <div class="applications-header">
+                <h2>Bonafide Certificate Applications</h2>
+                <div class="applications-count" id="applicationsCount">Loading...</div>
+            </div>
+
+            <div id="applicationsContent">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading applications...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('isClerkLoggedIn')) {
+            window.location.href = 'clerk-login.html';
+        }
+
+        // Wait for Firebase to initialize
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    resolve();
+                } else {
+                    setTimeout(() => {
+                        waitForFirebase().then(resolve);
+                    }, 100);
+                }
+            });
+        }
+
+        // Get clerk data
+        const clerkData = JSON.parse(sessionStorage.getItem('clerkData') || '{}');
+        const clerkKey = sessionStorage.getItem('clerkKey');
+
+        // Update clerk name in header
+        const clerkNameElement = document.getElementById('clerkName');
+        if (clerkNameElement) {
+            clerkNameElement.textContent = `Welcome, ${clerkData.firstName || 'Clerk'} ${clerkData.lastName || ''}`;
+        }
+
+        // Global variables
+        let allApplications = [];
+        let filteredApplications = [];
+
+        // Sample data for demonstration
+        const sampleApplications = [
+            {
+                id: 'APP001',
+                studentId: 'CS2021001',
+                studentName: 'Rahul Sharma',
+                rollNo: 'CS21001',
+                department: 'Computer Science',
+                year: '3rd Year',
+                purpose: 'Bank Account Opening',
+                applicationDate: Date.now() - 86400000 * 2, // 2 days ago
+                status: 'pending',
+                contactNumber: '9876543210',
+                email: 'rahul.sharma@college.edu'
+            },
+            {
+                id: 'APP002',
+                studentId: 'EC2020015',
+                studentName: 'Priya Patel',
+                rollNo: 'EC20015',
+                department: 'Electronics',
+                year: '4th Year',
+                purpose: 'Scholarship Application',
+                applicationDate: Date.now() - 86400000 * 1, // 1 day ago
+                status: 'pending',
+                contactNumber: '9876543211',
+                email: 'priya.patel@college.edu'
+            },
+            {
+                id: 'APP003',
+                studentId: 'ME2021025',
+                studentName: 'Amit Kumar',
+                rollNo: 'ME21025',
+                department: 'Mechanical',
+                year: '2nd Year',
+                purpose: 'Internship Application',
+                applicationDate: Date.now() - 86400000 * 3, // 3 days ago
+                status: 'approved',
+                contactNumber: '9876543212',
+                email: 'amit.kumar@college.edu',
+                processedDate: Date.now() - 86400000 * 1,
+                processedBy: 'Clerk Admin'
+            },
+            {
+                id: 'APP004',
+                studentId: 'CV2020008',
+                studentName: 'Sneha Joshi',
+                rollNo: 'CV20008',
+                department: 'Civil',
+                year: '4th Year',
+                purpose: 'Job Application',
+                applicationDate: Date.now() - 86400000 * 5, // 5 days ago
+                status: 'rejected',
+                contactNumber: '9876543213',
+                email: 'sneha.joshi@college.edu',
+                processedDate: Date.now() - 86400000 * 2,
+                processedBy: 'Clerk Admin',
+                rejectionReason: 'Incomplete documents'
+            },
+            {
+                id: 'APP005',
+                studentId: 'EE2021012',
+                studentName: 'Vikash Singh',
+                rollNo: 'EE21012',
+                department: 'Electrical',
+                year: '3rd Year',
+                purpose: 'Higher Studies',
+                applicationDate: Date.now() - 86400000 * 1, // 1 day ago
+                status: 'pending',
+                contactNumber: '9876543214',
+                email: 'vikash.singh@college.edu'
+            }
+        ];
+
+        // Load applications
+        async function loadApplications() {
+            try {
+                await waitForFirebase();
+                
+                // Try to load from Firebase
+                const snapshot = await firebase.database().ref('bonafideApplications').once('value');
+                const applications = snapshot.val();
+                
+                if (applications && Object.keys(applications).length > 0) {
+                    // Convert Firebase object to array
+                    allApplications = Object.keys(applications).map(key => ({
+                        id: key,
+                        ...applications[key]
+                    }));
+                } else {
+                    // Use sample data if no real data
+                    allApplications = sampleApplications;
+                }
+                
+                filteredApplications = [...allApplications];
+                displayApplications();
+                updateCount();
+                
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                // Fallback to sample data
+                allApplications = sampleApplications;
+                filteredApplications = [...allApplications];
+                displayApplications();
+                updateCount();
+            }
+        }
+
+        // Display applications
+        function displayApplications() {
+            const content = document.getElementById('applicationsContent');
+            
+            if (filteredApplications.length === 0) {
+                content.innerHTML = `
+                    <div class="no-applications">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Applications Found</h3>
+                        <p>No bonafide certificate applications match your current filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHTML = `
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Application ID</th>
+                            <th>Student Details</th>
+                            <th>Department</th>
+                            <th>Purpose</th>
+                            <th>Application Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredApplications.map(app => `
+                            <tr>
+                                <td><strong>${app.id}</strong></td>
+                                <td>
+                                    <div><strong>${app.studentName}</strong></div>
+                                    <div style="font-size: 0.8rem; color: #666;">
+                                        Roll: ${app.rollNo} | ${app.year}
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: #666;">
+                                        📞 ${app.contactNumber}
+                                    </div>
+                                </td>
+                                <td>${app.department}</td>
+                                <td>${app.purpose}</td>
+                                <td>${formatDate(app.applicationDate)}</td>
+                                <td>
+                                    <span class="status-badge status-${app.status}">
+                                        ${app.status.toUpperCase()}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-view" onclick="viewApplication('${app.id}')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        ${app.status === 'pending' ? `
+                                            <button class="btn btn-approve" onclick="approveApplication('${app.id}')">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                            <button class="btn btn-reject" onclick="rejectApplication('${app.id}')">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            content.innerHTML = tableHTML;
+        }
+
+        // Filter applications
+        function filterApplications() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            filteredApplications = allApplications.filter(app => {
+                let matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+                let matchesDepartment = departmentFilter === 'all' || app.department === departmentFilter;
+                let matchesDate = true;
+                
+                if (dateFilter) {
+                    const filterDate = new Date(dateFilter);
+                    const appDate = new Date(app.applicationDate);
+                    matchesDate = appDate.toDateString() === filterDate.toDateString();
+                }
+                
+                return matchesStatus && matchesDepartment && matchesDate;
+            });
+
+            displayApplications();
+            updateCount();
+        }
+
+        // Update applications count
+        function updateCount() {
+            const countElement = document.getElementById('applicationsCount');
+            countElement.textContent = `${filteredApplications.length} Applications`;
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // View application details
+        function viewApplication(applicationId) {
+            const app = allApplications.find(a => a.id === applicationId);
+            if (app) {
+                alert(`Application Details:\n\nID: ${app.id}\nStudent: ${app.studentName}\nRoll No: ${app.rollNo}\nDepartment: ${app.department}\nYear: ${app.year}\nPurpose: ${app.purpose}\nContact: ${app.contactNumber}\nEmail: ${app.email}\nStatus: ${app.status.toUpperCase()}\nApplied: ${formatDate(app.applicationDate)}`);
+            }
+        }
+
+        // Approve application
+        async function approveApplication(applicationId) {
+            if (confirm('Are you sure you want to approve this application?')) {
+                try {
+                    await waitForFirebase();
+                    
+                    // Update in Firebase (if connected)
+                    await firebase.database().ref(`bonafideApplications/${applicationId}`).update({
+                        status: 'approved',
+                        processedDate: firebase.database.ServerValue.TIMESTAMP,
+                        processedBy: `${clerkData.firstName} ${clerkData.lastName}`
+                    });
+                    
+                    // Update local data
+                    const app = allApplications.find(a => a.id === applicationId);
+                    if (app) {
+                        app.status = 'approved';
+                        app.processedDate = Date.now();
+                        app.processedBy = `${clerkData.firstName} ${clerkData.lastName}`;
+                    }
+                    
+                    alert('Application approved successfully!');
+                    filterApplications(); // Refresh display
+                    
+                } catch (error) {
+                    console.error('Error approving application:', error);
+                    // Update local data anyway for demo
+                    const app = allApplications.find(a => a.id === applicationId);
+                    if (app) {
+                        app.status = 'approved';
+                        app.processedDate = Date.now();
+                        app.processedBy = `${clerkData.firstName} ${clerkData.lastName}`;
+                    }
+                    alert('Application approved successfully!');
+                    filterApplications();
+                }
+            }
+        }
+
+        // Reject application
+        async function rejectApplication(applicationId) {
+            const reason = prompt('Please enter rejection reason:');
+            if (reason && confirm('Are you sure you want to reject this application?')) {
+                try {
+                    await waitForFirebase();
+                    
+                    // Update in Firebase (if connected)
+                    await firebase.database().ref(`bonafideApplications/${applicationId}`).update({
+                        status: 'rejected',
+                        processedDate: firebase.database.ServerValue.TIMESTAMP,
+                        processedBy: `${clerkData.firstName} ${clerkData.lastName}`,
+                        rejectionReason: reason
+                    });
+                    
+                    // Update local data
+                    const app = allApplications.find(a => a.id === applicationId);
+                    if (app) {
+                        app.status = 'rejected';
+                        app.processedDate = Date.now();
+                        app.processedBy = `${clerkData.firstName} ${clerkData.lastName}`;
+                        app.rejectionReason = reason;
+                    }
+                    
+                    alert('Application rejected successfully!');
+                    filterApplications(); // Refresh display
+                    
+                } catch (error) {
+                    console.error('Error rejecting application:', error);
+                    // Update local data anyway for demo
+                    const app = allApplications.find(a => a.id === applicationId);
+                    if (app) {
+                        app.status = 'rejected';
+                        app.processedDate = Date.now();
+                        app.processedBy = `${clerkData.firstName} ${clerkData.lastName}`;
+                        app.rejectionReason = reason;
+                    }
+                    alert('Application rejected successfully!');
+                    filterApplications();
+                }
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('isClerkLoggedIn');
+                sessionStorage.removeItem('clerkKey');
+                sessionStorage.removeItem('clerkData');
+                window.location.href = 'clerk-login.html';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApplications();
+        });
+    </script>
+</body>
+</html>

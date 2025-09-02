@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Attendance Behavior</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .student-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .present {
+            background-color: #e8f5e8;
+            color: #2d5a2d;
+        }
+        .present.active {
+            background-color: #4caf50;
+            color: white;
+        }
+        .absent {
+            background-color: #ffeaea;
+            color: #8b0000;
+        }
+        .absent.active {
+            background-color: #f44336;
+            color: white;
+        }
+        .save-btn {
+            background-color: #2196f3;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .save-btn:hover {
+            background-color: #1976d2;
+        }
+        .log {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Attendance Auto-Save Behavior</h1>
+    
+    <div class="test-section">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Click Present/Absent buttons for students</li>
+            <li>Check the log below to see what functions are called</li>
+            <li>Verify that NO Firebase save operations happen until you click "Save Attendance"</li>
+            <li>The Save button should only appear when you make changes</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Students:</h2>
+        
+        <div class="student-row">
+            <span>Student 1 (ID: 001)</span>
+            <button class="btn present" onclick="markAttendance('001', true)">Present</button>
+            <button class="btn absent" onclick="markAttendance('001', false)">Absent</button>
+        </div>
+        
+        <div class="student-row">
+            <span>Student 2 (ID: 002)</span>
+            <button class="btn present" onclick="markAttendance('002', true)">Present</button>
+            <button class="btn absent" onclick="markAttendance('002', false)">Absent</button>
+        </div>
+        
+        <div class="student-row">
+            <span>Student 3 (ID: 003)</span>
+            <button class="btn present" onclick="markAttendance('003', true)">Present</button>
+            <button class="btn absent" onclick="markAttendance('003', false)">Absent</button>
+        </div>
+
+        <button type="button" class="btn save-btn hidden" id="saveBtn" onclick="saveAttendance()">
+            Save Attendance
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>Activity Log:</h2>
+        <div id="log" class="log">Ready to test...\n</div>
+        <button onclick="clearLog()" class="btn">Clear Log</button>
+    </div>
+
+    <script>
+        // Object to store local attendance changes
+        let localAttendance = {};
+        
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = 'Log cleared...\n';
+        }
+        
+        // Function to mark attendance (only updates UI locally)
+        function markAttendance(studentId, isPresent) {
+            log(`🔄 markAttendance called: studentId=${studentId}, isPresent=${isPresent}`);
+            log(`   ➡️ This should NOT save to Firebase automatically`);
+            
+            // Store attendance locally
+            localAttendance[studentId] = isPresent;
+            log(`   📝 Local attendance updated: ${JSON.stringify(localAttendance)}`);
+            
+            // Update UI immediately
+            const presentBtn = document.querySelector(`button.present[onclick*="${studentId}"]`);
+            const absentBtn = document.querySelector(`button.absent[onclick*="${studentId}"]`);
+            
+            if (presentBtn && absentBtn) {
+                if (isPresent) {
+                    presentBtn.classList.add('active');
+                    absentBtn.classList.remove('active');
+                } else {
+                    presentBtn.classList.remove('active');
+                    absentBtn.classList.add('active');
+                }
+                log(`   🎨 UI updated for student ${studentId}`);
+            }
+            
+            // Show save button if there are changes
+            showSaveButton();
+        }
+        
+        function showSaveButton() {
+            log(`👁️ showSaveButton called`);
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.classList.remove('hidden');
+                log(`   ✅ Save button is now visible`);
+            }
+        }
+        
+        function hideSaveButton() {
+            log(`👁️ hideSaveButton called`);
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.classList.add('hidden');
+                log(`   ❌ Save button is now hidden`);
+            }
+        }
+        
+        function saveAttendance() {
+            log(`🔥 SAVE ATTENDANCE FUNCTION CALLED`);
+            log(`   ⚠️ This function should ONLY be called when Save button is clicked`);
+            
+            // Check if there are any attendance changes to save
+            if (Object.keys(localAttendance).length === 0) {
+                log(`   ❌ No attendance changes to save`);
+                alert('No attendance changes to save');
+                return;
+            }
+            
+            log(`   📊 Attendance data to save: ${JSON.stringify(localAttendance)}`);
+            log(`   🚫 SIMULATED Firebase save (not actually saving in test)`);
+            
+            // Simulate successful save
+            setTimeout(() => {
+                log(`   ✅ Simulated save completed successfully`);
+                
+                // Clear local attendance after successful save
+                localAttendance = {};
+                log(`   🧹 Local attendance cleared`);
+                
+                // Hide save button
+                hideSaveButton();
+                
+                alert('Test: Attendance would be saved now!');
+            }, 1000);
+        }
+        
+        log('🚀 Test page loaded and ready');
+    </script>
+</body>
+</html>

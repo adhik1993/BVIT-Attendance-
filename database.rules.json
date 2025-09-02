@@ -1,0 +1,140 @@
+{
+  "rules": {
+    "admins": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["email"],
+      "$uid": {
+        ".read": "auth != null && $uid === auth.uid",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    "teachers": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["email", "department", "firstName", "lastName"],
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
+        ".write": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
+        "initialPassword": {
+          ".write": true
+        },
+        "lastPasswordChange": {
+          ".write": true
+        },
+        ".validate": "newData.hasChildren(['firstName', 'lastName', 'email', 'phone'])",
+        "email": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$/)"
+        },
+        "phone": {
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9]{10}$/)"
+        }
+      }
+    },
+    "students": {
+      ".read": true,
+      ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || root.child('teachers').child(auth.uid).exists())",
+      ".indexOn": ["rollNo", "class", "department", "year"],
+      "$uid": {
+        ".validate": "newData.hasChildren(['firstName', 'lastName', 'rollNo', 'department', 'year'])",
+        "password": {
+          ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+        }
+      }
+    },
+    "attendance": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["date", "class", "department"]
+    },
+    "activities": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["timestamp", "type"]
+    },
+    "notifications": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["timestamp"],
+      "$notification": {
+        ".validate": "newData.hasChildren(['title', 'message', 'timestamp'])"
+      }
+    },
+    "notices": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+    "clerks": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["email", "clerkId", "firstName", "lastName"],
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
+        ".write": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
+        "initialPassword": {
+          ".write": true
+        },
+        "lastPasswordChange": {
+          ".write": true
+        }
+      }
+    },
+    "bonafideApplications": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["studentId", "status", "submissionDate", "processedDate"],
+      "$applicationId": {
+        ".validate": "newData.hasChildren(['studentId', 'studentName', 'submissionDate', 'status'])",
+        "studentId": {
+          ".validate": "newData.isString()"
+        },
+        "studentName": {
+          ".validate": "newData.isString()"
+        },
+        "status": {
+          ".validate": "newData.isString() && (newData.val() === 'pending' || newData.val() === 'approved' || newData.val() === 'rejected')"
+        },
+        "submissionDate": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    "applications": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["studentId", "status", "submissionDate", "type"]
+    },
+    "certificates": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["studentId", "certificateStatus", "approvedDate", "certificateType"],
+      "$certificateId": {
+        ".validate": "newData.hasChildren(['studentId', 'studentName', 'certificateType', 'certificateStatus'])",
+        "studentId": {
+          ".validate": "newData.isString()"
+        },
+        "studentName": {
+          ".validate": "newData.isString()"
+        },
+        "certificateStatus": {
+          ".validate": "newData.isString() && (newData.val() === 'ready_to_print' || newData.val() === 'printed' || newData.val() === 'issued')"
+        },
+        "certificateType": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    "printQueue": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["status", "priority", "createdDate"]
+    },
+    "certificateHistory": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["studentId", "issuedDate", "certificateType"]
+    },
+    ".read": false,
+    ".write": false
+  }
+} 

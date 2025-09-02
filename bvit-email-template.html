@@ -1,0 +1,110 @@
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+    
+    <!-- Header Section -->
+    <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 30px 20px; text-align: center;">
+        <div style="background-color: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 36px;">✅</span>
+        </div>
+        <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">
+            Attendance Submitted Successfully!
+        </h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">
+            BVIT Attendance Management System
+        </p>
+    </div>
+    
+    <!-- Greeting -->
+    <div style="padding: 30px 20px 20px;">
+        <p style="font-size: 18px; color: #333; margin: 0 0 20px;">
+            Dear <strong style="color: #4F46E5;">{{teacher_name}}</strong>,
+        </p>
+        <p style="font-size: 16px; color: #666; margin: 0 0 30px; line-height: 1.6;">
+            Your attendance has been successfully submitted to the BVIT system. Here are the complete details:
+        </p>
+    </div>
+    
+    <!-- Attendance Details Card -->
+    <div style="margin: 0 20px 20px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 25px; border-left: 5px solid #4F46E5;">
+        <h2 style="color: #4F46E5; margin: 0 0 20px; font-size: 20px; display: flex; align-items: center;">
+            📋 <span style="margin-left: 10px;">Attendance Details</span>
+        </h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 12px 0; color: #666; font-weight: 600; width: 40%;">📚 Subject:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500;">{{subject}}</td>
+            </tr>
+            <tr style="background-color: rgba(79, 70, 229, 0.05);">
+                <td style="padding: 12px 0; color: #666; font-weight: 600;">🏫 Class:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500;">{{class_name}}</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px 0; color: #666; font-weight: 600;">📅 Date:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500;">{{date}}</td>
+            </tr>
+            <tr style="background-color: rgba(79, 70, 229, 0.05);">
+                <td style="padding: 12px 0; color: #666; font-weight: 600;">🕒 Time:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500;">{{submission_time}}</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px 0; color: #666; font-weight: 600;">📝 Lecture Type:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500; text-transform: capitalize;">{{lecture_type}}</td>
+            </tr>
+            {{#batch}}
+            <tr style="background-color: rgba(79, 70, 229, 0.05);">
+                <td style="padding: 12px 0; color: #666; font-weight: 600;">👥 Batch:</td>
+                <td style="padding: 12px 0; color: #333; font-weight: 500;">{{batch}}</td>
+            </tr>
+            {{/batch}}
+        </table>
+    </div>
+    
+    <!-- Attendance Summary Card -->
+    <div style="margin: 0 20px 30px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 12px; padding: 25px; border-left: 5px solid #10B981;">
+        <h2 style="color: #059669; margin: 0 0 20px; font-size: 20px; display: flex; align-items: center;">
+            📊 <span style="margin-left: 10px;">Attendance Summary</span>
+        </h2>
+        
+        <!-- Attendance Stats -->
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; min-width: 120px; margin: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 24px; font-weight: bold; color: #10B981;">{{present_count}}</div>
+                <div style="font-size: 14px; color: #666; margin-top: 5px;">✅ Present</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; min-width: 120px; margin: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 24px; font-weight: bold; color: #EF4444;">{{absent_count}}</div>
+                <div style="font-size: 14px; color: #666; margin-top: 5px;">❌ Absent</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; min-width: 120px; margin: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 24px; font-weight: bold; color: #4F46E5;">{{total_students}}</div>
+                <div style="font-size: 14px; color: #666; margin-top: 5px;">📈 Total</div>
+            </div>
+        </div>
+        
+        <!-- Attendance Percentage -->
+        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 32px; font-weight: bold; color: #059669; margin-bottom: 10px;">
+                {{attendance_percentage}}%
+            </div>
+            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="background: linear-gradient(90deg, #10B981, #059669); height: 100%; width: {{attendance_percentage}}%; border-radius: 4px;"></div>
+            </div>
+            <div style="font-size: 14px; color: #666; margin-top: 10px;">Overall Attendance</div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div style="background: #f8fafc; padding: 30px 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+        <p style="color: #666; margin: 0 0 15px; font-size: 16px;">
+            Thank you for using BVIT Attendance Management System!
+        </p>
+        <div style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 12px 24px; border-radius: 25px; display: inline-block; font-weight: 600; margin-bottom: 15px;">
+            BVIT Administration
+        </div>
+        <p style="color: #999; font-size: 14px; margin: 0; line-height: 1.5;">
+            This is an automated notification from BVIT Attendance System.<br>
+            For any queries, please contact the administration office.
+        </p>
+    </div>
+    
+</div>

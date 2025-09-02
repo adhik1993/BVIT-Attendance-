@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Template - Proper Loading</title>
+</head>
+<body>
+    <h1>Firebase Loading Template</h1>
+    <div id="status">Loading Firebase...</div>
+    
+    <!-- STEP 1: Load Firebase SDK Loader (loads Firebase scripts dynamically) -->
+    <script src="firebase-loader.js"></script>
+    
+    <!-- STEP 2: Load Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        // STEP 3: Wait for Firebase to be ready and then use it
+        document.addEventListener('DOMContentLoaded', async function() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // Wait for Firebase SDK to load
+                await new Promise((resolve, reject) => {
+                    if (typeof firebase !== 'undefined') {
+                        resolve();
+                        return;
+                    }
+                    
+                    window.addEventListener('firebaseSDKReady', resolve);
+                    window.addEventListener('firebaseSDKError', (e) => reject(e.detail.error));
+                    
+                    // Timeout after 30 seconds
+                    setTimeout(() => reject('Firebase loading timeout'), 30000);
+                });
+                
+                statusDiv.innerHTML = 'Firebase SDK loaded! Initializing...';
+                
+                // Initialize Firebase
+                await window.waitForFirebase();
+                
+                statusDiv.innerHTML = 'Firebase initialized successfully!';
+                statusDiv.style.color = 'green';
+                
+                console.log('Firebase is ready to use!');
+                
+            } catch (error) {
+                console.error('Firebase initialization failed:', error);
+                statusDiv.innerHTML = `Firebase initialization failed: ${error}`;
+                statusDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

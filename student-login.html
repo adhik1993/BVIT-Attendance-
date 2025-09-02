@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVIT Attendance System - Student Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #F59E0B;
+            --primary-dark: #D97706;
+            --primary-light: rgba(245, 158, 11, 0.1);
+            --secondary: #4F46E5;
+            --accent: #10B981;
+            --danger: #EF4444;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --bg-light: #F3F4F6;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80') center/cover no-repeat;
+            background-attachment: fixed;
+            padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .login-header {
+            padding: 30px;
+            text-align: center;
+            background: white;
+        }
+
+        .login-header img {
+            width: 180px;
+            height: auto;
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+
+        .login-header h1 {
+            font-size: 26px;
+            color: #1F2937;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .login-header p {
+            color: #6B7280;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .login-form {
+            padding: 0 30px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 16px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus + i {
+            color: var(--primary);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .input-group input[type="password"] {
+            padding-right: 45px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login i {
+            font-size: 18px;
+        }
+
+        .error-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            font-size: 14px;
+            display: none;
+        }
+
+        .login-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .login-links a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .login-links a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .login-container {
+                max-width: 100%;
+                border-radius: 16px;
+            }
+
+            .login-header {
+                padding: 25px 20px 20px;
+            }
+
+            .login-header img {
+                width: 140px;
+            }
+            
+            .login-header h1 {
+                font-size: 22px;
+            }
+            
+            .login-header p {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .login-container {
+                border-radius: 12px;
+            }
+
+            .login-header {
+                padding: 20px 15px 15px;
+            }
+
+            .login-header img {
+                width: 120px;
+                margin-bottom: 15px;
+            }
+            
+            .login-header h1 {
+                font-size: 20px;
+                letter-spacing: 0.5px;
+            }
+            
+            .login-header p {
+                font-size: 12px;
+            }
+
+            .login-form {
+                padding: 0 15px 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .input-group input {
+                padding: 12px 12px 12px 40px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            .input-group i {
+                left: 14px;
+                font-size: 14px;
+            }
+
+            .btn-login {
+                padding: 14px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            .btn-login i {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
+            <h1>WELCOME TO BVIT</h1>
+            <p>Student Login Portal</p>
+        </div>
+
+        <form id="studentForm" class="login-form">
+            <div class="form-group">
+                <label for="studentRollNo">Roll Number</label>
+                <div class="input-group">
+                    <input type="text" id="studentRollNo" placeholder="Enter your roll number" required>
+                    <i class="fas fa-id-card"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="studentPassword">Password</label>
+                <div class="input-group">
+                    <input type="password" id="studentPassword" placeholder="Enter your password" required>
+                    <i class="fas fa-lock"></i>
+                    <button type="button" class="password-toggle" onclick="toggleStudentPassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i>
+                Login as Student
+            </button>
+            <div id="studentError" class="error-message"></div>
+        </form>
+
+        
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentForm = document.getElementById('studentForm');
+            if (studentForm) {
+                studentForm.addEventListener('submit', handleStudentLogin);
+            }
+        });
+
+        // Handle student login
+        async function handleStudentLogin(event) {
+            event.preventDefault();
+            
+            const rollNo = document.getElementById('studentRollNo').value.trim();
+            const password = document.getElementById('studentPassword').value.trim();
+            
+            if (!rollNo || !password) {
+                alert('कृपया रोल नंबर आणि पासवर्ड टाका');
+                return;
+            }
+            
+            try {
+                // Clear previous error
+                const errorDiv = document.getElementById('studentError');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                }
+
+                // Show loading state
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                }
+
+                // Wait for Firebase to initialize
+                await waitForFirebase();
+                
+                // Get student data from Firebase
+                const studentsSnapshot = await firebase.database().ref('students').once('value');
+                const students = studentsSnapshot.val();
+                
+                if (!students) {
+                    throw new Error('कोणतेही विद्यार्थी डेटा सापडला नाही');
+                }
+                
+                // Find student by roll number
+                let studentFound = false;
+                let studentData = null;
+                
+                Object.entries(students).forEach(([key, student]) => {
+                    // Match by rollNo field directly (not email)
+                    if (student.rollNo && student.rollNo.toString().toLowerCase() === rollNo.toLowerCase()) {
+                        // Check if student has password field, if not use default
+                        const studentPassword = student.password || student.rollNo || 'student123';
+                        if (studentPassword === password) {
+                            studentFound = true;
+                            studentData = { ...student, uid: key };
+                        }
+                    }
+                });
+                
+                if (studentFound && studentData) {
+                    // Store student data in session
+                    sessionStorage.setItem('isStudentLoggedIn', 'true');
+                    sessionStorage.setItem('studentData', JSON.stringify(studentData));
+                    
+                    // Start auto logout timer
+                    if (typeof startAutoLogoutTimer === 'function') {
+                        startAutoLogoutTimer('student');
+                    }
+                    if (typeof setupActivityListeners === 'function') {
+                        setupActivityListeners('student');
+                    }
+                    
+                    // Redirect to student dashboard
+                    window.location.href = 'student-dashboard.html';
+                } else {
+                    alert('चुकीचा रोल नंबर किंवा पासवर्ड');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('लॉगिन करताना त्रुटी: ' + error.message);
+                
+                // Reset button state
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as Student';
+                }
+            }
+        }
+
+        // Toggle password visibility for student
+        function toggleStudentPassword() {
+            const passwordInput = document.getElementById('studentPassword');
+            const toggleBtn = document.querySelector('.password-toggle');
+            const toggleIcon = toggleBtn.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html> 

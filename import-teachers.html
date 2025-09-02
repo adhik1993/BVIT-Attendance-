@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Teachers - BVIT Attendance</title>
+    
+    <!-- Load Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <!-- Load XLSX library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Load SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    
+    <!-- Load Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #EEF2FF;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --white: #FFFFFF;
+            --border-color: #E5E7EB;
+            --error: #EF4444;
+            --success: #10B981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #F3F4F6;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            font-size: 1.8rem;
+        }
+
+        .import-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .upload-container {
+            border: 2px dashed var(--border-color);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .browse-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .preview-container {
+            margin-top: 40px;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+        }
+
+        th {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px;
+            text-align: left;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        td {
+            padding: 16px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        .error-message {
+            color: var(--error);
+            background: #FEE2E2;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .import-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--success);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+
+        .import-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .import-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .download-template {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-right: 16px;
+        }
+
+        .download-template:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .action-buttons {
+            margin-top: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .help-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">
+            <i class="fas fa-file-import"></i>
+            Import Teachers
+        </h1>
+
+        <div class="import-section">
+            <div class="section-title">
+                <i class="fas fa-upload"></i>
+                Upload Excel File
+            </div>
+
+            <div class="upload-container" id="dropZone">
+                <i class="fas fa-file-excel upload-icon"></i>
+                <p class="upload-text">Drag & Drop your Excel file here or click to browse</p>
+                <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+                <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i>
+                    Browse Files
+                </button>
+            </div>
+
+            <div class="action-buttons">
+                <a href="#" id="downloadTemplate" class="download-template">
+                    <i class="fas fa-download"></i>
+                    Download Template
+                </a>
+                <button id="importBtn" class="import-btn" style="display: none;">
+                    <i class="fas fa-file-import"></i>
+                    Import Teachers
+                </button>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="preview" class="preview-container"></div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Initialize variables
+        let teachersData = null;
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const preview = document.getElementById('preview');
+        const importBtn = document.getElementById('importBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Function to validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Function to generate a strong password
+        function generatePassword() {
+            const length = 10;
+            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let password = '';
+            
+            // Add at least one uppercase letter
+            password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
+            
+            // Add at least one lowercase letter
+            password += 'abcdefghijklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 26));
+            
+            // Add at least one number
+            password += '0123456789'.charAt(Math.floor(Math.random() * 10));
+            
+            // Add at least one special character
+            password += '!@#$%^&*'.charAt(Math.floor(Math.random() * 8));
+            
+            // Fill the rest with random characters
+            for (let i = password.length; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            
+            // Shuffle the password
+            return password.split('').sort(() => Math.random() - 0.5).join('');
+        }
+
+        // Function to show loading state
+        function showLoading(message = 'Processing...') {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loadingOverlay';
+            loadingDiv.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            `;
+            loadingDiv.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="margin-top: 10px;">${message}</p>
+                </div>
+            `;
+            document.body.appendChild(loadingDiv);
+        }
+
+        // Function to hide loading state
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loadingOverlay');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Function to show error message
+        function showError(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                confirmButtonColor: '#3085d6'
+            });
+        }
+
+        // Function to show success message
+        function showSuccess(message) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                html: message,
+                confirmButtonColor: '#3085d6'
+            });
+        }
+
+        // Function to get department name
+        function getDepartmentName(code) {
+            const deptMap = {
+                'CT': 'Computer Technology',
+                'IT': 'Information Technology',
+                'ME': 'Mechanical Engineering',
+                'CE': 'Civil Engineering',
+                'EE': 'Electrical Engineering',
+                'ET': 'Electronics & Telecommunication',
+                'AI': 'Artificial Intelligence',
+                'CM': 'Computer Technology'
+            };
+            return deptMap[code] || code;
+        }
+
+        // Function to check if department has mandatory divisions
+        function departmentHasMandatoryDivisions(code) {
+            // Only CT department has mandatory divisions
+            return code === 'CT';
+        }
+
+        // Handle file selection
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const data = await readExcelFile(file);
+                if (validateData(data)) {
+                    teachersData = processExcelData(data);
+                    showPreview(teachersData);
+                    importBtn.style.display = 'inline-flex';
+                }
+            } catch (error) {
+                showError('Error reading file: ' + error.message);
+            }
+        });
+
+        // Handle drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.background = 'var(--primary-light)';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.background = 'transparent';
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.background = 'transparent';
+            
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+            
+            try {
+                const data = await readExcelFile(file);
+                if (validateData(data)) {
+                    teachersData = processExcelData(data);
+                    showPreview(teachersData);
+                    importBtn.style.display = 'inline-flex';
+                }
+            } catch (error) {
+                showError('Error reading file: ' + error.message);
+            }
+        });
+
+        // Read Excel file
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    try {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        resolve(jsonData);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = (error) => reject(error);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Validate data
+        function validateData(data) {
+            if (!data || data.length < 2) {
+                showError('File is empty or missing data');
+                return false;
+            }
+
+            const requiredHeaders = ['First Name', 'Last Name', 'Email', 'Phone', 'Departments', 'Classes'];
+            const headers = data[0].map(h => h.trim());
+
+            const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+            if (missingHeaders.length > 0) {
+                showError(`Missing required columns: ${missingHeaders.join(', ')}`);
+                return false;
+            }
+
+            return true;
+        }
+
+        // Process Excel data
+        function processExcelData(data) {
+            const [headers, ...rows] = data;
+            return rows.map(row => {
+                const teacher = {};
+                headers.forEach((header, index) => {
+                    let value = row[index] || '';
+                    
+                    // Process arrays
+                    if (header === 'Departments' || header === 'Classes') {
+                        value = value.toString().split(',').map(item => item.trim());
+                    }
+                    
+                    teacher[header.replace(/\s+/g, '')] = value;
+                });
+                return teacher;
+            });
+        }
+
+        // Show preview table
+        function showPreview(data) {
+            if (!data.length) {
+                preview.innerHTML = '<p>No data to preview</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = key.replace(/([A-Z])/g, ' $1').trim();
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create body
+            const tbody = document.createElement('tbody');
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = Array.isArray(value) ? value.join(', ') : value;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            preview.innerHTML = `
+                <h3 class="preview-title">
+                    <i class="fas fa-table"></i>
+                    Preview (${data.length} teachers)
+                </h3>
+            `;
+            preview.appendChild(table);
+        }
+
+        // Handle import button click
+        if (importBtn) {
+            importBtn.addEventListener('click', async () => {
+                try {
+                    if (!teachersData || teachersData.length === 0) {
+                        showError('No data to import');
+                        return;
+                    }
+
+                    importBtn.disabled = true;
+                    importBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+                    showLoading('Importing teachers...');
+
+                    // Store current admin user info for session restoration
+                    const currentUser = firebase.auth().currentUser;
+                    const adminEmail = currentUser ? currentUser.email : null;
+                    const adminUid = currentUser ? currentUser.uid : null;
+                    
+                    console.log('Current admin user:', adminEmail);
+                    
+                    // Store admin info in sessionStorage for restoration
+                    if (adminEmail && adminUid) {
+                        sessionStorage.setItem('importAdminEmail', adminEmail);
+                        sessionStorage.setItem('importAdminUid', adminUid);
+                    }
+
+                    // Collect existing emails first
+                    const existingEmailsSnapshot = await firebase.database()
+                        .ref('teachers')
+                        .orderByChild('email')
+                        .once('value');
+                    
+                    const existingEmails = new Set();
+                    existingEmailsSnapshot.forEach(snap => {
+                        existingEmails.add(snap.val().email.toLowerCase());
+                    });
+
+                    const results = {
+                        success: 0,
+                        skipped: 0,
+                        failed: 0,
+                        errors: []
+                    };
+
+                    // --- Teacher ID generation setup ---
+// Fetch all existing teacherIds from the database for auto-increment
+const teacherIdSnapshot = await firebase.database().ref('teachers').once('value');
+const departmentCounts = {};
+const usedTeacherIds = new Set();
+teacherIdSnapshot.forEach(snap => {
+    const t = snap.val();
+    if (t && t.teacherId && t.departments && t.departments.length > 0) {
+        // Use first department code for ID
+        const deptCode = (typeof t.departments[0] === 'string') ? t.departments[0] : t.departments[0].code;
+        const match = t.teacherId.match(/^(\w+)(\d{3,})$/);
+        if (deptCode && match) {
+            const num = parseInt(match[2], 10);
+            if (!departmentCounts[deptCode] || departmentCounts[deptCode] < num) {
+                departmentCounts[deptCode] = num;
+            }
+            usedTeacherIds.add(t.teacherId);
+        }
+    }
+});
+// --- End Teacher ID setup ---
+
+for (const teacher of teachersData) {
+                        try {
+                            // Validate email
+                            if (!isValidEmail(teacher.Email)) {
+                                results.failed++;
+                                results.errors.push(`Invalid email format: ${teacher.Email}`);
+                                continue;
+                            }
+
+                            // Check if email exists
+                            if (existingEmails.has(teacher.Email.toLowerCase())) {
+                                results.skipped++;
+                                results.errors.push(`Email already exists: ${teacher.Email}`);
+                                continue;
+                            }
+
+                            // Check if CT department has divisions
+                            if (teacher.Departments.includes('CT') && (!teacher.Divisions || teacher.Divisions.length === 0)) {
+                                results.failed++;
+                                results.errors.push(`Divisions are mandatory for CT department: ${teacher.Email}`);
+                                continue;
+                            }
+
+                            // Generate strong password
+                            const password = generatePassword();
+
+                            try {
+                                // Normalize email
+                                const normalizedEmail = teacher.Email.trim().toLowerCase();
+                                // Check if email exists in Firebase Authentication
+                                const signInMethods = await firebase.auth().fetchSignInMethodsForEmail(normalizedEmail);
+                                if (signInMethods.length > 0) {
+                                    results.skipped++;
+                                    results.errors.push(`Email already exists in Firebase Authentication: ${teacher.Email}`);
+                                    continue;
+                                }
+                                // Create user in Firebase Auth
+                                // Note: This will automatically sign in the new user, logging out the admin
+                                const userCredential = await firebase.auth().createUserWithEmailAndPassword(normalizedEmail, password);
+                                const uid = userCredential.user.uid;
+                                
+                                console.log('Created teacher user:', uid, 'for email:', normalizedEmail);
+
+                                // --- Ensure Departments is array ---
+                                let deptArr = Array.isArray(teacher.Departments) ? teacher.Departments : (typeof teacher.Departments === 'string' ? teacher.Departments.split(',').map(d => d.trim()) : []);
+                                // Generate unique teacherId
+                                let deptCode = deptArr[0] || '';
+                                deptCode = (deptCode || '').trim().toUpperCase();
+                                if (!departmentCounts[deptCode]) departmentCounts[deptCode] = 0;
+                                let nextNum = departmentCounts[deptCode] + 1;
+                                let teacherId = '';
+                                // Ensure uniqueness in case of race
+                                do {
+                                    teacherId = deptCode + String(nextNum).padStart(3, '0');
+                                    nextNum++;
+                                } while (usedTeacherIds.has(teacherId));
+                                departmentCounts[deptCode] = nextNum - 1;
+                                usedTeacherIds.add(teacherId);
+
+                                // Ensure teacherId is generated
+                                if (!teacherId || teacherId.trim() === '') {
+                                    throw new Error('TeacherId generation failed for ' + teacher.Email);
+                                }
+
+                                console.log('Generated teacherId for import:', teacherId, 'for teacher:', teacher.Email);
+
+                                // Prepare teacher data
+                                const teacherData = {
+                                    firstName: teacher.FirstName,
+                                    lastName: teacher.LastName,
+                                    email: teacher.Email,
+                                    phone: teacher.Phone,
+                                    departments: deptArr.map(dept => ({
+                                        code: dept,
+                                        name: getDepartmentName(dept)
+                                    })),
+                                    classes: teacher.Classes,
+                                    divisions: teacher.Divisions ? teacher.Divisions.split(',').map(d => d.trim()) : [],
+                                    createdAt: firebase.database.ServerValue.TIMESTAMP,
+                                    initialPassword: password,
+                                    teacherId: teacherId,
+                                    role: teacher.Type && typeof teacher.Type === 'string' ? teacher.Type.trim() : 'Lecturer'
+                                };
+
+                                console.log('Saving teacher data with teacherId:', teacherData);
+                                // Save to Firebase Database
+                                await firebase.database().ref('teachers/' + uid).set(teacherData);
+
+                                // Send password reset email
+                                await firebase.auth().sendPasswordResetEmail(teacher.Email);
+
+                                results.success++;
+                                existingEmails.add(teacher.Email.toLowerCase());
+
+                            } catch (authError) {
+                                console.error('Auth error:', authError);
+                                
+                                // Handle duplicate email gracefully
+                                if (authError.code === 'auth/email-already-in-use') {
+                                    console.log(`Email ${teacher.Email} already exists, skipping...`);
+                                    results.skipped++;
+                                    existingEmails.add(teacher.Email.toLowerCase());
+                                } else {
+                                    results.failed++;
+                                    results.errors.push(`Error creating user ${teacher.Email}: ${authError.message}`);
+                                }
+                                continue;
+                            }
+
+                        } catch (teacherError) {
+                            console.error('Teacher processing error:', teacherError);
+                            results.failed++;
+                            results.errors.push(`Error processing teacher ${teacher.Email}: ${teacherError.message}`);
+                        }
+                    }
+
+                    hideLoading();
+
+                    // Show results
+                    let message = `Import Results:<br><br>`;
+                    message += `Successfully imported: ${results.success}<br>`;
+                    message += `Skipped (already exists): ${results.skipped}<br>`;
+                    message += `Failed to import: ${results.failed}<br><br>`;
+                    
+                    if (results.errors.length > 0) {
+                        message += `Errors:<br>`;
+                        message += results.errors.map(err => `- ${err}`).join('<br>');
+                    }
+
+                    await showSuccess(message);
+
+                    // Restore admin session if needed
+                    const currentUserAfterImport = firebase.auth().currentUser;
+                    const storedAdminEmail = sessionStorage.getItem('importAdminEmail');
+                    const storedAdminUid = sessionStorage.getItem('importAdminUid');
+                    
+                    if (!currentUserAfterImport && storedAdminEmail) {
+                        console.log('Admin session lost during import. Please login again.');
+                        alert('Import completed successfully! Please login again to continue.');
+                        // Clean up stored admin info
+                        sessionStorage.removeItem('importAdminEmail');
+                        sessionStorage.removeItem('importAdminUid');
+                        window.location.href = 'login.html';
+                        return;
+                    } else if (currentUserAfterImport) {
+                        console.log('Admin session maintained:', currentUserAfterImport.email);
+                        // Clean up stored admin info
+                        sessionStorage.removeItem('importAdminEmail');
+                        sessionStorage.removeItem('importAdminUid');
+                    }
+
+                    // Redirect after a delay
+                    setTimeout(() => {
+                        window.location.href = 'teacher-management.html';
+                    }, 5000);
+
+                } catch (error) {
+                    hideLoading();
+                    console.error('Import error:', error);
+                    showError('Error importing teachers: ' + error.message);
+                    importBtn.disabled = false;
+                    importBtn.innerHTML = '<i class="fas fa-file-import"></i> Import Teachers';
+                }
+            });
+        }
+
+        // Download template
+        document.getElementById('downloadTemplate').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const template = [
+                ['First Name', 'Last Name', 'Email', 'Phone', 'Departments', 'Classes', 'Divisions', 'Type'],
+                ['John', 'Doe', 'john@example.com', '1234567890', 'CT,IT', 'FY,SY', 'A,B', 'Lecturer'],
+                ['Jane', 'Smith', 'jane@example.com', '9876543210', 'ME', 'TY,BE', '', 'Lab Assistant']
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
+            XLSX.writeFile(wb, 'teacher_import_template.xlsx');
+        });
+
+        // Check admin auth
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Check if admin
+            firebase.database().ref('admins/' + user.uid).once('value')
+                .then((snapshot) => {
+                    if (!snapshot.exists()) {
+                        firebase.auth().signOut();
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error checking admin status:', error);
+                    firebase.auth().signOut();
+                    window.location.href = 'login.html';
+                });
+        });
+    </script>
+</body>
+</html> 

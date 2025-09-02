@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activities - BVIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #E0E7FF;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --lighter: #F9FAFB;
+            --border: #E5E7EB;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --text-lighter: #9CA3AF;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--darker);
+            min-height: 100vh;
+            padding: 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: var(--text-lighter);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Activity List Styles */
+        .activity-list {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .activity-details {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .activity-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            background: var(--light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+        }
+
+        .activity-detail i {
+            font-size: 0.875rem;
+            color: var(--primary);
+        }
+
+        .activity-time {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-lighter);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 5rem;
+                padding: 1rem;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 5rem;
+                padding: 1rem;
+            }
+
+            .activity-details {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .activity-detail {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="header-title">
+                <i class="fas fa-clock"></i>
+                Activities
+            </h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="filterActivities('all')">
+                    <i class="fas fa-history"></i>
+                    <span class="nav-text">All Activities</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="filterActivities('today')">
+                    <i class="fas fa-calendar-day"></i>
+                    <span class="nav-text">Today's Activities</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="filterActivities('theory')">
+                    <i class="fas fa-book"></i>
+                    <span class="nav-text">Theory Lectures</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="filterActivities('practical')">
+                    <i class="fas fa-flask"></i>
+                    <span class="nav-text">Practical Sessions</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="filterActivities('department')">
+                    <i class="fas fa-building"></i>
+                    <span class="nav-text">By Department</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">
+                <i class="fas fa-history"></i>
+                <span id="currentView">All Activities</span>
+            </h1>
+            <a href="admin-dashboard.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <div class="activity-list" id="activityList">
+            <!-- Activities will be loaded here -->
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Loading activities...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Wait for Firebase to be ready
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                const check = () => {
+                    if (window.firebase && window.firebase.apps.length) {
+                        resolve();
+                    } else {
+                        setTimeout(check, 100);
+                    }
+                };
+                check();
+            });
+        }
+
+        // Function to get time ago
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        // Function to update active link
+        function updateActiveLink(filter) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[onclick="filterActivities('${filter}')"]`).classList.add('active');
+        }
+
+        // Function to update page title
+        function updatePageTitle(filter) {
+            const titles = {
+                'all': 'All Activities',
+                'today': 'Today\'s Activities',
+                'theory': 'Theory Lectures',
+                'practical': 'Practical Sessions',
+                'department': 'Activities by Department'
+            };
+            document.getElementById('currentView').textContent = titles[filter];
+        }
+
+        // Function to filter activities
+        async function filterActivities(filter) {
+            try {
+                updateActiveLink(filter);
+                updatePageTitle(filter);
+                
+                const activityList = document.getElementById('activityList');
+                activityList.innerHTML = `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Loading activities...</div>
+                        </div>
+                    </div>
+                `;
+
+                await waitForFirebase();
+                const attendanceRef = firebase.database().ref('attendance');
+                let query = attendanceRef;
+
+                // Apply filters
+                switch(filter) {
+                    case 'today':
+                        const today = new Date().toISOString().split('T')[0];
+                        query = attendanceRef.orderByChild('date').equalTo(today);
+                        break;
+                    case 'theory':
+                        query = attendanceRef.orderByChild('lectureType').equalTo('theory');
+                        break;
+                    case 'practical':
+                        query = attendanceRef.orderByChild('lectureType').equalTo('practical');
+                        break;
+                    default:
+                        query = attendanceRef.orderByChild('timestamp');
+                }
+
+                const snapshot = await query.limitToLast(50).once('value');
+
+                if (!snapshot.exists()) {
+                    activityList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-check"></i>
+                            <p>No activities found</p>
+                            <div class="subtitle">Activities will appear here once teachers fill attendance</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Convert to array and sort
+                const activities = [];
+                snapshot.forEach(child => {
+                    activities.push({
+                        id: child.key,
+                        ...child.val()
+                    });
+                });
+
+                // Sort by timestamp descending
+                activities.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Get teacher details
+                const teacherIds = [...new Set(activities.map(a => a.teacherId))];
+                const teacherDetails = {};
+
+                for (const teacherId of teacherIds) {
+                    const teacherSnap = await firebase.database().ref('teachers/' + teacherId).once('value');
+                    if (teacherSnap.exists()) {
+                        const teacher = teacherSnap.val();
+                        if (!teacher.firstName || !teacher.lastName) {
+                            console.warn('Missing name for teacherId:', teacherId, teacher);
+                        }
+                        let displayName = '';
+                        if (teacher.firstName && teacher.lastName) {
+                            displayName = `${teacher.firstName} ${teacher.lastName}`;
+                        } else if (teacher.firstName) {
+                            displayName = teacher.firstName;
+                        } else if (teacher.lastName) {
+                            displayName = teacher.lastName;
+                        } else {
+                            displayName = 'Teacher';
+                        }
+                        teacherDetails[teacherId] = displayName;
+                    } else {
+                        console.warn('Teacher not found for teacherId:', teacherId);
+                        teacherDetails[teacherId] = 'Teacher';
+                    }
+                }
+
+                // If department filter, group by department
+                if (filter === 'department') {
+                    const departmentGroups = {};
+                    activities.forEach(activity => {
+                        if (activity.class) {
+                            const dept = activity.class.split('-')[0];
+                            if (!departmentGroups[dept]) {
+                                departmentGroups[dept] = [];
+                            }
+                            departmentGroups[dept].push(activity);
+                        }
+                    });
+
+                    activityList.innerHTML = Object.entries(departmentGroups)
+                        .map(([dept, deptActivities]) => {
+                            return `
+                                <div class="department-section">
+                                    <h2 class="department-title">${dept}</h2>
+                                    ${deptActivities.map(activity => createActivityHTML(activity, teacherDetails)).join('')}
+                                </div>
+                            `;
+                        }).join('');
+                } else {
+                    // Regular list view
+                    activityList.innerHTML = activities
+                        .map(activity => createActivityHTML(activity, teacherDetails))
+                        .join('');
+                }
+
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                activityList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error loading activities</p>
+                        <div class="subtitle">Please try refreshing the page</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to create activity HTML
+        function createActivityHTML(activity, teacherDetails) {
+            const timeAgo = getTimeAgo(activity.timestamp);
+            const teacherName = teacherDetails[activity.teacherId] || 'Teacher';
+
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">
+                            ${teacherName} took attendance
+                        </div>
+                        <div class="activity-details">
+                            <span class="activity-detail">
+                                <i class="fas fa-users"></i>
+                                ${activity.class || 'N/A'}
+                            </span>
+                            <span class="activity-detail">
+                                <i class="fas fa-book"></i>
+                                ${activity.subject || 'N/A'}
+                            </span>
+                            <span class="activity-detail">
+                                <i class="fas fa-clock"></i>
+                                ${activity.lectureType || 'N/A'}
+                            </span>
+                        </div>
+                        <div class="activity-time">${timeAgo}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load all activities when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            filterActivities('all');
+        });
+    </script>
+</body>
+</html> 
