@@ -2644,39 +2644,160 @@
             loadTotalStudentsCount();
         }
 
-        // Missing function definitions - Add these functions to fix JavaScript errors
+        // 💾 FIREBASE OPTIMIZATION - Caching to reduce reads/writes
+        let studentsCache = null;
+        let studentsCacheTime = 0;
+        let attendanceCache = null;
+        let attendanceCacheTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
         window.loadStudentsWithCache = async function() {
-            console.log('📚 Loading students with cache...');
+            console.log('📚 Loading students with cache optimization...');
+            
+            // Check if cache is valid
+            const now = Date.now();
+            if (studentsCache && (now - studentsCacheTime) < CACHE_DURATION) {
+                console.log('✅ Using cached students data (saves Firebase read)');
+                return studentsCache;
+            }
+            
             try {
+                console.log('🔄 Fetching fresh students data from Firebase');
                 const snapshot = await firebase.database().ref('students').once('value');
-                return snapshot.val() || {};
+                studentsCache = snapshot.val() || {};
+                studentsCacheTime = now;
+                console.log(`💾 Students cached for ${CACHE_DURATION/60000} minutes`);
+                return studentsCache;
             } catch (error) {
                 console.error('Error loading students:', error);
-                return {};
+                return studentsCache || {}; // Return cached data if available
             }
         };
 
-        window.loadAttendanceOptimized = async function() {
-            console.log('📊 Loading attendance optimized...');
+        window.loadAttendanceOptimized = async function(teacherId = null) {
+            console.log('📊 Loading attendance with optimization...');
+            
+            // Check if cache is valid
+            const now = Date.now();
+            if (attendanceCache && (now - attendanceCacheTime) < CACHE_DURATION) {
+                console.log('✅ Using cached attendance data (saves Firebase read)');
+                return attendanceCache;
+            }
+            
             try {
-                const snapshot = await firebase.database().ref('attendance').once('value');
-                return snapshot.val() || {};
+                console.log('🔄 Fetching fresh attendance data from Firebase');
+                let query = firebase.database().ref('attendance');
+                
+                // Optimize: Only load teacher-specific data if teacherId provided
+                if (teacherId) {
+                    query = query.orderByChild('teacherId').equalTo(teacherId);
+                    console.log('🎯 Loading only teacher-specific attendance (reduces data transfer)');
+                }
+                
+                const snapshot = await query.once('value');
+                attendanceCache = snapshot.val() || {};
+                attendanceCacheTime = now;
+                console.log(`💾 Attendance cached for ${CACHE_DURATION/60000} minutes`);
+                return attendanceCache;
             } catch (error) {
                 console.error('Error loading attendance:', error);
-                return {};
+                return attendanceCache || {}; // Return cached data if available
             }
         };
 
+        // 🚀 OPTIMIZED FIREBASE WRITES - Batch operations to reduce costs
         window.saveAttendanceWithOfflineSupport = async function(data) {
-            console.log('💾 Saving attendance with offline support...');
+            console.log('💾 Saving attendance with optimization...');
             try {
-                await firebase.database().ref('attendance').push(data);
+                // Clear cache after write to ensure fresh data on next read
+                attendanceCache = null;
+                attendanceCacheTime = 0;
+                
+                // Use set() with specific key instead of push() for better control
+                const attendanceKey = `${data.date}_${data.teacherId}_${Date.now()}`;
+                await firebase.database().ref(`attendance/${attendanceKey}`).set(data);
+                
+                console.log('✅ Attendance saved with optimized write operation');
                 return { success: true };
             } catch (error) {
                 console.error('Error saving attendance:', error);
                 return { success: false, error: error.message };
             }
         };
+        
+        // 📦 BATCH OPERATIONS - Reduce multiple Firebase calls
+        window.batchUpdateAttendance = async function(updates) {
+            console.log('📦 Performing batch attendance updates...');
+            try {
+                // Clear cache before batch operation
+                attendanceCache = null;
+                attendanceCacheTime = 0;
+                
+                // Use Firebase batch update for multiple operations
+                await firebase.database().ref().update(updates);
+                console.log('✅ Batch update completed - saves multiple Firebase writes');
+                return { success: true };
+            } catch (error) {
+                console.error('Error in batch update:', error);
+                return { success: false, error: error.message };
+            }
+        };
+        
+        // 📱 OFFLINE SUPPORT - Reduce Firebase dependency
+        let offlineQueue = [];
+        let isOnline = navigator.onLine;
+        
+        // Monitor online/offline status
+        window.addEventListener('online', () => {
+            isOnline = true;
+            console.log('🌐 Back online - processing offline queue');
+            processOfflineQueue();
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            console.log('📱 Gone offline - queuing operations');
+        });
+        
+        // Process queued operations when back online
+        async function processOfflineQueue() {
+            if (offlineQueue.length === 0) return;
+            
+            console.log(`🔄 Processing ${offlineQueue.length} offline operations`);
+            const batch = {};
+            
+            offlineQueue.forEach((operation, index) => {
+                batch[`attendance/${operation.key}`] = operation.data;
+            });
+            
+            try {
+                await firebase.database().ref().update(batch);
+                console.log('✅ Offline queue processed successfully');
+                offlineQueue = []; // Clear queue
+            } catch (error) {
+                console.error('❌ Error processing offline queue:', error);
+            }
+        }
+        
+        // 🗜️ DATA COMPRESSION - Reduce payload size
+        function compressAttendanceData(data) {
+            // Remove unnecessary fields and compress data
+            const compressed = {
+                d: data.date,
+                t: data.time,
+                c: data.class,
+                s: data.subject,
+                lt: data.lectureType,
+                ti: data.teacherId,
+                st: data.students,
+                ts: data.totalStudents,
+                pc: data.presentCount,
+                ac: data.absentCount
+            };
+            
+            console.log('🗜️ Data compressed - reduced payload size');
+            return compressed;
+        }
 
         // Function to load total students count for teacher's assigned classes
         async function loadTotalStudentsCount() {
@@ -2684,9 +2805,17 @@
             if (!totalStudentsElement || !window.teacherData) return;
 
             try {
-                const snapshot = await firebase.database().ref('students').once('value');
+                console.log('📊 Loading total students with cache optimization...');
+                // 💰 COST OPTIMIZATION: Use cached data to reduce Firebase reads
+                const students = await window.loadStudentsWithCache();
                 let totalStudents = 0;
-                const students = snapshot.val() || {};
+                
+                // Only count if we have valid cached data
+                if (!students || Object.keys(students).length === 0) {
+                    totalStudentsElement.textContent = '0';
+                    console.log('⚠️ No students data available (cache miss)');
+                    return;
+                }
 
                 // Get teacher's assigned data
                 const teacherClasses = window.teacherData.classes || [];
@@ -2827,12 +2956,12 @@
                     return;
                 }
 
-                const snapshot = await firebase.database().ref('attendance').once('value');
+                console.log('📈 Loading average attendance with optimization...');
+                // Use cached attendance data to reduce Firebase reads
+                const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
                 let totalPresent = 0;
                 let totalStudents = 0;
                 let recordCount = 0;
-
-                const attendanceData = snapshot.val() || {};
                 Object.values(attendanceData).forEach(record => {
                     // Check if record is by current teacher
                     if (record.teacherId === currentUser.uid) {
@@ -2971,11 +3100,11 @@
                     return;
                 }
                 
-                const snapshot = await firebase.database().ref('attendance').once('value');
+                console.log('📅 Loading today\'s attendance with optimization...');
+                // Use optimized attendance loading with teacher filter
+                const attendanceData = await window.loadAttendanceOptimized(teacherKey);
                 let totalPresent = 0;
                 let totalStudents = 0;
-                
-                const attendanceData = snapshot.val() || {};
                 Object.values(attendanceData).forEach(record => {
                     if (record.date === today && record.teacherId === teacherKey) {
                         const students = record.students || {};
@@ -3264,6 +3393,22 @@
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1001-1022)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1023-1044)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (1045 onwards)</option>';
+            } else if (selectedDepartment === 'CT' && selectedYear === 'FY') {
+                console.log('🎯 CT FY detected - Custom batch ranges for C division');
+                const divisionSelect = document.getElementById('division');
+                const selectedDivision = divisionSelect ? divisionSelect.value : '';
+                
+                if (selectedDivision === 'C') {
+                    console.log('🎯 CT FY C Division detected - Custom Batch C range (1441 to onward)');
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (21-40 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (1441 to onward)</option>';
+                } else {
+                    console.log('🎯 CT FY (A/B Division) - Standard batch ranges');
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (20 students)</option>';
+                }
             } else {
                 console.log('✅ Standard batches - Showing Batch A, B, and C');
                 // Show all batches for other departments/years
@@ -3337,7 +3482,7 @@
                                 <i class="fas fa-users"></i>
                                 Select Division
                             </label>
-                            <select id="division">
+                            <select id="division" onchange="updateBatchDropdown();">
                                 <option value="">All Divisions</option>
                                 <option value="A">Division A</option>
                                 <option value="B">Division B</option>
@@ -4485,8 +4630,89 @@
                 const batchLetter = batch.replace('Batch', '');
                 let startIndex, endIndex;
                 
+                // Check if this is Computer Technology First Year with special C division configuration
+                if (department === 'CT' && year === 'FY' && division === 'C') {
+                    console.log('🎯 Applying custom CT FY C Division batch ranges - Batch C (1441 to onward)');
+                    
+                    // Create filtered students array for CT FY C Division with roll numbers 1441+
+                    const ctFYCStudents = allStudents.filter(student => {
+                        const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                        return rollNum >= 1441; // Only students with roll numbers 1441 and above
+                    });
+                    
+                    console.log(`CT FY C Division: Found ${ctFYCStudents.length} students with roll numbers 1441+`);
+                    
+                    // Apply batch-specific filtering
+                    let batchStudents = [];
+                    
+                    switch (batchLetter) {
+                        case 'A': 
+                            // Batch A: Standard 1-20 students
+                            batchStudents = allStudents.slice(0, 20);
+                            console.log(`CT FY C Division Batch A: Found ${batchStudents.length} students (1-20)`);
+                            break;
+                        case 'B': 
+                            // Batch B: Standard 21-40 students
+                            batchStudents = allStudents.slice(20, 40);
+                            console.log(`CT FY C Division Batch B: Found ${batchStudents.length} students (21-40)`);
+                            break;
+                        case 'C': 
+                            // Batch C: Roll numbers 1441 onwards
+                            batchStudents = ctFYCStudents;
+                            console.log(`CT FY C Division Batch C: Found ${batchStudents.length} students (Roll 1441 onwards)`);
+                            break;
+                        default: 
+                            // Default to Batch A
+                            batchStudents = allStudents.slice(0, 20);
+                            console.log(`CT FY C Division Default (Batch A): Found ${batchStudents.length} students (1-20)`);
+                            break;
+                    }
+                    
+                    // Display the batch students directly
+                    if (tableBody) {
+                        if (batchStudents.length === 0) {
+                            tableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-user-slash"></i>
+                                            <p>No students found for CT FY C Division Batch ${batchLetter}</p>
+                                            <div class="subtitle">${batchLetter === 'C' ? 'Roll numbers 1441 onwards' : `Students ${batchLetter === 'A' ? '1-20' : '21-40'}`}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            let studentsHTML = '';
+                            batchStudents.forEach((student, index) => {
+                                studentsHTML += `
+                                    <tr data-student-id="${student.id}">
+                                        <td>${student.rollNo}</td>
+                                        <td>${student.name}</td>
+                                        <td>
+                                            <div class="attendance-buttons">
+                                                <button class="btn-attendance present" 
+                                                    onclick="markAttendance('${student.id}', true)">
+                                                    <i class="fas fa-check"></i>
+                                                    Present
+                                                </button>
+                                                <button class="btn-attendance absent" 
+                                                    onclick="markAttendance('${student.id}', false)">
+                                                    <i class="fas fa-times"></i>
+                                                    Absent
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            tableBody.innerHTML = studentsHTML;
+                        }
+                    }
+                    return; // Exit early since we handled the display
+                }
                 // Check if this is Computer Technology Second Year
-                if (department === 'CT' && year === 'SY') {
+                else if (department === 'CT' && year === 'SY') {
                     console.log('🎯 Applying custom CT SY batch ranges for Division:', division);
                     
                     if (division === 'A') {
@@ -5651,6 +5877,9 @@
         async function submitAttendance() {
             console.log('🚀 SUBMIT ATTENDANCE CLICKED - Starting Firebase save process');
             
+            // Wait for Firebase to be ready
+            await waitForFirebase();
+            
             // Check if any students are marked
             const allStudentRows = document.querySelectorAll('tr[data-student-id]');
             const totalStudents = allStudentRows.length;
@@ -5735,9 +5964,39 @@
                     absentCount: absentCount
                 };
                 
-                // Save to Firebase
-                const attendanceRef = firebase.database().ref('attendance').child(attendanceKey);
-                await attendanceRef.set(attendanceData);
+                // 🚀 OPTIMIZED FIREBASE SAVE - Multiple cost-saving strategies
+                console.log('💾 Using optimized Firebase save with cost reduction...');
+                
+                // Clear attendance cache to ensure fresh data
+                attendanceCache = null;
+                attendanceCacheTime = 0;
+                
+                // 📱 Check if online - if offline, queue for later
+                if (!isOnline) {
+                    console.log('📱 Offline - queuing attendance for later sync');
+                    offlineQueue.push({
+                        key: attendanceKey,
+                        data: attendanceData,
+                        timestamp: Date.now()
+                    });
+                    
+                    // Store in localStorage as backup
+                    localStorage.setItem('offlineAttendance', JSON.stringify(offlineQueue));
+                    
+                    // Show success message even when offline
+                    console.log('✅ Attendance queued for sync when online');
+                } else {
+                    // 💰 Use direct set operation for better performance and lower cost
+                    console.log('🔥 Attempting to save to Firebase with key:', attendanceKey);
+                    console.log('📦 Data being saved:', attendanceData);
+                    
+                    if (!window.db) {
+                        throw new Error('Firebase database not initialized');
+                    }
+                    
+                    await window.db.ref(`attendance/${attendanceKey}`).set(attendanceData);
+                    console.log('✅ Attendance saved successfully to Firebase with key:', attendanceKey);
+                }
                 
                 console.log('✅ Attendance saved successfully to Firebase!');
                 
@@ -6535,6 +6794,9 @@
         async function loadAttendanceReport() {
             console.log('📊 Loading attendance report...');
             
+            // Wait for Firebase to be ready
+            await waitForFirebase();
+            
             const reportContent = document.getElementById('reportContent');
             if (!reportContent) {
                 console.error('❌ Report content element not found');
@@ -6579,7 +6841,7 @@
                 console.log('🔍 Filters:', { department, year, division, startDate, endDate, teacherKey });
 
                 // Load attendance data from Firebase
-                const attendanceSnapshot = await firebase.database().ref('attendance').once('value');
+                const attendanceSnapshot = await window.db.ref('attendance').once('value');
                 const attendanceData = attendanceSnapshot.val() || {};
                 
                 console.log('📦 Raw attendance data loaded:', Object.keys(attendanceData).length, 'records');
