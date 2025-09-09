@@ -3394,17 +3394,27 @@
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1023-1044)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (1045 onwards)</option>';
             } else if (selectedDepartment === 'CT' && selectedYear === 'FY') {
-                console.log('🎯 CT FY detected - Custom batch ranges for C division');
+                console.log('🎯 CT FY detected - Custom batch ranges for divisions');
                 const divisionSelect = document.getElementById('division');
                 const selectedDivision = divisionSelect ? divisionSelect.value : '';
                 
-                if (selectedDivision === 'C') {
+                if (selectedDivision === 'A') {
+                    console.log('🎯 CT FY A Division detected - Custom batch ranges (1201-1220, 1221-1240, 1241 onwards)');
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (1201-1220)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (1221-1240)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (1241 onwards)</option>';
+                } else if (selectedDivision === 'C') {
                     console.log('🎯 CT FY C Division detected - Custom Batch C range (1441 to onward)');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (21-40 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (1441 to onward)</option>';
+                } else if (selectedDivision === 'B') {
+                    console.log('🎯 CT FY B Division detected - Custom batch ranges (1301-1320, 1321-1340, 1341 onwards)');
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (1301-1320)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (1321-1340)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (1341 onwards)</option>';
                 } else {
-                    console.log('🎯 CT FY (A/B Division) - Standard batch ranges');
+                    console.log('🎯 CT FY (Other Division) - Standard batch ranges');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (20 students)</option>';
@@ -4630,8 +4640,178 @@
                 const batchLetter = batch.replace('Batch', '');
                 let startIndex, endIndex;
                 
+                // Check if this is Computer Technology First Year with special division configurations
+                if (department === 'CT' && year === 'FY' && division === 'A') {
+                    console.log('🎯 Applying custom CT FY A Division batch ranges - Roll number based filtering');
+                    
+                    // Apply batch-specific filtering based on roll number ranges
+                    let batchStudents = [];
+                    
+                    switch (batchLetter) {
+                        case 'A': 
+                            // Batch A: Roll numbers 1201-1220
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1201 && rollNum <= 1220;
+                            });
+                            console.log(`CT FY A Division Batch A: Found ${batchStudents.length} students (Roll 1201-1220)`);
+                            break;
+                        case 'B': 
+                            // Batch B: Roll numbers 1221-1240
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1221 && rollNum <= 1240;
+                            });
+                            console.log(`CT FY A Division Batch B: Found ${batchStudents.length} students (Roll 1221-1240)`);
+                            break;
+                        case 'C': 
+                            // Batch C: Roll numbers 1241 onwards
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1241;
+                            });
+                            console.log(`CT FY A Division Batch C: Found ${batchStudents.length} students (Roll 1241 onwards)`);
+                            break;
+                        default: 
+                            // Default to Batch A
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1201 && rollNum <= 1220;
+                            });
+                            console.log(`CT FY A Division Default (Batch A): Found ${batchStudents.length} students (Roll 1201-1220)`);
+                            break;
+                    }
+                    
+                    // Display the batch students directly
+                    if (tableBody) {
+                        if (batchStudents.length === 0) {
+                            tableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-user-slash"></i>
+                                            <p>No students found for CT FY A Division Batch ${batchLetter}</p>
+                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1201-1220' : batchLetter === 'B' ? 'Roll numbers 1221-1240' : 'Roll numbers 1241 onwards'}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            let studentsHTML = '';
+                            batchStudents.forEach((student, index) => {
+                                studentsHTML += `
+                                    <tr data-student-id="${student.id}">
+                                        <td>${student.rollNo}</td>
+                                        <td>${student.name}</td>
+                                        <td>
+                                            <div class="attendance-buttons">
+                                                <button class="btn-attendance present" 
+                                                    onclick="markAttendance('${student.id}', true)">
+                                                    <i class="fas fa-check"></i>
+                                                    Present
+                                                </button>
+                                                <button class="btn-attendance absent" 
+                                                    onclick="markAttendance('${student.id}', false)">
+                                                    <i class="fas fa-times"></i>
+                                                    Absent
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            tableBody.innerHTML = studentsHTML;
+                        }
+                    }
+                    return; // Exit early since we handled the display
+                }
+                // Check if this is Computer Technology First Year Division B
+                else if (department === 'CT' && year === 'FY' && division === 'B') {
+                    console.log('🎯 Applying custom CT FY B Division batch ranges - Roll number based filtering');
+                    
+                    // Apply batch-specific filtering based on roll number ranges
+                    let batchStudents = [];
+                    
+                    switch (batchLetter) {
+                        case 'A': 
+                            // Batch A: Roll numbers 1301-1320
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1301 && rollNum <= 1320;
+                            });
+                            console.log(`CT FY B Division Batch A: Found ${batchStudents.length} students (Roll 1301-1320)`);
+                            break;
+                        case 'B': 
+                            // Batch B: Roll numbers 1321-1340
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1321 && rollNum <= 1340;
+                            });
+                            console.log(`CT FY B Division Batch B: Found ${batchStudents.length} students (Roll 1321-1340)`);
+                            break;
+                        case 'C': 
+                            // Batch C: Roll numbers 1341 onwards
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1341;
+                            });
+                            console.log(`CT FY B Division Batch C: Found ${batchStudents.length} students (Roll 1341 onwards)`);
+                            break;
+                        default: 
+                            // Default to Batch A
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1301 && rollNum <= 1320;
+                            });
+                            console.log(`CT FY B Division Default (Batch A): Found ${batchStudents.length} students (Roll 1301-1320)`);
+                            break;
+                    }
+                    
+                    // Display the batch students directly
+                    if (tableBody) {
+                        if (batchStudents.length === 0) {
+                            tableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-user-slash"></i>
+                                            <p>No students found for CT FY B Division Batch ${batchLetter}</p>
+                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1301-1320' : batchLetter === 'B' ? 'Roll numbers 1321-1340' : 'Roll numbers 1341 onwards'}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            let studentsHTML = '';
+                            batchStudents.forEach((student, index) => {
+                                studentsHTML += `
+                                    <tr data-student-id="${student.id}">
+                                        <td>${student.rollNo}</td>
+                                        <td>${student.name}</td>
+                                        <td>
+                                            <div class="attendance-buttons">
+                                                <button class="btn-attendance present" 
+                                                    onclick="markAttendance('${student.id}', true)">
+                                                    <i class="fas fa-check"></i>
+                                                    Present
+                                                </button>
+                                                <button class="btn-attendance absent" 
+                                                    onclick="markAttendance('${student.id}', false)">
+                                                    <i class="fas fa-times"></i>
+                                                    Absent
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            tableBody.innerHTML = studentsHTML;
+                        }
+                    }
+                    return; // Exit early since we handled the display
+                }
                 // Check if this is Computer Technology First Year with special C division configuration
-                if (department === 'CT' && year === 'FY' && division === 'C') {
+                else if (department === 'CT' && year === 'FY' && division === 'C') {
                     console.log('🎯 Applying custom CT FY C Division batch ranges - Batch C (1441 to onward)');
                     
                     // Create filtered students array for CT FY C Division with roll numbers 1441+
@@ -5902,6 +6082,9 @@
             const selectedDate = document.getElementById('date').value;
             const selectedLectureType = document.getElementById('lectureType').value;
             
+            // Only use division for departments that actually have divisions (CT only)
+            const actualDivision = departmentHasDivisions(department) ? division : null;
+            
             if (!department || !year || !subject || !selectedDate || !selectedLectureType) {
                 alert('⚠️ Please fill all required fields!');
                 return;
@@ -5912,7 +6095,7 @@
             const absentCount = totalStudents - presentCount;
             
             const confirmMsg = `📊 Confirm Attendance Submission:\n\n` +
-                `🏫 Class: ${year}${department}${division ? '-' + division : ''}${batch ? '-' + batch : ''}\n` +
+                `🏫 Class: ${year}${department}${actualDivision ? '-' + actualDivision : ''}${batch ? '-' + batch : ''}\n` +
                 `📚 Subject: ${subject}\n` +
                 `📅 Date: ${selectedDate}\n` +
                 `🎯 Type: ${selectedLectureType}\n\n` +
@@ -5938,10 +6121,20 @@
                 console.log('📦 Starting Firebase save with local data:', localAttendanceData);
                 
                 // Create attendance key with timestamp for multiple sessions
-                const classCode = year + department + (division ? '-' + division : '') + (batch ? '-' + batch : '');
+                const classCode = year + department + (actualDivision ? '-' + actualDivision : '') + (batch ? '-' + batch : '');
                 const timestamp = new Date().getTime(); // Add timestamp for unique sessions
                 const sessionTime = new Date().toLocaleTimeString('en-GB', { hour12: false }); // HH:MM:SS format
                 const attendanceKey = `${selectedDate}_${classCode}_${selectedLectureType}_${subject}_${timestamp}`;
+                
+                console.log('🏫 Class code generation:', {
+                    department: department,
+                    year: year,
+                    division: division,
+                    actualDivision: actualDivision,
+                    batch: batch,
+                    finalClassCode: classCode,
+                    hasDivisions: departmentHasDivisions(department)
+                });
                 
                 // Get teacher info
                 const teacherKey = sessionStorage.getItem('teacherKey');
