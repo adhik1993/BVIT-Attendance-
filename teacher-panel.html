@@ -3384,6 +3384,11 @@
                 console.log('🚫 ET TY detected - Only showing Batch A and B (NO Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (21-37 students)</option>';
+            } else if (selectedDepartment === 'EE' && selectedYear === 'FY') {
+                console.log('🎯 EE FY detected - Custom batch ranges with specific roll numbers');
+                batchSelect.innerHTML += '<option value="BatchA">Batch A (1501-1522 + 1543)</option>';
+                batchSelect.innerHTML += '<option value="BatchB">Batch B (1523-1544 skip 1543)</option>';
+                batchSelect.innerHTML += '<option value="BatchC">Batch C (1545-1562)</option>';
             } else if (selectedDepartment === 'EE' && selectedYear === 'TY') {
                 console.log('🚫 EE TY detected - Only showing Batch A and B (no Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-23 students)</option>';
@@ -5084,27 +5089,89 @@
                             break;
                     }
                 } else if (department === 'EE' && year === 'FY') {
-                    // 🎯 Electrical Engineering First Year custom batch ranges
-                    console.log('🎯 Applying custom EE FY batch ranges');
+                    // 🎯 Electrical Engineering First Year custom batch ranges - Roll number based filtering
+                    console.log('🎯 Applying custom EE FY batch ranges - Roll number based filtering');
+                    
+                    // Apply batch-specific filtering based on roll number ranges
+                    let batchStudents = [];
                     
                     switch (batchLetter) {
                         case 'A': 
-                            startIndex = 0; 
-                            endIndex = 22; 
-                            break;   // Students 1-22
+                            // Batch A: Roll numbers 1501-1522 + 1543
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return (rollNum >= 1501 && rollNum <= 1522) || rollNum === 1543;
+                            });
+                            console.log(`EE FY Batch A: Found ${batchStudents.length} students (Roll 1501-1522 + 1543)`);
+                            break;
                         case 'B': 
-                            startIndex = 22; 
-                            endIndex = 44; 
-                            break;   // Students 23-44
+                            // Batch B: Roll numbers 1523-1544 skip 1543
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1523 && rollNum <= 1544 && rollNum !== 1543;
+                            });
+                            console.log(`EE FY Batch B: Found ${batchStudents.length} students (Roll 1523-1544 skip 1543)`);
+                            break;
                         case 'C': 
-                            startIndex = 44; 
-                            endIndex = allStudents.length; 
-                            break;   // Students 45 onwards
+                            // Batch C: Roll numbers 1545-1562
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollNum >= 1545 && rollNum <= 1562;
+                            });
+                            console.log(`EE FY Batch C: Found ${batchStudents.length} students (Roll 1545-1562)`);
+                            break;
                         default: 
-                            startIndex = 0; 
-                            endIndex = 22; 
+                            // Default to Batch A
+                            batchStudents = allStudents.filter(student => {
+                                const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
+                                return (rollNum >= 1501 && rollNum <= 1522) || rollNum === 1543;
+                            });
+                            console.log(`EE FY Default (Batch A): Found ${batchStudents.length} students (Roll 1501-1522 + 1543)`);
                             break;
                     }
+                    
+                    // Display the batch students directly
+                    if (tableBody) {
+                        if (batchStudents.length === 0) {
+                            tableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-user-slash"></i>
+                                            <p>No students found for EE FY Batch ${batchLetter}</p>
+                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1562'}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            let studentsHTML = '';
+                            batchStudents.forEach((student, index) => {
+                                studentsHTML += `
+                                    <tr data-student-id="${student.id}">
+                                        <td>${student.rollNo}</td>
+                                        <td>${student.name}</td>
+                                        <td>
+                                            <div class="attendance-buttons">
+                                                <button class="btn-attendance present" 
+                                                    onclick="markAttendance('${student.id}', true)">
+                                                    <i class="fas fa-check"></i>
+                                                    Present
+                                                </button>
+                                                <button class="btn-attendance absent" 
+                                                    onclick="markAttendance('${student.id}', false)">
+                                                    <i class="fas fa-times"></i>
+                                                    Absent
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            tableBody.innerHTML = studentsHTML;
+                        }
+                    }
+                    return; // Exit early since we handled the display
                 } else if (department === 'EE' && year === 'SY') {
                     // 🎯 Electrical Engineering Second Year custom batch ranges
                     console.log('🎯 Applying custom EE SY batch ranges');
