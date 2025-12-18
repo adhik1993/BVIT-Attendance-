@@ -3261,8 +3261,8 @@
                 
                 // Special handling for CE TY - only Batch A
                 if (departmentValue === 'CE' && yearValue === 'TY') {
-                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3026)</option>';
-                    console.log('🎯 CE TY: Only Batch A available in dropdown');
+                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3027)</option>';
+                    console.log('🎯 CE TY: Only Batch A (3001-3027) available in dropdown');
                 } else {
                     // Default batches for other departments/years
                     batchSelect.innerHTML += '<option value="A">Batch A</option>';
@@ -5567,12 +5567,12 @@
                         console.log('🚫 CE FY: Invalid batch selected');
                     }
                 } else if (department === 'CE' && year === 'TY') {
-                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3026
+                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3027
                     if (batchLetter === 'A') {
-                        // Filter students with roll numbers 3001-3026
+                        // Filter students with roll numbers 3001-3027 (including all students)
                         batchStudents = allStudents.filter(s => {
                             const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
-                            return roll >= 3001 && roll <= 3026;
+                            return roll >= 3001 && roll <= 3027;
                         });
                         // Sort by roll number
                         batchStudents.sort((a, b) => {
@@ -5580,11 +5580,11 @@
                             const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
                             return rollA - rollB;
                         });
-                        console.log('🎯 CE TY Batch A: Roll 3001-3026 loaded');
+                        console.log('🎯 CE TY Batch A: Roll 3001-3027 loaded (' + batchStudents.length + ' students)');
                     } else {
                         // No Batch B or C for CE TY
                         batchStudents = [];
-                        console.log('🚫 CE TY: Only Batch A available');
+                        console.log('🚫 CE TY: Only Batch A available, Batch B and C deleted');
                     }
                 } else {
                     batchStudents = allStudents.slice(startIndex, endIndex);
