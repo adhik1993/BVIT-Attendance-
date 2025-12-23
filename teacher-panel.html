@@ -3388,7 +3388,7 @@
                 console.log('🎯 EE FY detected - Custom batch ranges with specific roll numbers');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1501-1522 + 1543 skip 1504)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1523-1544 skip 1543)</option>';
-                batchSelect.innerHTML += '<option value="BatchC">Batch C (1545-1562 + 1504)</option>';
+                batchSelect.innerHTML += '<option value="BatchC">Batch C (1545-1564 + 1504)</option>';
             } else if (selectedDepartment === 'EE' && selectedYear === 'TY') {
                 console.log('🚫 EE TY detected - Only showing Batch A and B (no Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-23 students)</option>';
@@ -5116,7 +5116,7 @@
                             // Batch C: Roll numbers 1545-1562 + 1504
                             batchStudents = allStudents.filter(student => {
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
-                                return (rollNum >= 1545 && rollNum <= 1562) || rollNum === 1504;
+                                return (rollNum >= 1545 && rollNum <= 1564) || rollNum === 1504;
                             });
                             console.log(`EE FY Batch C: Found ${batchStudents.length} students (Roll 1545-1562 + 1504)`);
                             break;
@@ -5139,7 +5139,7 @@
                                         <div class="empty-state">
                                             <i class="fas fa-user-slash"></i>
                                             <p>No students found for EE FY Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1562 + 1504'}</div>
+                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1564 + 1504'}</div>
                                         </div>
                                     </td>
                                 </tr>
