@@ -2720,76 +2720,6 @@
             loadTotalStudentsCount();
         }
 
-        // 💾 FIREBASE OPTIMIZATION - Persistent Caching (localStorage)
-        // detailed instructions on cache strategy to reduce Firebase reads
-        const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours cache
-
-        window.loadStudentsWithCache = async function () {
-            console.log('📚 Loading students with cache optimization (localStorage)...');
-
-            const cached = localStorage.getItem('students_cache');
-            if (cached) {
-                try {
-                    const { data, timestamp } = JSON.parse(cached);
-                    // Check if cache is within valid duration (24h)
-                    if (Date.now() - timestamp < CACHE_DURATION) {
-                        console.log('✅ Using cached students data from localStorage');
-                        return data;
-                    } else {
-                        console.log('⌛ Cache expired, fetching fresh data');
-                    }
-                } catch (e) {
-                    console.warn('Error parsing cache, fetching fresh data');
-                }
-            }
-
-            try {
-                console.log('🔄 Fetching fresh students data from Firebase');
-                const snapshot = await firebase.database().ref('students').once('value');
-                const data = snapshot.val() || {};
-
-                // Save to localStorage
-                try {
-                    localStorage.setItem('students_cache', JSON.stringify({
-                        data,
-                        timestamp: Date.now()
-                    }));
-                    console.log('💾 Students cached to localStorage');
-                } catch (e) {
-                    console.warn('Failed to save to localStorage (quota exceeded?)', e);
-                }
-
-                return data;
-            } catch (error) {
-                console.error('Error loading students:', error);
-                return {};
-            }
-        };
-
-        window.loadAttendanceOptimized = async function (teacherId = null) {
-            console.log('📊 Loading attendance with optimization...');
-
-            // For attendance, we might want shorter cache or session-based queries
-            // But since the user wants to reduce costs, let's optimize the QUERY first
-
-            try {
-                console.log('🔄 Fetching attendance data from Firebase');
-                let query = firebase.database().ref('attendance');
-
-                // Optimize: Only load teacher-specific data if teacherId provided
-                if (teacherId) {
-                    query = query.orderByChild('teacherId').equalTo(teacherId);
-                    console.log(`🎯 Loading only teacher-specific attendance (teacherId: ${teacherId})`);
-                }
-
-                const snapshot = await query.once('value');
-                return snapshot.val() || {};
-            } catch (error) {
-                console.error('Error loading attendance:', error);
-                return {};
-            }
-        };
-
         // 🚀 OPTIMIZED FIREBASE WRITES - Batch operations to reduce costs
         window.saveAttendanceWithOfflineSupport = async function (data) {
             console.log('💾 Saving attendance with optimization...');
@@ -2890,15 +2820,16 @@
             if (!totalStudentsElement || !window.teacherData) return;
 
             try {
-                console.log('📊 Loading total students with cache optimization...');
-                // 💰 COST OPTIMIZATION: Use cached data to reduce Firebase reads
-                const students = await window.loadStudentsWithCache();
+                console.log('📊 Loading total students...');
+                // 💰 COST WARNING: This fetches ALL students. Optimized version reverted per user request.
+                const snapshot = await firebase.database().ref('students').once('value');
+                const students = snapshot.val() || {};
                 let totalStudents = 0;
 
-                // Only count if we have valid cached data
+                // Rest of the logic remains the same as it filters client-side
                 if (!students || Object.keys(students).length === 0) {
                     totalStudentsElement.textContent = '0';
-                    console.log('⚠️ No students data available (cache miss)');
+                    console.log('⚠️ No students data available');
                     return;
                 }
 
@@ -3041,9 +2972,10 @@
                     return;
                 }
 
-                console.log('📈 Loading average attendance with optimization...');
-                // Use cached attendance data to reduce Firebase reads
-                const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
+                console.log('📈 Loading average attendance...');
+                // Fetch all attendance for average calculation (Reverted optimization)
+                const snapshot = await firebase.database().ref('attendance').once('value');
+                const attendanceData = snapshot.val() || {};
                 let totalPresent = 0;
                 let totalStudents = 0;
                 let recordCount = 0;
@@ -3185,9 +3117,10 @@
                     return;
                 }
 
-                console.log('📅 Loading today\'s attendance with optimization...');
-                // Use optimized attendance loading with teacher filter
-                const attendanceData = await window.loadAttendanceOptimized(teacherKey);
+                console.log('📅 Loading today\'s attendance...');
+                // Fetch fresh attendance data (Reverted optimization)
+                const snapshot = await firebase.database().ref('attendance').once('value');
+                const attendanceData = snapshot.val() || {};
                 let totalPresent = 0;
                 let totalStudents = 0;
                 Object.values(attendanceData).forEach(record => {
@@ -5916,20 +5849,9 @@
             const studentsRef = window.db.ref('students');
 
             try {
-                let snapshot;
-                const departmentFullName = getDepartmentFullName(department);
+                // Reverted: Fetch ALL students to ensure client-side filtering works as before
+                const snapshot = await studentsRef.once('value');
 
-                // 💰 COST OPTIMIZATION: Query by department if possible
-                if (departmentFullName) {
-                    console.log(`🔥 using optimized query for department: ${departmentFullName}`);
-                    snapshot = await window.db.ref('students')
-                        .orderByChild('department')
-                        .equalTo(departmentFullName)
-                        .once('value');
-                } else {
-                    console.warn('⚠️ Department name not found, falling back to full fetch');
-                    snapshot = await studentsRef.once('value');
-                }
                 const students = [];
 
                 if (!snapshot.exists()) {
@@ -5950,7 +5872,8 @@
                     return;
                 }
 
-                // Get department full name - REMOVED REDECLARATION
+                // Get department full name
+                const departmentFullName = getDepartmentFullName(department);
                 console.log('Looking for department:', departmentFullName);
 
                 // Normalize selected year
@@ -7281,12 +7204,9 @@
                 console.log('🔍 Filters:', { department, year, division, startDate, endDate, teacherKey });
 
                 // Load attendance data from Firebase
-                // 💰 COST OPTIMIZATION: Only fetch records for this teacher
-                console.log(`🔥 Fetching attendance for teacher: ${teacherKey}`);
-                const attendanceSnapshot = await window.db.ref('attendance')
-                    .orderByChild('teacherId')
-                    .equalTo(teacherKey)
-                    .once('value');
+                // Load attendance data from Firebase
+                console.log('Fetching all attendance data (Reverted optimization)...');
+                const attendanceSnapshot = await window.db.ref('attendance').once('value');
                 const attendanceData = attendanceSnapshot.val() || {};
 
                 console.log('📦 Raw attendance data loaded:', Object.keys(attendanceData).length, 'records');
