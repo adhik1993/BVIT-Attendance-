@@ -3,7 +3,9 @@
     "admins": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": ["email"],
+      ".indexOn": [
+        "email"
+      ],
       "$uid": {
         ".read": "auth != null && $uid === auth.uid",
         ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
@@ -12,7 +14,12 @@
     "teachers": {
       ".read": true,
       ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": ["email", "department", "firstName", "lastName"],
+      ".indexOn": [
+        "email",
+        "department",
+        "firstName",
+        "lastName"
+      ],
       "$uid": {
         ".read": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
         ".write": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
@@ -34,7 +41,12 @@
     "students": {
       ".read": true,
       ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || root.child('teachers').child(auth.uid).exists())",
-      ".indexOn": ["rollNo", "class", "department", "year"],
+      ".indexOn": [
+        "rollNo",
+        "class",
+        "department",
+        "year"
+      ],
       "$uid": {
         ".validate": "newData.hasChildren(['firstName', 'lastName', 'rollNo', 'department', 'year'])",
         "password": {
@@ -45,17 +57,27 @@
     "attendance": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["date", "class", "department"]
+      ".indexOn": [
+        "date",
+        "class",
+        "department",
+        "teacherId"
+      ]
     },
     "activities": {
       ".read": true,
       ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": ["timestamp", "type"]
+      ".indexOn": [
+        "timestamp",
+        "type"
+      ]
     },
     "notifications": {
       ".read": true,
       ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": ["timestamp"],
+      ".indexOn": [
+        "timestamp"
+      ],
       "$notification": {
         ".validate": "newData.hasChildren(['title', 'message', 'timestamp'])"
       }
@@ -67,7 +89,12 @@
     "clerks": {
       ".read": true,
       ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": ["email", "clerkId", "firstName", "lastName"],
+      ".indexOn": [
+        "email",
+        "clerkId",
+        "firstName",
+        "lastName"
+      ],
       "$uid": {
         ".read": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
         ".write": "auth != null && ($uid === auth.uid || root.child('admins').child(auth.uid).exists())",
@@ -82,7 +109,12 @@
     "bonafideApplications": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["studentId", "status", "submissionDate", "processedDate"],
+      ".indexOn": [
+        "studentId",
+        "status",
+        "submissionDate",
+        "processedDate"
+      ],
       "$applicationId": {
         ".validate": "newData.hasChildren(['studentId', 'studentName', 'submissionDate', 'status'])",
         "studentId": {
@@ -102,12 +134,22 @@
     "applications": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["studentId", "status", "submissionDate", "type"]
+      ".indexOn": [
+        "studentId",
+        "status",
+        "submissionDate",
+        "type"
+      ]
     },
     "certificates": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["studentId", "certificateStatus", "approvedDate", "certificateType"],
+      ".indexOn": [
+        "studentId",
+        "certificateStatus",
+        "approvedDate",
+        "certificateType"
+      ],
       "$certificateId": {
         ".validate": "newData.hasChildren(['studentId', 'studentName', 'certificateType', 'certificateStatus'])",
         "studentId": {
@@ -127,14 +169,22 @@
     "printQueue": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["status", "priority", "createdDate"]
+      ".indexOn": [
+        "status",
+        "priority",
+        "createdDate"
+      ]
     },
     "certificateHistory": {
       ".read": true,
       ".write": true,
-      ".indexOn": ["studentId", "issuedDate", "certificateType"]
+      ".indexOn": [
+        "studentId",
+        "issuedDate",
+        "certificateType"
+      ]
     },
     ".read": false,
     ".write": false
   }
-} 
+}

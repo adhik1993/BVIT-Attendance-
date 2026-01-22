@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <script>
-// Global Firebase Offline Fallback (must be first)
-(function() {
-    if (typeof window.firebase === 'undefined') {
-        window.firebaseOfflineMode = false;
-        window.firebase = {
-            database: function() {
-                window.firebaseOfflineMode = true;
-                return {
-                    ref: function() { return { on: function() {}, once: function() {}, off: function() {}, set: function() {}, update: function() {}, remove: function() {} }; }
-                };
-            },
-            auth: function() {
-                window.firebaseOfflineMode = true;
-                return {
-                    onAuthStateChanged: function(cb) { cb(null); return function(){}; },
-                    signOut: function() { return Promise.resolve(); },
-                    currentUser: null
-                };
-            },
-            apps: [],
-        };
-    }
-})();
+    // Global Firebase Offline Fallback (must be first)
+    (function () {
+        if (typeof window.firebase === 'undefined') {
+            window.firebaseOfflineMode = false;
+            window.firebase = {
+                database: function () {
+                    window.firebaseOfflineMode = true;
+                    return {
+                        ref: function () { return { on: function () { }, once: function () { }, off: function () { }, set: function () { }, update: function () { }, remove: function () { } }; }
+                    };
+                },
+                auth: function () {
+                    window.firebaseOfflineMode = true;
+                    return {
+                        onAuthStateChanged: function (cb) { cb(null); return function () { }; },
+                        signOut: function () { return Promise.resolve(); },
+                        currentUser: null
+                    };
+                },
+                apps: [],
+            };
+        }
+    })();
 </script>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - BVIT</title>
-    
+
     <!-- Load Firebase SDKs first -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+
     <!-- Then load our Firebase config -->
     <script src="firebase-config.js"></script>
-    
+
     <!-- Other resources -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -128,7 +129,8 @@
             transition: all 0.3s ease;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: rgba(255, 255, 255, 0.1);
             color: white;
         }
@@ -217,10 +219,25 @@
             font-size: 1.5rem;
         }
 
-        .stat-students { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
-        .stat-teachers { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
-        .stat-attendance { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .stat-performance { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .stat-students {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-teachers {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-attendance {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-performance {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
 
         .stat-value {
             font-size: 2rem;
@@ -304,7 +321,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             animation: rotate 20s linear infinite;
         }
 
@@ -441,7 +458,8 @@
                 padding: 1rem;
             }
 
-            .logo-text, .nav-text {
+            .logo-text,
+            .nav-text {
                 display: none;
             }
 
@@ -497,7 +515,8 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-height: 44px; /* Added for better touch targets */
+            min-height: 44px;
+            /* Added for better touch targets */
         }
 
         .logout-button:hover {
@@ -516,31 +535,40 @@
 
         /* Mobile styles for logout button */
         @media (max-width: 1024px) {
-    .sidebar .logout-button {
-        position: absolute;
-        left: 20px;
-        bottom: 70px;
-        width: 48px;
-        height: 48px;
-        padding: 0;
-        border-radius: 50%;
-        justify-content: center;
-        align-items: center;
-        min-width: unset;
-        min-height: unset;
-    }
-    .sidebar .logout-button span {
-        display: none;
-    }
-    .sidebar .logout-button i {
-        font-size: 1.3rem;
-        margin: 0;
-    }
-    .header-logout { display: none !important; }
-}
-        @media (min-width: 1025px) {
-            .header-logout { display: none !important; }
+            .sidebar .logout-button {
+                position: absolute;
+                left: 20px;
+                bottom: 70px;
+                width: 48px;
+                height: 48px;
+                padding: 0;
+                border-radius: 50%;
+                justify-content: center;
+                align-items: center;
+                min-width: unset;
+                min-height: unset;
+            }
+
+            .sidebar .logout-button span {
+                display: none;
+            }
+
+            .sidebar .logout-button i {
+                font-size: 1.3rem;
+                margin: 0;
+            }
+
+            .header-logout {
+                display: none !important;
+            }
         }
+
+        @media (min-width: 1025px) {
+            .header-logout {
+                display: none !important;
+            }
+        }
+
         /* Ensure sidebar is scrollable and on top */
         .sidebar {
             overflow-y: auto;
@@ -612,6 +640,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -693,41 +722,41 @@
                 </div>
             </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon stat-students">
-                    <i class="fas fa-user-graduate"></i>
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-students">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-value" id="totalStudents">Loading...</div>
+                    <div class="stat-label">Total Students</div>
                 </div>
-                <div class="stat-value" id="totalStudents">Loading...</div>
-                <div class="stat-label">Total Students</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-teachers">
-                    <i class="fas fa-chalkboard-teacher"></i>
+                <div class="stat-card">
+                    <div class="stat-icon stat-teachers">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-value" id="totalTeachers">Loading...</div>
+                    <div class="stat-label">Total Teachers</div>
                 </div>
-                <div class="stat-value" id="totalTeachers">Loading...</div>
-                <div class="stat-label">Total Teachers</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-attendance">
-                    <i class="fas fa-clipboard-check"></i>
+                <div class="stat-card">
+                    <div class="stat-icon stat-attendance">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="stat-value" id="averageAttendance">Loading...</div>
+                    <div class="stat-label">Average Attendance</div>
                 </div>
-                <div class="stat-value" id="averageAttendance">Loading...</div>
-                <div class="stat-label">Average Attendance</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-performance">
-                    <i class="fas fa-chart-line"></i>
+                <div class="stat-card">
+                    <div class="stat-icon stat-performance">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="performanceRate">Loading...</div>
+                    <div class="stat-label">Performance Rate</div>
                 </div>
-                <div class="stat-value" id="performanceRate">Loading...</div>
-                <div class="stat-label">Performance Rate</div>
             </div>
-        </div>
 
 
-        <!-- Quick Actions -->
-        <!--
+            <!-- Quick Actions -->
+            <!--
         <div class="quick-actions">
             <div class="action-card" onclick="window.location.href='student-management.html'">
                 <i class="fas fa-user-plus action-icon"></i>
@@ -744,21 +773,21 @@
         </div>
         -->
 
-        <!-- Charts Section -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <h3 class="chart-title">Attendance Trend</h3>
-                <div class="chart-container">
-                    <canvas id="attendanceChart"></canvas>
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Attendance Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Department Statistics</h3>
+                    <div class="chart-container">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="chart-card">
-                <h3 class="chart-title">Department Statistics</h3>
-                <div class="chart-container">
-                    <canvas id="departmentChart"></canvas>
-                </div>
-            </div>
-        </div>
         </div>
 
         <!-- Feedback Report Section -->
@@ -766,10 +795,12 @@
             <div class="header">
                 <h1 class="page-title">
                     <i class="fas fa-comment-dots"></i> Feedback Report
-                    <span id="feedbackStatusIndicator" style="font-size: 0.8rem; margin-left: 1rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 500;">Loading...</span>
+                    <span id="feedbackStatusIndicator"
+                        style="font-size: 0.8rem; margin-left: 1rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 500;">Loading...</span>
                 </h1>
                 <div class="header-actions">
-                    <button id="feedbackToggleBtn" class="btn" onclick="toggleFeedbackSystem()" style="margin-right: 1rem;">
+                    <button id="feedbackToggleBtn" class="btn" onclick="toggleFeedbackSystem()"
+                        style="margin-right: 1rem;">
                         <i class="fas fa-toggle-on"></i> <span id="feedbackToggleText">Disable Feedback</span>
                     </button>
                     <button class="btn btn-primary" onclick="showDashboard()">
@@ -811,35 +842,42 @@
             </div>
 
             <!-- Feedback Filters -->
-            <div class="feedback-filters" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
+            <div class="feedback-filters"
+                style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Department:</label>
-                        <select id="departmentFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="departmentFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Departments</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Class/Year:</label>
-                        <select id="classFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="classFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Classes</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Teacher:</label>
-                        <select id="teacherFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="teacherFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Teachers</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Subject:</label>
-                        <select id="subjectFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="subjectFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Subjects</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Lecture Type:</label>
-                        <select id="lectureTypeFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="lectureTypeFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Types</option>
                             <option value="Theory">Theory</option>
                             <option value="Practical">Practical</option>
@@ -847,7 +885,8 @@
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Rating:</label>
-                        <select id="ratingFilter" onchange="filterFeedbacks()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="ratingFilter" onchange="filterFeedbacks()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">All Ratings</option>
                             <option value="5">5 Stars</option>
                             <option value="4">4+ Stars</option>
@@ -860,7 +899,8 @@
             </div>
 
             <!-- Feedback Table -->
-            <div class="feedback-table-container" style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+            <div class="feedback-table-container"
+                style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
                 <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
                     <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-table"></i> Feedback Details
@@ -870,15 +910,33 @@
                     <table id="feedbackTable" style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: var(--light);">
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Student</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Department</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Class</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Teacher</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Subject</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Type</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Rating</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Date</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Action</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Student</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Department</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Class</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Teacher</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Subject</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Type</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Rating</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Date</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Action</th>
                             </tr>
                         </thead>
                         <tbody id="feedbackTableBody">
@@ -907,11 +965,15 @@
             </div>
 
             <!-- Filters -->
-            <div class="attendance-check-filters" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div class="attendance-check-filters"
+                style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Department:</label>
-                        <select id="attendanceCheckDepartment" onchange="loadYearsForDepartment()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Department:</label>
+                        <select id="attendanceCheckDepartment" onchange="loadYearsForDepartment()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
                             <option value="">Select Department</option>
                             <option value="CT">Computer Technology</option>
                             <option value="IT">Information Technology</option>
@@ -923,8 +985,10 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Year:</label>
-                        <select id="attendanceCheckYear" onchange="loadDivisionsForDepartment()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Year:</label>
+                        <select id="attendanceCheckYear" onchange="loadDivisionsForDepartment()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
                             <option value="">Select Year</option>
                             <option value="FY">First Year (FY)</option>
                             <option value="SY">Second Year (SY)</option>
@@ -933,17 +997,22 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Division:</label>
-                        <select id="attendanceCheckDivision" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Division:</label>
+                        <select id="attendanceCheckDivision"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
                             <option value="">Select Division</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Date:</label>
-                        <input type="date" id="attendanceCheckDate" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark);">Date:</label>
+                        <input type="date" id="attendanceCheckDate"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;">
                     </div>
                     <div>
-                        <button id="checkAttendanceBtn" class="btn btn-primary" onclick="checkAttendanceForDate()" style="width: 100%; padding: 0.75rem;">
+                        <button id="checkAttendanceBtn" class="btn btn-primary" onclick="checkAttendanceForDate()"
+                            style="width: 100%; padding: 0.75rem;">
                             <i class="fas fa-search"></i> Check Attendance
                         </button>
                     </div>
@@ -985,31 +1054,55 @@
                 </div>
 
                 <!-- Subjects Table -->
-                <div class="subjects-table-container" style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+                <div class="subjects-table-container"
+                    style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
                     <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
                         <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-table"></i> Subjects with Attendance
-                            <span id="selectedDateDisplay" style="font-size: 0.9rem; color: var(--text-light); font-weight: normal;"></span>
+                            <span id="selectedDateDisplay"
+                                style="font-size: 0.9rem; color: var(--text-light); font-weight: normal;"></span>
                         </h3>
                     </div>
                     <div style="overflow-x: auto;">
                         <table id="subjectsTable" style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: var(--light);">
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Subject</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Lecture Type</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Teacher</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Time</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Present</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Absent</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Total</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Percentage</th>
-                                    <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Action</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Subject</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Lecture Type</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Batch</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Teacher</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Time</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Present</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Absent</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Total</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Percentage</th>
+                                    <th
+                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody id="subjectsTableBody">
                                 <tr>
-                                    <td colspan="9" style="padding: 2rem; text-align: center; color: var(--text-light);">
+                                    <td colspan="10"
+                                        style="padding: 2rem; text-align: center; color: var(--text-light);">
                                         Select filters and click "Check Attendance" to view results
                                     </td>
                                 </tr>
@@ -1030,11 +1123,14 @@
             </div>
 
             <!-- Filters -->
-            <div class="filters-container" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div class="filters-container"
+                style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Department:</label>
-                        <select id="batchDepartment" onchange="loadBatchYears(); loadBatchOptions();" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="batchDepartment" onchange="loadBatchYears(); loadBatchOptions();"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">-- Select Department --</option>
                             <option value="CT">Computer Technology</option>
                             <option value="IT">Information Technology</option>
@@ -1047,24 +1143,28 @@
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year:</label>
-                        <select id="batchYear" onchange="loadBatchDivisions(); loadBatchOptions();" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="batchYear" onchange="loadBatchDivisions(); loadBatchOptions();"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">-- Select Year --</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Division:</label>
-                        <select id="batchDivision" onchange="loadBatchOptions()" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="batchDivision" onchange="loadBatchOptions()"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">-- Select Division --</option>
                         </select>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Batch:</label>
-                        <select id="batchLetter" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <select id="batchLetter"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
                             <option value="">-- Select Batch --</option>
                         </select>
                     </div>
                     <div>
-                        <button onclick="loadBatchStudents()" style="width: 100%; padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        <button onclick="loadBatchStudents()"
+                            style="width: 100%; padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                             <i class="fas fa-search"></i> Load Students
                         </button>
                     </div>
@@ -1072,157 +1172,238 @@
             </div>
 
             <!-- Batch Configuration Panel -->
-            <div id="batchConfigPanel" style="display: none; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; border: 2px solid var(--primary);">
+            <div id="batchConfigPanel"
+                style="display: none; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; border: 2px solid var(--primary);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h3 style="margin: 0; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-cogs"></i> Batch Configuration
                     </h3>
-                    <button onclick="closeBatchConfig()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-light);">
+                    <button onclick="closeBatchConfig()"
+                        style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-light);">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
+
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                     <!-- Batch A Configuration -->
-                    <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
-                        <h4 style="margin: 0 0 1rem 0; color: var(--secondary); display: flex; align-items: center; gap: 0.5rem;">
+                    <div
+                        style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
+                        <h4
+                            style="margin: 0 0 1rem 0; color: var(--secondary); display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-users"></i> Batch A Configuration
                         </h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start Roll:</label>
-                                <input type="number" id="batchAStart" value="1" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start
+                                    Roll:</label>
+                                <input type="number" id="batchAStart" value="1" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End Roll:</label>
-                                <input type="number" id="batchAEnd" value="20" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End
+                                    Roll:</label>
+                                <input type="number" id="batchAEnd" value="20" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra Students (Roll Numbers):</label>
-                            <input type="text" id="batchAExtra" placeholder="e.g., 25,27,30" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to include</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchAExtra" placeholder="e.g., 25,27,30"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                include</small>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude Students (Roll Numbers):</label>
-                            <input type="text" id="batchAExclude" placeholder="e.g., 5,10,15" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to exclude</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchAExclude" placeholder="e.g., 5,10,15"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                exclude</small>
                         </div>
-                        <div id="batchAPreview" style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">Preview: 1-20 (20 students)</div>
+                        <div id="batchAPreview"
+                            style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">
+                            Preview: 1-20 (20 students)</div>
                     </div>
 
                     <!-- Batch B Configuration -->
-                    <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
-                        <h4 style="margin: 0 0 1rem 0; color: var(--warning); display: flex; align-items: center; gap: 0.5rem;">
+                    <div
+                        style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
+                        <h4
+                            style="margin: 0 0 1rem 0; color: var(--warning); display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-users"></i> Batch B Configuration
                         </h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start Roll:</label>
-                                <input type="number" id="batchBStart" value="21" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start
+                                    Roll:</label>
+                                <input type="number" id="batchBStart" value="21" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End Roll:</label>
-                                <input type="number" id="batchBEnd" value="40" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End
+                                    Roll:</label>
+                                <input type="number" id="batchBEnd" value="40" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra Students (Roll Numbers):</label>
-                            <input type="text" id="batchBExtra" placeholder="e.g., 45,47,50" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to include</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchBExtra" placeholder="e.g., 45,47,50"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                include</small>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude Students (Roll Numbers):</label>
-                            <input type="text" id="batchBExclude" placeholder="e.g., 25,30,35" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to exclude</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchBExclude" placeholder="e.g., 25,30,35"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                exclude</small>
                         </div>
-                        <div id="batchBPreview" style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">Preview: 21-40 (20 students)</div>
+                        <div id="batchBPreview"
+                            style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">
+                            Preview: 21-40 (20 students)</div>
                     </div>
 
                     <!-- Batch C Configuration -->
-                    <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
-                        <h4 style="margin: 0 0 1rem 0; color: var(--danger); display: flex; align-items: center; gap: 0.5rem;">
+                    <div
+                        style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--lighter);">
+                        <h4
+                            style="margin: 0 0 1rem 0; color: var(--danger); display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-users"></i> Batch C Configuration
                         </h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start Roll:</label>
-                                <input type="number" id="batchCStart" value="41" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Start
+                                    Roll:</label>
+                                <input type="number" id="batchCStart" value="41" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                             <div>
-                                <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End Roll:</label>
-                                <input type="number" id="batchCEnd" value="60" min="1" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">End
+                                    Roll:</label>
+                                <input type="number" id="batchCEnd" value="60" min="1"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
                             </div>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra Students (Roll Numbers):</label>
-                            <input type="text" id="batchCExtra" placeholder="e.g., 65,67,70" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to include</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Extra
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchCExtra" placeholder="e.g., 65,67,70"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                include</small>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude Students (Roll Numbers):</label>
-                            <input type="text" id="batchCExclude" placeholder="e.g., 45,50,55" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
-                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to exclude</small>
+                            <label
+                                style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Exclude
+                                Students (Roll Numbers):</label>
+                            <input type="text" id="batchCExclude" placeholder="e.g., 45,50,55"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem;">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Comma-separated roll numbers to
+                                exclude</small>
                         </div>
-                        <div id="batchCPreview" style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">Preview: 41-60 (20 students)</div>
+                        <div id="batchCPreview"
+                            style="font-size: 0.875rem; color: var(--text-light); background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border);">
+                            Preview: 41-60 (20 students)</div>
                     </div>
                 </div>
-                
+
                 <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="previewBatchConfiguration()" style="padding: 0.75rem 1.5rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="previewBatchConfiguration()"
+                        style="padding: 0.75rem 1.5rem; background: var(--info); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-eye"></i> Preview Configuration
                     </button>
-                    <button onclick="saveBatchConfiguration()" style="padding: 0.75rem 1.5rem; background: var(--secondary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="saveBatchConfiguration()"
+                        style="padding: 0.75rem 1.5rem; background: var(--secondary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-save"></i> Save Configuration
                     </button>
-                    <button onclick="resetBatchConfiguration()" style="padding: 0.75rem 1.5rem; background: var(--warning); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="resetBatchConfiguration()"
+                        style="padding: 0.75rem 1.5rem; background: var(--warning); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-undo"></i> Reset to Default
                     </button>
                 </div>
             </div>
 
             <!-- Action Buttons -->
-            <div id="batchActions" style="display: none; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <div id="batchActions"
+                style="display: none; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button onclick="showBatchConfigPanel()" style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="showBatchConfigPanel()"
+                        style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-cogs"></i> Configure Batch Ranges
                     </button>
-                    <button onclick="showShiftStudentModal()" style="padding: 0.75rem 1.5rem; background: var(--secondary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="showShiftStudentModal()"
+                        style="padding: 0.75rem 1.5rem; background: var(--secondary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-exchange-alt"></i> Shift Students Between Batches
                     </button>
-                    <button onclick="deleteDuplicateRoll2026()" style="padding: 0.75rem 1.5rem; background: var(--danger); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="deleteDuplicateRoll2026()"
+                        style="padding: 0.75rem 1.5rem; background: var(--danger); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-trash"></i> Delete Duplicate Roll 2026 (CE SY Batch B)
                     </button>
-                    <button onclick="showBulkDeleteModal()" style="padding: 0.75rem 1.5rem; background: var(--warning); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="showBulkDeleteModal()"
+                        style="padding: 0.75rem 1.5rem; background: var(--warning); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-users-slash"></i> Bulk Delete Students
                     </button>
-                    <button onclick="clearAllBatchConfigurations()" style="padding: 0.75rem 1.5rem; background: #6B7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    <button onclick="clearAllBatchConfigurations()"
+                        style="padding: 0.75rem 1.5rem; background: #6B7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         <i class="fas fa-eraser"></i> Clear All Configurations
                     </button>
                 </div>
             </div>
 
             <!-- Students Table -->
-            <div id="batchStudentsTable" style="display: none; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+            <div id="batchStudentsTable"
+                style="display: none; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
                 <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
                     <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-users"></i> Batch Students
-                        <span id="batchStudentsCount" style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; margin-left: 1rem;">0</span>
+                        <span id="batchStudentsCount"
+                            style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; margin-left: 1rem;">0</span>
                     </h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: var(--light);">
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
-                                    <input type="checkbox" id="selectAllBatchStudents" onchange="toggleSelectAllBatchStudents()">
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    <input type="checkbox" id="selectAllBatchStudents"
+                                        onchange="toggleSelectAllBatchStudents()">
                                 </th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Roll No</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Name</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Department</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Year</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Division</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">Actions</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Roll No</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Name</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Department</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Year</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Division</th>
+                                <th
+                                    style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
+                                    Actions</th>
                             </tr>
                         </thead>
                         <tbody id="batchStudentsTableBody">
@@ -1250,22 +1431,22 @@
                     await window.waitForFirebase();
                 }
                 console.log('Fetching dashboard stats...');
-                
+
                 // Get total students count
                 const studentsSnapshot = await window.db.ref('students').once('value');
                 const totalStudents = studentsSnapshot.exists() ? Object.keys(studentsSnapshot.val()).length : 0;
                 document.getElementById('totalStudents').textContent = totalStudents;
-                
+
                 // Get total teachers count
                 const teachersSnapshot = await window.db.ref('teachers').once('value');
                 const totalTeachers = teachersSnapshot.exists() ? Object.keys(teachersSnapshot.val()).length : 0;
                 document.getElementById('totalTeachers').textContent = totalTeachers;
-                
+
                 // Calculate average attendance
                 const attendanceSnapshot = await window.db.ref('attendance').once('value');
                 let totalAttendance = 0;
                 let attendanceCount = 0;
-                
+
                 if (attendanceSnapshot.exists()) {
                     attendanceSnapshot.forEach(dateSnapshot => {
                         const students = dateSnapshot.val().students || {};
@@ -1277,21 +1458,21 @@
                         }
                     });
                 }
-                
+
                 const averageAttendance = attendanceCount > 0 ? (totalAttendance / attendanceCount).toFixed(1) : 0;
                 document.getElementById('averageAttendance').textContent = averageAttendance + '%';
-                
+
                 // Calculate performance rate (based on attendance for now)
                 const performanceRate = averageAttendance > 0 ? averageAttendance : 0;
                 document.getElementById('performanceRate').textContent = performanceRate + '%';
-                
+
                 console.log('Dashboard stats updated:', {
                     totalStudents,
                     totalTeachers,
                     averageAttendance,
                     performanceRate
                 });
-                
+
             } catch (error) {
                 console.error('Error updating dashboard stats:', error);
             }
@@ -1302,43 +1483,43 @@
             try {
                 await waitForFirebase();
                 const activityList = document.getElementById('activityList');
-                
+
                 // Check if element exists
                 if (!activityList) {
                     console.warn('activityList element not found, skipping recent activities update');
                     return;
                 }
-                
+
                 // Get recent attendance records from Firebase
                 const attendanceSnapshot = await window.db.ref('attendance')
                     .orderByChild('timestamp')
                     .limitToLast(10)
                     .once('value');
-                
+
                 // Clear loading state
                 activityList.innerHTML = '';
-                
+
                 if (attendanceSnapshot.exists()) {
                     // Convert to array and sort by timestamp
                     const activities = [];
                     attendanceSnapshot.forEach(snap => {
                         const data = snap.val();
                         if (data.teacherId) {
-                        activities.push({
+                            activities.push({
                                 id: snap.key,
                                 ...data,
                                 timestamp: data.timestamp || Date.now()
-                        });
+                            });
                         }
                     });
-                    
+
                     // Sort by timestamp descending
                     activities.sort((a, b) => b.timestamp - a.timestamp);
-                    
+
                     // Get teacher details
                     const teacherIds = [...new Set(activities.map(a => a.teacherId))];
                     const teacherDetails = {};
-                    
+
                     for (const teacherId of teacherIds) {
                         const teacherSnap = await window.db.ref('teachers/' + teacherId).once('value');
                         if (teacherSnap.exists()) {
@@ -1362,12 +1543,12 @@
                             teacherDetails[teacherId] = 'Teacher';
                         }
                     }
-                    
+
                     // Add activities to the list
                     activities.slice(0, 10).forEach(activity => {
                         const timeAgo = getTimeAgo(activity.timestamp);
                         const teacherName = teacherDetails[activity.teacherId] || 'Teacher';
-                        
+
                         const li = document.createElement('li');
                         li.className = 'activity-item';
                         li.innerHTML = `
@@ -1433,11 +1614,11 @@
         function getTimeAgo(timestamp) {
             const now = Date.now();
             const diff = now - timestamp;
-            
+
             const minutes = Math.floor(diff / 60000);
             const hours = Math.floor(minutes / 60);
             const days = Math.floor(hours / 24);
-            
+
             if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
             if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
             if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
@@ -1461,12 +1642,12 @@
         }
 
         // Update stats and activities when page loads
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             try {
                 // Update stats and activities
                 updateDashboardStats();
                 updateRecentActivities();
-                
+
                 // Initialize charts
                 const attendanceChart = document.getElementById('attendanceChart');
                 const departmentChart = document.getElementById('departmentChart');
@@ -1475,10 +1656,10 @@
                     try {
                         // Get attendance data for last 6 months
                         const attendanceData = await getAttendanceData();
-                        
+
                         // Get department data
                         const departmentData = await getDepartmentData();
-                        
+
                         // Attendance Trend Chart
                         new Chart(attendanceChart, {
                             type: 'line',
@@ -1554,22 +1735,22 @@
                 const months = [];
                 const values = [];
                 const today = new Date();
-                
+
                 // Get last 6 months
                 for (let i = 5; i >= 0; i--) {
                     const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
                     months.push(month.toLocaleString('default', { month: 'short' }));
                 }
-                
+
                 // Get attendance data for each month
                 const attendanceSnapshot = await window.db.ref('attendance').once('value');
                 const attendanceData = attendanceSnapshot.val() || {};
-                
+
                 // Calculate monthly averages
                 months.forEach(month => {
                     let totalAttendance = 0;
                     let count = 0;
-                    
+
                     Object.entries(attendanceData).forEach(([date, data]) => {
                         const attendanceDate = new Date(date);
                         if (attendanceDate.toLocaleString('default', { month: 'short' }) === month) {
@@ -1582,12 +1763,12 @@
                             }
                         }
                     });
-                    
+
                     values.push(count > 0 ? (totalAttendance / count).toFixed(1) : 0);
                 });
-                
+
                 return { labels: months, values };
-                
+
             } catch (error) {
                 console.error('Error getting attendance data:', error);
                 return { labels: [], values: [] };
@@ -1599,11 +1780,11 @@
         // Handle logout
         function handleLogout() {
             console.log('Logging out...');
-            
+
             // Clear session storage
             sessionStorage.clear();
             console.log('Session storage cleared');
-            
+
             // Sign out from Firebase
             firebase.auth().signOut()
                 .then(() => {
@@ -1632,23 +1813,23 @@
 
         // Function to check if admin is authenticated
         function isAdminAuthenticated() {
-                const isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
-                const adminData = sessionStorage.getItem('adminData');
+            const isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn');
+            const adminData = sessionStorage.getItem('adminData');
             const adminToken = localStorage.getItem('adminToken');
-                
+
             console.log('Checking admin authentication:', {
                 isAdminLoggedIn,
                 hasAdminData: !!adminData,
                 hasAdminToken: !!adminToken
             });
-                
+
             return isAdminLoggedIn === 'true' && (adminData || adminToken);
         }
 
         // Function to navigate with session check
         function navigateWithSessionCheck(url) {
             console.log('Navigating to:', url);
-            
+
             if (isAdminAuthenticated()) {
                 // Reset auto logout timer if exists
                 if (typeof startAutoLogoutTimer === 'function') {
@@ -1671,45 +1852,45 @@
         }
 
         // Update navigation when DOM loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('DOM loaded, setting up navigation');
-            
+
             // Check initial authentication
             if (!isAdminAuthenticated()) {
                 console.log('Initial auth check failed');
                 window.location.href = 'welcome.html';
                 return;
             }
-            
+
             // Update navigation links with debounced click handler
             const debouncedNavigate = debounce((url) => {
                 navigateWithSessionCheck(url);
             }, 300);
-            
+
             document.querySelectorAll('.nav-link, .action-card').forEach(element => {
-                const href = element.getAttribute('href') || 
-                            element.getAttribute('onclick')?.match(/window\.location\.href='([^']+)'/)?.[1];
-                
+                const href = element.getAttribute('href') ||
+                    element.getAttribute('onclick')?.match(/window\.location\.href='([^']+)'/)?.[1];
+
                 if (href && href !== '#') {
-                    element.addEventListener('click', function(e) {
+                    element.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         console.log('Navigation clicked:', href);
                         debouncedNavigate(href);
                     });
-                    
+
                     // Remove onclick attribute to prevent double navigation
                     element.removeAttribute('onclick');
                 }
             });
-            
+
             // Load dashboard data
             updateDashboardStats();
             updateRecentActivities();
         });
 
         // Handle page visibility changes
-        document.addEventListener('visibilitychange', function() {
+        document.addEventListener('visibilitychange', function () {
             if (!document.hidden && isAdminAuthenticated()) {
                 console.log('Page visible, checking session');
                 // Reset auto logout timer if exists
@@ -1720,7 +1901,7 @@
         });
 
         // Handle page focus
-        window.addEventListener('focus', function() {
+        window.addEventListener('focus', function () {
             if (isAdminAuthenticated()) {
                 console.log('Page focused, checking session');
                 // Reset auto logout timer if exists
@@ -1741,20 +1922,20 @@
         async function toggleFeedbackSystem() {
             try {
                 await waitForFirebase();
-                
+
                 // Toggle the state
                 feedbackSystemEnabled = !feedbackSystemEnabled;
-                
+
                 // Update Firebase setting
                 await window.db.ref('settings/feedbackEnabled').set(feedbackSystemEnabled);
-                
+
                 // Update UI
                 updateFeedbackToggleUI();
-                
+
                 // Show confirmation
                 const status = feedbackSystemEnabled ? 'enabled' : 'disabled';
                 alert(`Feedback system has been ${status} successfully!`);
-                
+
             } catch (error) {
                 console.error('Error toggling feedback system:', error);
                 alert('Error updating feedback system. Please try again.');
@@ -1767,14 +1948,14 @@
             const toggleText = document.getElementById('feedbackToggleText');
             const toggleIcon = toggleBtn.querySelector('i');
             const statusIndicator = document.getElementById('feedbackStatusIndicator');
-            
+
             if (feedbackSystemEnabled) {
                 toggleBtn.className = 'btn';
                 toggleBtn.style.background = '#EF4444';
                 toggleBtn.style.color = 'white';
                 toggleIcon.className = 'fas fa-toggle-on';
                 toggleText.textContent = 'Disable Feedback';
-                
+
                 // Update status indicator
                 statusIndicator.textContent = 'ENABLED';
                 statusIndicator.style.background = '#10B981';
@@ -1785,7 +1966,7 @@
                 toggleBtn.style.color = 'white';
                 toggleIcon.className = 'fas fa-toggle-off';
                 toggleText.textContent = 'Enable Feedback';
-                
+
                 // Update status indicator
                 statusIndicator.textContent = 'DISABLED';
                 statusIndicator.style.background = '#EF4444';
@@ -1797,7 +1978,7 @@
         async function loadFeedbackSystemStatus() {
             try {
                 await waitForFirebase();
-                
+
                 const statusSnapshot = await window.db.ref('settings/feedbackEnabled').once('value');
                 if (statusSnapshot.exists()) {
                     feedbackSystemEnabled = statusSnapshot.val();
@@ -1806,9 +1987,9 @@
                     feedbackSystemEnabled = true;
                     await window.db.ref('settings/feedbackEnabled').set(true);
                 }
-                
+
                 updateFeedbackToggleUI();
-                
+
             } catch (error) {
                 console.error('Error loading feedback system status:', error);
                 feedbackSystemEnabled = true; // Default to enabled
@@ -1821,11 +2002,11 @@
             document.getElementById('dashboardSection').style.display = 'none';
             document.getElementById('feedbackReportSection').style.display = 'block';
             document.querySelector('.page-title').textContent = 'Feedback Report';
-            
+
             // Update nav active state
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.closest('.nav-link').classList.add('active');
-            
+
             // Load feedback system status and data
             loadFeedbackSystemStatus();
             loadFeedbackData();
@@ -1836,7 +2017,7 @@
             document.getElementById('feedbackReportSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
             document.querySelector('.page-title').textContent = 'Dashboard Overview';
-            
+
             // Update nav active state
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             document.querySelector('.nav-link[href="#"]').classList.add('active');
@@ -1846,10 +2027,10 @@
         async function loadFeedbackData() {
             try {
                 await waitForFirebase();
-                
+
                 const feedbackSnapshot = await window.db.ref('feedback').once('value');
                 allFeedbacks = [];
-                
+
                 if (feedbackSnapshot.exists()) {
                     feedbackSnapshot.forEach(snap => {
                         const feedback = snap.val();
@@ -1860,18 +2041,18 @@
                         });
                     });
                 }
-                
+
                 // Sort by timestamp descending
                 allFeedbacks.sort((a, b) => b.timestamp - a.timestamp);
-                
+
                 // Update stats and populate filters
                 await updateFeedbackStats();
                 await populateFilters();
-                
+
                 // Show all feedbacks initially
                 filteredFeedbacks = [...allFeedbacks];
                 await displayFeedbacks();
-                
+
             } catch (error) {
                 console.error('Error loading feedback data:', error);
                 document.getElementById('feedbackTableBody').innerHTML = `
@@ -1888,18 +2069,18 @@
         async function updateFeedbackStats() {
             const totalFeedbacks = allFeedbacks.length;
             document.getElementById('totalFeedbacks').textContent = totalFeedbacks;
-            
+
             if (totalFeedbacks === 0) {
                 document.getElementById('averageRating').textContent = '0.0';
                 document.getElementById('topRatedTeacher').textContent = '-';
                 document.getElementById('thisMonthFeedbacks').textContent = '0';
                 return;
             }
-            
+
             // Calculate average rating
             let totalRating = 0;
             let ratingCount = 0;
-            
+
             allFeedbacks.forEach(feedback => {
                 if (feedback.ratings) {
                     const ratings = Object.values(feedback.ratings);
@@ -1908,10 +2089,10 @@
                     ratingCount++;
                 }
             });
-            
+
             const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : '0.0';
             document.getElementById('averageRating').textContent = averageRating;
-            
+
             // Find top rated teacher
             const teacherRatings = {};
             allFeedbacks.forEach(feedback => {
@@ -1925,7 +2106,7 @@
                     teacherRatings[feedback.teacher].count++;
                 }
             });
-            
+
             let topTeacher = '-';
             let topRating = 0;
             Object.keys(teacherRatings).forEach(teacher => {
@@ -1935,7 +2116,7 @@
                     topTeacher = teacher;
                 }
             });
-            
+
             // Get teacher name for display
             let displayTeacherName = topTeacher;
             try {
@@ -1945,7 +2126,7 @@
                         const teacher = snap.val();
                         const teacherId = teacher.teacherId || teacher.code || teacher.email || snap.key;
                         if (teacherId === topTeacher) {
-                            displayTeacherName = teacher.firstName && teacher.lastName 
+                            displayTeacherName = teacher.firstName && teacher.lastName
                                 ? `${teacher.firstName} ${teacher.lastName}`.trim()
                                 : teacher.name || topTeacher;
                         }
@@ -1954,9 +2135,9 @@
             } catch (error) {
                 console.error('Error resolving teacher name:', error);
             }
-            
+
             document.getElementById('topRatedTeacher').textContent = displayTeacherName;
-            
+
             // Count this month's feedbacks
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
@@ -1964,7 +2145,7 @@
                 const feedbackDate = new Date(feedback.timestamp);
                 return feedbackDate.getMonth() === currentMonth && feedbackDate.getFullYear() === currentYear;
             }).length;
-            
+
             document.getElementById('thisMonthFeedbacks').textContent = thisMonthCount;
         }
 
@@ -1973,11 +2154,11 @@
             let studentData = {};
             const teachers = [...new Set(allFeedbacks.map(f => f.teacher).filter(Boolean))];
             const subjects = [...new Set(allFeedbacks.map(f => f.subject).filter(Boolean))];
-            
+
             // Get student data for departments and classes
             const departments = new Set();
             const classes = new Set();
-            
+
             try {
                 // Get all students to populate department and class filters
                 const studentsSnapshot = await window.db.ref('students').once('value');
@@ -1995,25 +2176,25 @@
             } catch (error) {
                 console.error('Error loading student data for filters:', error);
             }
-            
+
             // Populate department filter
             const departmentFilter = document.getElementById('departmentFilter');
             departmentFilter.innerHTML = '<option value="">All Departments</option>';
             [...departments].sort().forEach(dept => {
                 departmentFilter.innerHTML += `<option value="${dept}">${dept}</option>`;
             });
-            
+
             // Populate class filter
             const classFilter = document.getElementById('classFilter');
             classFilter.innerHTML = '<option value="">All Classes</option>';
             [...classes].sort().forEach(cls => {
                 classFilter.innerHTML += `<option value="${cls}">${cls}</option>`;
             });
-            
+
             // Populate teacher filter with resolved names
             const teacherFilter = document.getElementById('teacherFilter');
             teacherFilter.innerHTML = '<option value="">All Teachers</option>';
-            
+
             // Get teacher names for filter display
             let teacherNames = {};
             try {
@@ -2022,7 +2203,7 @@
                     teachersSnapshot.forEach(snap => {
                         const teacher = snap.val();
                         const teacherId = teacher.teacherId || teacher.code || teacher.email || snap.key;
-                        const teacherName = teacher.firstName && teacher.lastName 
+                        const teacherName = teacher.firstName && teacher.lastName
                             ? `${teacher.firstName} ${teacher.lastName}`.trim()
                             : teacher.name || teacherId;
                         teacherNames[teacherId] = teacherName;
@@ -2031,12 +2212,12 @@
             } catch (error) {
                 console.error('Error loading teacher names for filter:', error);
             }
-            
+
             teachers.forEach(teacherId => {
                 const displayName = teacherNames[teacherId] || teacherId;
                 teacherFilter.innerHTML += `<option value="${teacherId}">${displayName}</option>`;
             });
-            
+
             // Populate subject filter
             const subjectFilter = document.getElementById('subjectFilter');
             subjectFilter.innerHTML = '<option value="">All Subjects</option>';
@@ -2053,7 +2234,7 @@
             const subjectFilter = document.getElementById('subjectFilter').value;
             const lectureTypeFilter = document.getElementById('lectureTypeFilter').value;
             const ratingFilter = document.getElementById('ratingFilter').value;
-            
+
             // Get student data for department and class filtering
             let studentData = {};
             if (departmentFilter || classFilter) {
@@ -2074,29 +2255,29 @@
                     console.error('Error loading student data for filtering:', error);
                 }
             }
-            
+
             filteredFeedbacks = allFeedbacks.filter(feedback => {
                 // Department filter
                 if (departmentFilter && feedback.studentId) {
                     const student = studentData[feedback.studentId];
                     if (!student || student.department !== departmentFilter) return false;
                 }
-                
+
                 // Class filter
                 if (classFilter && feedback.studentId) {
                     const student = studentData[feedback.studentId];
                     if (!student || student.class !== classFilter) return false;
                 }
-                
+
                 // Teacher filter
                 if (teacherFilter && feedback.teacher !== teacherFilter) return false;
-                
+
                 // Subject filter
                 if (subjectFilter && feedback.subject !== subjectFilter) return false;
-                
+
                 // Lecture type filter
                 if (lectureTypeFilter && feedback.lectureType !== lectureTypeFilter) return false;
-                
+
                 // Rating filter
                 if (ratingFilter && feedback.ratings) {
                     const ratings = Object.values(feedback.ratings);
@@ -2104,17 +2285,17 @@
                     const minRating = parseInt(ratingFilter);
                     if (avgRating < minRating) return false;
                 }
-                
+
                 return true;
             });
-            
+
             displayFeedbacks();
         }
 
         // Display Feedbacks in Table
         async function displayFeedbacks() {
             const tbody = document.getElementById('feedbackTableBody');
-            
+
             if (filteredFeedbacks.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -2125,7 +2306,7 @@
                 `;
                 return;
             }
-            
+
             // Get student data for department and class display
             let studentData = {};
             try {
@@ -2144,7 +2325,7 @@
             } catch (error) {
                 console.error('Error loading student data for display:', error);
             }
-            
+
             // Get teacher data for name resolution
             let teacherData = {};
             try {
@@ -2153,7 +2334,7 @@
                     teachersSnapshot.forEach(snap => {
                         const teacher = snap.val();
                         const teacherId = teacher.teacherId || teacher.code || teacher.email || snap.key;
-                        const teacherName = teacher.firstName && teacher.lastName 
+                        const teacherName = teacher.firstName && teacher.lastName
                             ? `${teacher.firstName} ${teacher.lastName}`.trim()
                             : teacher.name || teacherId;
                         teacherData[teacherId] = teacherName;
@@ -2162,25 +2343,25 @@
             } catch (error) {
                 console.error('Error loading teacher data for display:', error);
             }
-            
+
             tbody.innerHTML = '';
-            
+
             filteredFeedbacks.forEach(feedback => {
                 const date = new Date(feedback.timestamp).toLocaleDateString();
-                
+
                 // Get student info
                 const student = studentData[feedback.studentId] || { department: 'N/A', class: 'N/A' };
-                
+
                 // Calculate overall rating
                 let overallRating = 0;
                 if (feedback.ratings) {
                     const ratings = Object.values(feedback.ratings);
                     overallRating = (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1);
                 }
-                
+
                 // Generate star display
                 const stars = generateStars(parseFloat(overallRating));
-                
+
                 const row = document.createElement('tr');
                 row.style.borderBottom = '1px solid var(--border)';
                 row.innerHTML = `
@@ -2215,7 +2396,7 @@
                         </button>
                     </td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
         }
@@ -2239,7 +2420,7 @@
         async function viewFeedbackDetails(feedbackId) {
             const feedback = allFeedbacks.find(f => f.id === feedbackId);
             if (!feedback) return;
-            
+
             // Resolve teacher name
             let teacherName = feedback.teacher || 'N/A';
             try {
@@ -2249,7 +2430,7 @@
                         const teacher = snap.val();
                         const teacherId = teacher.teacherId || teacher.code || teacher.email || snap.key;
                         if (teacherId === feedback.teacher) {
-                            teacherName = teacher.firstName && teacher.lastName 
+                            teacherName = teacher.firstName && teacher.lastName
                                 ? `${teacher.firstName} ${teacher.lastName}`.trim()
                                 : teacher.name || feedback.teacher;
                         }
@@ -2258,7 +2439,7 @@
             } catch (error) {
                 console.error('Error resolving teacher name in details:', error);
             }
-            
+
             let detailsHtml = `
                 <div style="max-width: 600px;">
                     <h4 style="margin-bottom: 1rem; color: var(--primary);">Feedback Details</h4>
@@ -2270,10 +2451,10 @@
                         <p><strong>Date:</strong> ${new Date(feedback.timestamp).toLocaleString()}</p>
                     </div>
             `;
-            
+
             if (feedback.ratings) {
                 detailsHtml += '<h5 style="margin-bottom: 0.5rem;">Detailed Ratings:</h5><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">';
-                
+
                 const ratingLabels = {
                     knowledge: 'Subject Knowledge',
                     clarity: 'Clarity of Explanation',
@@ -2285,7 +2466,7 @@
                     motivation: 'Motivation',
                     quality: 'Overall Quality'
                 };
-                
+
                 Object.entries(feedback.ratings).forEach(([key, value]) => {
                     const label = ratingLabels[key] || key;
                     const stars = generateStars(value);
@@ -2299,12 +2480,12 @@
                         </div>
                     `;
                 });
-                
+
                 detailsHtml += '</div>';
             }
-            
+
             detailsHtml += '</div>';
-            
+
             // Show in a modal-like alert
             const popup = window.open('', '_blank', 'width=700,height=600,scrollbars=yes,resizable=yes');
             popup.document.write(`
@@ -2337,11 +2518,11 @@
             document.getElementById('dashboardSection').style.display = 'none';
             document.getElementById('feedbackReportSection').style.display = 'none';
             document.getElementById('attendanceCheckSection').style.display = 'block';
-            
+
             // Update navigation
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             document.querySelector('a[onclick="showAttendanceCheck()"]').classList.add('active');
-            
+
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('attendanceCheckDate').value = today;
@@ -2352,11 +2533,11 @@
             const department = document.getElementById('attendanceCheckDepartment').value;
             const yearSelect = document.getElementById('attendanceCheckYear');
             const divisionSelect = document.getElementById('attendanceCheckDivision');
-            
+
             // Reset year and division
             yearSelect.value = '';
             divisionSelect.innerHTML = '<option value="">Select Division</option>';
-            
+
             // Hide results
             document.getElementById('attendanceCheckResults').style.display = 'none';
         }
@@ -2365,10 +2546,10 @@
         function loadDivisionsForDepartment() {
             const department = document.getElementById('attendanceCheckDepartment').value;
             const divisionSelect = document.getElementById('attendanceCheckDivision');
-            
+
             // Reset division
             divisionSelect.innerHTML = '<option value="">Select Division</option>';
-            
+
             // Only CT department has divisions
             if (department === 'CT') {
                 divisionSelect.innerHTML = `
@@ -2382,7 +2563,7 @@
                 divisionSelect.innerHTML = '<option value="ALL">All Students</option>';
                 divisionSelect.value = 'ALL';
             }
-            
+
             // Hide results
             document.getElementById('attendanceCheckResults').style.display = 'none';
         }
@@ -2394,43 +2575,43 @@
                 const year = document.getElementById('attendanceCheckYear').value;
                 const division = document.getElementById('attendanceCheckDivision').value;
                 const date = document.getElementById('attendanceCheckDate').value;
-                
+
                 // Validation
                 if (!department || !year || !date) {
                     alert('Please select Department, Year, and Date');
                     return;
                 }
-                
+
                 if (department === 'CT' && !division) {
                     alert('Please select Division for CT department');
                     return;
                 }
-                
+
                 // Show loading
                 const btn = document.getElementById('checkAttendanceBtn');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 btn.disabled = true;
-                
+
                 console.log('🔍 Checking attendance for:', { department, year, division, date });
-                
+
                 // Wait for Firebase initialization
                 if (typeof window.waitForFirebase === 'function') {
                     await window.waitForFirebase();
                 }
-                
+
                 // Get attendance records for the selected date
                 const attendanceSnapshot = await window.db.ref('attendance').once('value');
-                
+
                 const subjectsData = [];
                 let totalSubjects = 0;
                 let theoryCount = 0;
                 let practicalCount = 0;
                 let totalStudentsAttended = 0;
-                
+
                 if (attendanceSnapshot.exists()) {
                     const teacherDetails = {}; // Cache for teacher names
-                    
+
                     // Get teacher details first
                     const teachersSnapshot = await window.db.ref('teachers').once('value');
                     if (teachersSnapshot.exists()) {
@@ -2441,14 +2622,14 @@
                                 const firstName = teacher.firstName || '';
                                 const lastName = teacher.lastName || '';
                                 const fullName = `${firstName} ${lastName}`.trim() || teacher.name || teacherId;
-                                
+
                                 // Store teacher name with multiple possible keys
                                 teacherDetails[teacherId] = fullName;
                                 teacherDetails[snap.key] = fullName;
                                 if (teacher.code && teacher.code !== teacherId) {
                                     teacherDetails[teacher.code] = fullName;
                                 }
-                                
+
                                 console.log('📝 Teacher mapped:', {
                                     teacherId: teacherId,
                                     firebaseKey: snap.key,
@@ -2458,12 +2639,12 @@
                             }
                         });
                     }
-                    
+
                     console.log('👥 Teacher details cache:', teacherDetails);
-                    
+
                     attendanceSnapshot.forEach(snap => {
                         const record = snap.val();
-                        
+
                         // Check if record matches our criteria
                         if (record.date === date) {
                             // For new attendance structure (with class field)
@@ -2472,30 +2653,30 @@
                                 const recordDept = extractDepartmentFromClass(classCode);
                                 const recordYear = extractYearFromClass(classCode);
                                 const recordDivision = extractDivisionFromClass(classCode);
-                                
+
                                 if (recordDept === department && recordYear === year) {
                                     // Check division match
                                     let divisionMatch = true;
                                     if (department === 'CT' && division !== 'ALL') {
                                         divisionMatch = recordDivision === division;
                                     }
-                                    
+
                                     if (divisionMatch) {
                                         const students = record.students || {};
                                         const presentCount = Object.values(students).filter(status => status === true).length;
                                         const absentCount = Object.values(students).filter(status => status === false).length;
                                         const totalCount = Object.keys(students).length;
                                         const percentage = totalCount > 0 ? ((presentCount / totalCount) * 100).toFixed(1) : '0';
-                                        
+
                                         // Enhanced teacher name resolution
                                         let teacherName = 'N/A';
                                         if (record.teacherId) {
-                                            teacherName = teacherDetails[record.teacherId] || 
-                                                         teacherDetails[record.teacherId.toUpperCase()] ||
-                                                         teacherDetails[record.teacherId.toLowerCase()] ||
-                                                         record.teacherId;
+                                            teacherName = teacherDetails[record.teacherId] ||
+                                                teacherDetails[record.teacherId.toUpperCase()] ||
+                                                teacherDetails[record.teacherId.toLowerCase()] ||
+                                                record.teacherId;
                                         }
-                                        
+
                                         console.log('🔍 Teacher resolution for record:', {
                                             recordTeacherId: record.teacherId,
                                             resolvedName: teacherName,
@@ -2505,6 +2686,7 @@
                                         subjectsData.push({
                                             subject: record.subject || 'N/A',
                                             lectureType: record.lectureType || 'N/A',
+                                            batch: extractBatchFromClass(record.class) || '-',
                                             teacher: teacherName,
                                             time: record.time || 'N/A',
                                             present: presentCount,
@@ -2513,7 +2695,7 @@
                                             percentage: percentage,
                                             recordId: snap.key
                                         });
-                                        
+
                                         totalSubjects++;
                                         if (record.lectureType === 'theory') theoryCount++;
                                         if (record.lectureType === 'practical') practicalCount++;
@@ -2527,23 +2709,23 @@
                                 if (department === 'CT' && division !== 'ALL' && record.division) {
                                     divisionMatch = record.division === division;
                                 }
-                                
+
                                 if (divisionMatch) {
                                     const students = record.students || {};
                                     const presentCount = Object.values(students).filter(status => status === true).length;
                                     const absentCount = Object.values(students).filter(status => status === false).length;
                                     const totalCount = Object.keys(students).length;
                                     const percentage = totalCount > 0 ? ((presentCount / totalCount) * 100).toFixed(1) : '0';
-                                    
+
                                     // Enhanced teacher name resolution for old structure
                                     let teacherName = 'N/A';
                                     if (record.teacherId) {
-                                        teacherName = teacherDetails[record.teacherId] || 
-                                                     teacherDetails[record.teacherId.toUpperCase()] ||
-                                                     teacherDetails[record.teacherId.toLowerCase()] ||
-                                                     record.teacherId;
+                                        teacherName = teacherDetails[record.teacherId] ||
+                                            teacherDetails[record.teacherId.toUpperCase()] ||
+                                            teacherDetails[record.teacherId.toLowerCase()] ||
+                                            record.teacherId;
                                     }
-                                    
+
                                     console.log('🔍 Teacher resolution (old structure):', {
                                         recordTeacherId: record.teacherId,
                                         resolvedName: teacherName
@@ -2552,6 +2734,7 @@
                                     subjectsData.push({
                                         subject: record.subject || 'N/A',
                                         lectureType: record.lectureType || 'N/A',
+                                        batch: '-',
                                         teacher: teacherName,
                                         time: record.time || 'N/A',
                                         present: presentCount,
@@ -2560,7 +2743,7 @@
                                         percentage: percentage,
                                         recordId: snap.key
                                     });
-                                    
+
                                     totalSubjects++;
                                     if (record.lectureType === 'theory') theoryCount++;
                                     if (record.lectureType === 'practical') practicalCount++;
@@ -2570,7 +2753,7 @@
                         }
                     });
                 }
-                
+
                 console.log('📊 Found attendance data:', {
                     totalSubjects,
                     theoryCount,
@@ -2578,13 +2761,13 @@
                     totalStudentsAttended,
                     subjectsData
                 });
-                
+
                 // Update stats
                 document.getElementById('totalSubjectsCount').textContent = totalSubjects;
                 document.getElementById('theorySubjectsCount').textContent = theoryCount;
                 document.getElementById('practicalSubjectsCount').textContent = practicalCount;
                 document.getElementById('totalStudentsAttended').textContent = totalStudentsAttended;
-                
+
                 // Update date display
                 const formattedDate = new Date(date).toLocaleDateString('en-IN', {
                     weekday: 'long',
@@ -2593,13 +2776,13 @@
                     day: 'numeric'
                 });
                 document.getElementById('selectedDateDisplay').textContent = `(${formattedDate})`;
-                
+
                 // Update table
                 updateSubjectsTable(subjectsData);
-                
+
                 // Show results
                 document.getElementById('attendanceCheckResults').style.display = 'block';
-                
+
             } catch (error) {
                 console.error('Error checking attendance:', error);
                 alert('Error loading attendance data. Please try again.');
@@ -2614,7 +2797,7 @@
         // Update Subjects Table
         function updateSubjectsTable(subjectsData) {
             const tbody = document.getElementById('subjectsTableBody');
-            
+
             if (subjectsData.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -2625,23 +2808,28 @@
                 `;
                 return;
             }
-            
+
             tbody.innerHTML = '';
-            
+
             subjectsData.forEach((subject, index) => {
                 const row = document.createElement('tr');
                 row.style.borderBottom = '1px solid var(--border)';
-                
+
                 // Color coding for percentage
                 let percentageColor = '#EF4444'; // Red for low
                 if (parseFloat(subject.percentage) >= 75) percentageColor = '#10B981'; // Green for good
                 else if (parseFloat(subject.percentage) >= 50) percentageColor = '#F59E0B'; // Yellow for average
-                
+
                 row.innerHTML = `
                     <td style="padding: 1rem; font-weight: 500;">${subject.subject}</td>
                     <td style="padding: 1rem;">
                         <span style="padding: 0.25rem 0.5rem; background: ${subject.lectureType === 'theory' ? 'rgba(79, 70, 229, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${subject.lectureType === 'theory' ? 'var(--primary)' : 'var(--secondary)'}; border-radius: 4px; font-size: 0.875rem; text-transform: capitalize;">
                             <i class="fas ${subject.lectureType === 'theory' ? 'fa-chalkboard' : 'fa-flask'}"></i> ${subject.lectureType}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.5rem; background: var(--light); color: var(--text-dark); border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                            ${subject.batch}
                         </span>
                     </td>
                     <td style="padding: 1rem;">${subject.teacher}</td>
@@ -2672,7 +2860,7 @@
                         </button>
                     </td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
         }
@@ -2698,10 +2886,44 @@
         }
 
         function extractDivisionFromClass(classCode) {
-            if (classCode.includes('-A')) return 'A';
-            if (classCode.includes('-B')) return 'B';
-            if (classCode.includes('-C')) return 'C';
+            if (!classCode) return 'ALL';
+            const parts = classCode.split('-');
+            for (const part of parts) {
+                if (part === 'A') return 'A';
+                if (part === 'B') return 'B';
+                if (part === 'C') return 'C';
+            }
             return 'ALL';
+        }
+
+        function extractBatchFromClass(classCode) {
+            if (!classCode) return '-';
+            // Check explicit markers first
+            if (classCode.includes('BatchA')) return 'A';
+            if (classCode.includes('BatchB')) return 'B';
+            if (classCode.includes('BatchC')) return 'C';
+
+            // Check implicit suffixes
+            const parts = classCode.split('-');
+            const lastPart = parts[parts.length - 1];
+
+            if (['A', 'B', 'C'].includes(lastPart)) {
+                const dept = extractDepartmentFromClass(classCode);
+
+                // If CT, format is usually YearDept-Div-Batch or YearDept-Div
+                if (dept === 'CT') {
+                    // If 3 parts (e.g. TYCT-A-A), last is batch
+                    if (parts.length >= 3) return lastPart;
+                    // If 2 parts (e.g. TYCT-A), last is division, so no batch
+                    return '-';
+                }
+
+                // For other departments, format is usually YearDept-Batch or YearDept
+                // If 2 parts (e.g. TYCE-A), last is batch (since no division in CE)
+                if (parts.length >= 2) return lastPart;
+            }
+
+            return '-';
         }
 
         // ========== BATCH MANAGEMENT FUNCTIONS ==========
@@ -2713,7 +2935,7 @@
             document.getElementById('feedbackReportSection').style.display = 'none';
             document.getElementById('attendanceCheckSection').style.display = 'none';
             document.getElementById('batchManagementSection').style.display = 'block';
-            
+
             // Update active nav
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.closest('.nav-link').classList.add('active');
@@ -2723,9 +2945,9 @@
         function loadBatchYears() {
             const department = document.getElementById('batchDepartment').value;
             const yearSelect = document.getElementById('batchYear');
-            
+
             yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
-            
+
             if (department) {
                 yearSelect.innerHTML += `
                     <option value="FY">First Year</option>
@@ -2734,7 +2956,7 @@
                     <option value="BE">Final Year</option>
                 `;
             }
-            
+
             // Reset dependent dropdowns
             document.getElementById('batchDivision').innerHTML = '<option value="">-- Select Division --</option>';
             document.getElementById('batchLetter').innerHTML = '<option value="">-- Select Batch --</option>';
@@ -2745,9 +2967,9 @@
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
             const divisionSelect = document.getElementById('batchDivision');
-            
+
             divisionSelect.innerHTML = '<option value="">-- Select Division --</option>';
-            
+
             if (department && year) {
                 if (department === 'CT') {
                     divisionSelect.innerHTML += `
@@ -2758,13 +2980,13 @@
                 } else {
                     divisionSelect.innerHTML += `<option value="ALL">All Students</option>`;
                 }
-                
+
                 // Auto-load batch options if division is automatically set
                 setTimeout(() => {
                     loadBatchOptions();
                 }, 100);
             }
-            
+
             // Reset batch dropdown
             document.getElementById('batchLetter').innerHTML = '<option value="">-- Select Batch --</option>';
         }
@@ -2775,11 +2997,11 @@
             const year = document.getElementById('batchYear').value;
             const division = document.getElementById('batchDivision').value;
             const batchSelect = document.getElementById('batchLetter');
-            
+
             console.log('Loading batch options:', { department, year, division });
-            
+
             batchSelect.innerHTML = '<option value="">-- Select Batch --</option>';
-            
+
             if (department && year && division) {
                 console.log('Adding batch options A, B, C');
                 batchSelect.innerHTML += `
@@ -2799,15 +3021,15 @@
             const year = document.getElementById('batchYear').value;
             const division = document.getElementById('batchDivision').value;
             const batchLetter = document.getElementById('batchLetter').value;
-            
+
             console.log('🔍 Loading batch students with filters:', { department, year, division, batchLetter });
-            
+
             if (!department || !year || !division || !batchLetter) {
                 alert('Please select all filters first');
                 console.log('❌ Missing filters');
                 return;
             }
-            
+
             try {
                 // Show loading message
                 const tbody = document.getElementById('batchStudentsTableBody');
@@ -2818,13 +3040,13 @@
                         </td>
                     </tr>
                 `;
-                
+
                 console.log('📡 Fetching students from Firebase...');
-                
+
                 // Get all students using firebase.database()
                 const studentsSnapshot = await firebase.database().ref('students').once('value');
                 const allStudents = [];
-                
+
                 if (!studentsSnapshot.exists()) {
                     console.log('❌ No students found in database');
                     tbody.innerHTML = `
@@ -2836,26 +3058,26 @@
                     `;
                     return;
                 }
-                
+
                 studentsSnapshot.forEach(snapshot => {
                     const student = snapshot.val();
                     student.id = snapshot.key;
                     allStudents.push(student);
                 });
-                
+
                 console.log(`📊 Total students in database: ${allStudents.length}`);
-                
+
                 // Debug: Show sample student data
                 if (allStudents.length > 0) {
                     console.log('📋 Sample student data:', allStudents[0]);
                     console.log('🔍 Looking for:', { department, year });
-                    
+
                     // Show unique branches and years in database
                     const uniqueBranches = [...new Set(allStudents.map(s => s.branch).filter(b => b))];
                     const uniqueYears = [...new Set(allStudents.map(s => s.year).filter(y => y))];
                     console.log('🏢 Available branches:', uniqueBranches);
                     console.log('📅 Available years:', uniqueYears);
-                    
+
                     // Show CE students specifically
                     const ceStudents = allStudents.filter(s => s.branch && s.branch.includes('Civil'));
                     console.log('🏗️ CE students found:', ceStudents.length);
@@ -2865,44 +3087,44 @@
                         console.log('🏗️ CE years available:', ceYears);
                     }
                 }
-                
+
                 // Map department codes to branch names
                 const departmentMapping = {
                     'CE': 'Civil Engineering',
-                    'IT': 'Information Technology', 
+                    'IT': 'Information Technology',
                     'ME': 'Mechanical Engineering',
                     'CT': 'Computer Technology',
                     'EE': 'Electrical Engineering',
                     'ET': 'Electronics & Telecommunication',
                     'AI': 'Artificial Intelligence'
                 };
-                
+
                 // Map year codes to full names
                 const yearMapping = {
                     'FY': 'First',
-                    'SY': 'Second', 
+                    'SY': 'Second',
                     'TY': 'Third',
                     'BE': 'Fourth'
                 };
-                
+
                 const targetBranch = departmentMapping[department];
                 const targetYear = yearMapping[year];
-                
-                console.log('🎯 Mapping:', { 
-                    department, 
-                    targetBranch, 
-                    year, 
-                    targetYear 
+
+                console.log('🎯 Mapping:', {
+                    department,
+                    targetBranch,
+                    year,
+                    targetYear
                 });
-                
+
                 // Filter students by branch and year (using actual database fields)
                 let filteredStudents = [];
                 let debugCount = 0;
-                
+
                 filteredStudents = allStudents.filter(student => {
                     const branchMatch = student.branch === targetBranch;
                     const yearMatch = student.year === targetYear;
-                    
+
                     // Debug first few mismatches
                     if (!branchMatch || !yearMatch) {
                         if (debugCount < 3) {
@@ -2917,18 +3139,18 @@
                             debugCount++;
                         }
                     }
-                    
+
                     return branchMatch && yearMatch;
                 });
-                
+
                 console.log(`🎯 Students after dept/year filter: ${filteredStudents.length}`);
-                
+
                 // Filter by division if CT department
                 if (department === 'CT' && division !== 'ALL') {
                     filteredStudents = filteredStudents.filter(student => student.division === division);
                     console.log(`🎯 Students after division filter: ${filteredStudents.length}`);
                 }
-                
+
                 if (filteredStudents.length === 0) {
                     console.log('❌ No students found for selected filters');
                     tbody.innerHTML = `
@@ -2940,13 +3162,13 @@
                     `;
                     return;
                 }
-                
+
                 // Sort by roll number with better error handling
                 filteredStudents.sort((a, b) => {
                     // Handle different roll number formats safely
                     let rollA = 0;
                     let rollB = 0;
-                    
+
                     try {
                         if (a.rollNo !== null && a.rollNo !== undefined) {
                             if (typeof a.rollNo === 'number') {
@@ -2959,7 +3181,7 @@
                         console.warn('Error parsing rollNo for student:', a.name, a.rollNo);
                         rollA = 0;
                     }
-                    
+
                     try {
                         if (b.rollNo !== null && b.rollNo !== undefined) {
                             if (typeof b.rollNo === 'number') {
@@ -2972,23 +3194,23 @@
                         console.warn('Error parsing rollNo for student:', b.name, b.rollNo);
                         rollB = 0;
                     }
-                    
+
                     return rollA - rollB;
                 });
-                
+
                 console.log('📋 Students sorted by roll number');
-                
+
                 // Apply exact teacher panel batch logic
                 let batchStudents;
                 let startIndex = 0;
                 let endIndex = 20;
-                
+
                 // Sort students by roll number first (like teacher panel) with safe error handling
                 filteredStudents.sort((a, b) => {
                     // Handle different roll number formats safely
                     let rollA = 0;
                     let rollB = 0;
-                    
+
                     try {
                         if (a.rollNo !== null && a.rollNo !== undefined) {
                             if (typeof a.rollNo === 'number') {
@@ -3001,7 +3223,7 @@
                         console.warn('Error parsing rollNo for student:', a.name, a.rollNo);
                         rollA = 0;
                     }
-                    
+
                     try {
                         if (b.rollNo !== null && b.rollNo !== undefined) {
                             if (typeof b.rollNo === 'number') {
@@ -3014,23 +3236,23 @@
                         console.warn('Error parsing rollNo for student:', b.name, b.rollNo);
                         rollB = 0;
                     }
-                    
+
                     return rollA - rollB;
                 });
-                
+
                 console.log('📋 Students sorted by roll number');
-                
+
                 // 🎯 FIRST: Try to apply custom batch configuration
                 console.log('🔧 Checking for custom batch configuration...');
                 console.log(`🔍 Debug: Department=${department}, Year=${year}, Batch=${batchLetter}`);
                 console.log(`🔍 Debug: Available configurations:`, batchConfigurations);
                 console.log(`🔍 Debug: Looking for key: ${department}_${year}`);
                 batchStudents = applyCustomBatchConfiguration(filteredStudents, batchLetter, department, year);
-                
+
                 // If no custom configuration found, fall back to hardcoded logic
                 if (batchStudents === null) {
                     console.log('📋 No custom configuration found, using hardcoded batch logic');
-                    
+
                     // Apply department/year specific batch logic (copied from teacher panel)
                     if (department === 'IT' && year === 'FY') {
                         // IT FY: A(1-20), B(21-40), C(41+)
@@ -3041,113 +3263,113 @@
                             default: startIndex = 0; endIndex = 20; break;
                         }
                         batchStudents = filteredStudents.slice(startIndex, endIndex);
-                    
-                } else if (department === 'IT' && year === 'SY') {
-                    // IT SY: A(1-24), B(25-48), C(49-71)
-                    switch (batchLetter) {
-                        case 'A': startIndex = 0; endIndex = 24; break;
-                        case 'B': startIndex = 24; endIndex = 48; break;
-                        case 'C': startIndex = 48; endIndex = 71; break;
-                        default: startIndex = 0; endIndex = 24; break;
-                    }
-                    batchStudents = filteredStudents.slice(startIndex, endIndex);
-                    
-                } else if (department === 'IT' && year === 'TY') {
-                    // IT TY: A(1-23), B(24-46), C(47-70) with special roll handling
-                    if (batchLetter === 'A') {
-                        batchStudents = filteredStudents.slice(0, 23);
-                        // Force add roll 3623 to Batch A
-                        const roll3623Student = filteredStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623);
-                        if (roll3623Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623)) {
-                            batchStudents.push(roll3623Student);
-                            console.log('🎯 Added roll 3623 to Batch A');
+
+                    } else if (department === 'IT' && year === 'SY') {
+                        // IT SY: A(1-24), B(25-48), C(49-71)
+                        switch (batchLetter) {
+                            case 'A': startIndex = 0; endIndex = 24; break;
+                            case 'B': startIndex = 24; endIndex = 48; break;
+                            case 'C': startIndex = 48; endIndex = 71; break;
+                            default: startIndex = 0; endIndex = 24; break;
                         }
-                        // Also add roll 23 if present
-                        const roll23Student = filteredStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23);
-                        if (roll23Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23)) {
-                            batchStudents.push(roll23Student);
-                            console.log('🎯 Added roll 23 to Batch A');
+                        batchStudents = filteredStudents.slice(startIndex, endIndex);
+
+                    } else if (department === 'IT' && year === 'TY') {
+                        // IT TY: A(1-23), B(24-46), C(47-70) with special roll handling
+                        if (batchLetter === 'A') {
+                            batchStudents = filteredStudents.slice(0, 23);
+                            // Force add roll 3623 to Batch A
+                            const roll3623Student = filteredStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623);
+                            if (roll3623Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623)) {
+                                batchStudents.push(roll3623Student);
+                                console.log('🎯 Added roll 3623 to Batch A');
+                            }
+                            // Also add roll 23 if present
+                            const roll23Student = filteredStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23);
+                            if (roll23Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23)) {
+                                batchStudents.push(roll23Student);
+                                console.log('🎯 Added roll 23 to Batch A');
+                            }
+                            // Sort after adding
+                            batchStudents.sort((a, b) => {
+                                const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
+                                const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
+                                return rollA - rollB;
+                            });
+                        } else if (batchLetter === 'B') {
+                            batchStudents = filteredStudents.slice(23, 46).filter(s => {
+                                const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
+                                return roll !== 23 && roll !== 3623; // Remove roll 23 and 3623 from Batch B
+                            });
+                            console.log('🎯 IT TY Batch B: Removed roll 23 and 3623');
+                        } else if (batchLetter === 'C') {
+                            batchStudents = filteredStudents.slice(46, 70);
+                        } else {
+                            batchStudents = filteredStudents.slice(0, 23);
                         }
-                        // Sort after adding
-                        batchStudents.sort((a, b) => {
-                            const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
-                            const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
-                            return rollA - rollB;
-                        });
-                    } else if (batchLetter === 'B') {
-                        batchStudents = filteredStudents.slice(23, 46).filter(s => {
-                            const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
-                            return roll !== 23 && roll !== 3623; // Remove roll 23 and 3623 from Batch B
-                        });
-                        console.log('🎯 IT TY Batch B: Removed roll 23 and 3623');
-                    } else if (batchLetter === 'C') {
-                        batchStudents = filteredStudents.slice(46, 70);
-                    } else {
-                        batchStudents = filteredStudents.slice(0, 23);
-                    }
-                    
-                } else if (department === 'CE' && year === 'SY') {
-                    // CE SY: Special batch handling
-                    if (batchLetter === 'A') {
-                        // Batch A: 1-22 (0-21) and 27 (index 26)
-                        batchStudents = filteredStudents.slice(0, 22).concat(filteredStudents.slice(26, 27));
-                    } else if (batchLetter === 'B') {
-                        // Batch B: 23-26 (22-25), 28-43 (27-43), and add 26 (index 25), remove 27 (index 26)
-                        batchStudents = filteredStudents.slice(22, 26) // 23-26
-                            .concat(filteredStudents.slice(27, 43))    // 28-43
-                            .concat(filteredStudents.slice(25, 26));   // add 26
-                    } else {
-                        // Default fallback
-                        batchStudents = filteredStudents.slice(0, 22).concat(filteredStudents.slice(26, 27));
-                    }
-                    
-                } else if (department === 'CE' && year === 'TY') {
-                    // CE TY: Only Batch A with roll 3001-3026
-                    if (batchLetter === 'A') {
-                        batchStudents = filteredStudents.filter(s => {
-                            const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
-                            return roll >= 3001 && roll <= 3026;
-                        });
-                        console.log('🎯 CE TY Batch A: Roll 3001-3026 loaded');
-                    } else {
-                        batchStudents = [];
-                        console.log('🚫 CE TY: Only Batch A available');
-                    }
-                    
-                } else if (department === 'ET' && year === 'FY') {
-                    // ET FY: A(1-20), B(21-40), C(41+)
-                    switch (batchLetter) {
-                        case 'A': batchStudents = filteredStudents.slice(0, 20); break;
-                        case 'B': batchStudents = filteredStudents.slice(20, 40); break;
-                        case 'C': batchStudents = filteredStudents.slice(40); break;
-                        default: batchStudents = filteredStudents.slice(0, 20); break;
-                    }
-                    
-                } else if (department === 'ET' && year === 'SY') {
-                    // ET SY: A(1-24), B(25-48), C(49-69)
-                    switch (batchLetter) {
-                        case 'A': batchStudents = filteredStudents.slice(0, 24); break;
-                        case 'B': batchStudents = filteredStudents.slice(24, 48); break;
-                        case 'C': batchStudents = filteredStudents.slice(48, 69); break;
-                        default: batchStudents = filteredStudents.slice(0, 24); break;
-                    }
-                    
-                } else if (department === 'ET' && year === 'TY') {
-                    // ET TY: A(1-20), B(21-37), NO C
-                    switch (batchLetter) {
-                        case 'A': batchStudents = filteredStudents.slice(0, 20); break;
-                        case 'B': batchStudents = filteredStudents.slice(20, 37); break;
-                        default: batchStudents = filteredStudents.slice(0, 20); break;
-                    }
-                    
-                } else if (department === 'EE' && year === 'TY') {
-                    // EE TY: Only Batch A and B (no Batch C)
-                    switch (batchLetter) {
-                        case 'A': batchStudents = filteredStudents.slice(0, 23); break;
-                        case 'B': batchStudents = filteredStudents.slice(23); break;
-                        default: batchStudents = filteredStudents.slice(0, 23); break;
-                    }
-                    
+
+                    } else if (department === 'CE' && year === 'SY') {
+                        // CE SY: Special batch handling
+                        if (batchLetter === 'A') {
+                            // Batch A: 1-22 (0-21) and 27 (index 26)
+                            batchStudents = filteredStudents.slice(0, 22).concat(filteredStudents.slice(26, 27));
+                        } else if (batchLetter === 'B') {
+                            // Batch B: 23-26 (22-25), 28-43 (27-43), and add 26 (index 25), remove 27 (index 26)
+                            batchStudents = filteredStudents.slice(22, 26) // 23-26
+                                .concat(filteredStudents.slice(27, 43))    // 28-43
+                                .concat(filteredStudents.slice(25, 26));   // add 26
+                        } else {
+                            // Default fallback
+                            batchStudents = filteredStudents.slice(0, 22).concat(filteredStudents.slice(26, 27));
+                        }
+
+                    } else if (department === 'CE' && year === 'TY') {
+                        // CE TY: Only Batch A with roll 3001-3026
+                        if (batchLetter === 'A') {
+                            batchStudents = filteredStudents.filter(s => {
+                                const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
+                                return roll >= 3001 && roll <= 3026;
+                            });
+                            console.log('🎯 CE TY Batch A: Roll 3001-3026 loaded');
+                        } else {
+                            batchStudents = [];
+                            console.log('🚫 CE TY: Only Batch A available');
+                        }
+
+                    } else if (department === 'ET' && year === 'FY') {
+                        // ET FY: A(1-20), B(21-40), C(41+)
+                        switch (batchLetter) {
+                            case 'A': batchStudents = filteredStudents.slice(0, 20); break;
+                            case 'B': batchStudents = filteredStudents.slice(20, 40); break;
+                            case 'C': batchStudents = filteredStudents.slice(40); break;
+                            default: batchStudents = filteredStudents.slice(0, 20); break;
+                        }
+
+                    } else if (department === 'ET' && year === 'SY') {
+                        // ET SY: A(1-24), B(25-48), C(49-69)
+                        switch (batchLetter) {
+                            case 'A': batchStudents = filteredStudents.slice(0, 24); break;
+                            case 'B': batchStudents = filteredStudents.slice(24, 48); break;
+                            case 'C': batchStudents = filteredStudents.slice(48, 69); break;
+                            default: batchStudents = filteredStudents.slice(0, 24); break;
+                        }
+
+                    } else if (department === 'ET' && year === 'TY') {
+                        // ET TY: A(1-20), B(21-37), NO C
+                        switch (batchLetter) {
+                            case 'A': batchStudents = filteredStudents.slice(0, 20); break;
+                            case 'B': batchStudents = filteredStudents.slice(20, 37); break;
+                            default: batchStudents = filteredStudents.slice(0, 20); break;
+                        }
+
+                    } else if (department === 'EE' && year === 'TY') {
+                        // EE TY: Only Batch A and B (no Batch C)
+                        switch (batchLetter) {
+                            case 'A': batchStudents = filteredStudents.slice(0, 23); break;
+                            case 'B': batchStudents = filteredStudents.slice(23); break;
+                            default: batchStudents = filteredStudents.slice(0, 23); break;
+                        }
+
                     } else {
                         // Default batch system for other departments/years (20 students per batch)
                         const batchMap = { 'A': 1, 'B': 2, 'C': 3 };
@@ -3157,22 +3379,22 @@
                         batchStudents = filteredStudents.slice(startIndex, endIndex);
                     }
                 } // Close the if (batchStudents === null) block
-                
+
                 console.log(`🎯 ${department} ${year} Batch ${batchLetter}: ${batchStudents.length} students loaded`);
-                
+
                 console.log(`✅ Final batch students: ${batchStudents.length}`);
-                
+
                 // Display students
                 displayBatchStudents(batchStudents);
-                
+
                 // Show action buttons and table
                 document.getElementById('batchActions').style.display = 'block';
                 document.getElementById('batchStudentsTable').style.display = 'block';
-                
+
             } catch (error) {
                 console.error('❌ Error loading batch students:', error);
                 alert('Error loading students: ' + error.message);
-                
+
                 // Show error in table
                 const tbody = document.getElementById('batchStudentsTableBody');
                 tbody.innerHTML = `
@@ -3189,9 +3411,9 @@
         function displayBatchStudents(students) {
             const tbody = document.getElementById('batchStudentsTableBody');
             const countSpan = document.getElementById('batchStudentsCount');
-            
+
             countSpan.textContent = students.length;
-            
+
             if (students.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -3202,7 +3424,7 @@
                 `;
                 return;
             }
-            
+
             tbody.innerHTML = students.map(student => `
                 <tr>
                     <td style="padding: 1rem; border-bottom: 1px solid var(--border);">
@@ -3226,7 +3448,7 @@
         function toggleSelectAllBatchStudents() {
             const selectAll = document.getElementById('selectAllBatchStudents');
             const checkboxes = document.querySelectorAll('.student-checkbox');
-            
+
             checkboxes.forEach(checkbox => {
                 checkbox.checked = selectAll.checked;
             });
@@ -3236,68 +3458,68 @@
         async function deleteDuplicateRoll2026() {
             const confirmDelete = confirm('Delete duplicate roll 2026 from CE Second Year Batch B?');
             if (!confirmDelete) return;
-            
+
             try {
                 console.log('🎯 Deleting duplicate roll 2026 from CE SY Batch B...');
-                
+
                 // Get all students
                 const studentsSnapshot = await firebase.database().ref('students').once('value');
                 const allStudents = [];
-                
+
                 studentsSnapshot.forEach(snapshot => {
                     const student = snapshot.val();
                     student.id = snapshot.key;
                     allStudents.push(student);
                 });
-                
+
                 // Filter CE SY students only
-                const cesyStudents = allStudents.filter(student => 
+                const cesyStudents = allStudents.filter(student =>
                     student.department === 'CE' && student.year === 'SY'
                 );
-                
+
                 // Sort by roll number
                 cesyStudents.sort((a, b) => {
                     const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
                     const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
                     return rollA - rollB;
                 });
-                
+
                 // CE SY Batch B range: students 23-43 (index 22-42)
                 const batchBStudents = cesyStudents.slice(22, 43);
-                
+
                 // Find roll 2026 students in Batch B
                 const roll2026Students = batchBStudents.filter(student => {
                     const rollNo = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                     return rollNo === 2026;
                 });
-                
+
                 console.log(`🔍 Found ${roll2026Students.length} students with roll 2026 in CE SY Batch B:`);
                 roll2026Students.forEach((student, index) => {
                     console.log(`${index + 1}. ${student.name} - Roll: ${student.rollNo} - ID: ${student.id}`);
                 });
-                
+
                 if (roll2026Students.length > 1) {
                     // Keep first, delete others
                     const keepStudent = roll2026Students[0];
                     const deleteStudents = roll2026Students.slice(1);
-                    
+
                     console.log(`✅ Keeping: ${keepStudent.name} (Roll: ${keepStudent.rollNo})`);
                     console.log(`🗑️ Will delete ${deleteStudents.length} duplicate(s)`);
-                    
+
                     // Delete duplicates
                     for (const student of deleteStudents) {
                         await firebase.database().ref('students/' + student.id).remove();
                         console.log(`🗑️ Deleted: ${student.name} (Roll: ${student.rollNo})`);
                     }
-                    
+
                     console.log('✅ Duplicate deletion completed!');
                     alert(`Successfully deleted ${deleteStudents.length} duplicate roll 2026 student(s) from CE SY Batch B!`);
-                    
+
                     // Reload students if currently viewing CE SY Batch B
                     const currentDept = document.getElementById('batchDepartment').value;
                     const currentYear = document.getElementById('batchYear').value;
                     const currentBatch = document.getElementById('batchLetter').value;
-                    
+
                     if (currentDept === 'CE' && currentYear === 'SY' && currentBatch === 'B') {
                         loadBatchStudents();
                     }
@@ -3305,7 +3527,7 @@
                     console.log('✅ No duplicates found - only one roll 2026 student in CE SY Batch B');
                     alert('No duplicate roll 2026 found in CE SY Batch B');
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error during deletion:', error);
                 alert('Error occurred during deletion: ' + error.message);
@@ -3316,7 +3538,7 @@
         async function deleteStudent(studentId) {
             const confirmDelete = confirm('Are you sure you want to delete this student?');
             if (!confirmDelete) return;
-            
+
             try {
                 await firebase.database().ref('students/' + studentId).remove();
                 alert('Student deleted successfully!');
@@ -3330,12 +3552,12 @@
         // Show Bulk Delete Modal
         function showBulkDeleteModal() {
             const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
-            
+
             if (selectedCheckboxes.length === 0) {
                 alert('Please select students to delete');
                 return;
             }
-            
+
             const confirmDelete = confirm(`Delete ${selectedCheckboxes.length} selected student(s)?`);
             if (confirmDelete) {
                 bulkDeleteStudents(selectedCheckboxes);
@@ -3345,17 +3567,17 @@
         // Bulk Delete Students
         async function bulkDeleteStudents(checkboxes) {
             try {
-                const deletePromises = Array.from(checkboxes).map(checkbox => 
+                const deletePromises = Array.from(checkboxes).map(checkbox =>
                     firebase.database().ref('students/' + checkbox.value).remove()
                 );
-                
+
                 await Promise.all(deletePromises);
                 alert(`Successfully deleted ${checkboxes.length} student(s)!`);
                 loadBatchStudents(); // Reload the table
-                
+
                 // Reset select all checkbox
                 document.getElementById('selectAllBatchStudents').checked = false;
-                
+
             } catch (error) {
                 console.error('Error in bulk delete:', error);
                 alert('Error deleting students: ' + error.message);
@@ -3378,7 +3600,7 @@
                 align-items: center;
                 z-index: 1000;
             `;
-            
+
             modal.innerHTML = `
                 <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -3436,12 +3658,12 @@
                     </form>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
             updateSourceBatchInfo();
             updateSelectedStudentsList();
         }
-        
+
         // Close Shift Student Modal
         function closeShiftStudentModal() {
             const modal = document.getElementById('shiftStudentModal');
@@ -3449,17 +3671,17 @@
                 modal.remove();
             }
         }
-        
+
         // Update Source Batch Information
         function updateSourceBatchInfo() {
             const sourceBatchInfo = document.getElementById('sourceBatchInfo');
             if (!sourceBatchInfo) return;
-            
+
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
             const division = document.getElementById('batchDivision').value;
             const currentBatch = document.getElementById('batchLetter').value;
-            
+
             if (department && year && currentBatch) {
                 const departmentNames = {
                     'CE': 'Civil Engineering',
@@ -3470,14 +3692,14 @@
                     'ET': 'Electronics & Telecommunication',
                     'AI': 'Artificial Intelligence'
                 };
-                
+
                 const yearNames = {
                     'FY': 'First Year',
                     'SY': 'Second Year',
                     'TY': 'Third Year',
                     'BE': 'Final Year'
                 };
-                
+
                 sourceBatchInfo.innerHTML = `
                     <strong>Department:</strong> ${departmentNames[department] || department}<br>
                     <strong>Year:</strong> ${yearNames[year] || year}<br>
@@ -3488,22 +3710,22 @@
                 sourceBatchInfo.innerHTML = 'Please load a batch first to see source information';
             }
         }
-        
+
         // Update Selected Students List
         function updateSelectedStudentsList() {
             const selectedList = document.getElementById('selectedStudentsList');
             if (!selectedList) return;
-            
+
             // Get all checkboxes from the batch students table
             const checkboxes = document.querySelectorAll('#batchStudentsTableBody .student-checkbox:checked');
-            
+
             console.log('🔍 Found checked checkboxes:', checkboxes.length);
-            
+
             if (checkboxes.length === 0) {
                 // Show all available students for selection
                 const allCheckboxes = document.querySelectorAll('#batchStudentsTableBody .student-checkbox');
                 console.log('📋 Total available students:', allCheckboxes.length);
-                
+
                 if (allCheckboxes.length === 0) {
                     selectedList.innerHTML = `
                         <p style="margin: 0; color: var(--danger); text-align: center;">
@@ -3519,72 +3741,72 @@
                 }
                 return;
             }
-            
+
             let studentsHtml = `<div style="font-weight: 500; margin-bottom: 0.5rem; color: var(--primary);">Selected ${checkboxes.length} student(s):</div>`;
-            
+
             checkboxes.forEach((checkbox, index) => {
                 const row = checkbox.closest('tr');
                 const rollNo = row.cells[1].textContent;
                 const name = row.cells[2].textContent;
-                
+
                 studentsHtml += `
                     <div style="padding: 0.5rem; margin-bottom: 0.25rem; background: var(--light); border-radius: 4px; font-size: 0.9rem;">
                         <strong style="color: var(--primary);">Roll ${rollNo}:</strong> ${name}
                     </div>
                 `;
             });
-            
+
             selectedList.innerHTML = studentsHtml;
         }
-        
+
         // Shift Selected Students
         async function shiftSelectedStudents(event) {
             event.preventDefault();
-            
+
             const targetBatch = document.getElementById('targetBatch').value;
             const checkboxes = document.querySelectorAll('#batchStudentsTableBody .student-checkbox:checked');
-            
+
             if (!targetBatch) {
                 alert('Please select target batch!');
                 return;
             }
-            
+
             if (checkboxes.length === 0) {
                 alert('Please select students to shift!');
                 return;
             }
-            
+
             const currentBatch = document.getElementById('batchLetter').value;
             if (targetBatch === currentBatch) {
                 alert('Target batch cannot be same as current batch!');
                 return;
             }
-            
+
             const confirmShift = confirm(`Shift ${checkboxes.length} students from Batch ${currentBatch} to Batch ${targetBatch}?\n\nThis will change their roll numbers to fit the target batch range.`);
             if (!confirmShift) return;
-            
+
             try {
                 console.log(`🔄 Shifting ${checkboxes.length} students from Batch ${currentBatch} to Batch ${targetBatch}`);
-                
+
                 const studentIds = Array.from(checkboxes).map(cb => cb.value);
                 let successCount = 0;
                 let errorCount = 0;
-                
+
                 // Get target batch range
                 const targetRanges = {
                     'A': { start: 1, end: 20 },
                     'B': { start: 21, end: 40 },
                     'C': { start: 41, end: 60 }
                 };
-                
+
                 const targetRange = targetRanges[targetBatch];
-                
+
                 // Get all students in target batch to find available roll numbers
                 const department = document.getElementById('batchDepartment').value;
                 const year = document.getElementById('batchYear').value;
                 const departmentMapping = {
                     'CE': 'Civil Engineering',
-                    'IT': 'Information Technology', 
+                    'IT': 'Information Technology',
                     'ME': 'Mechanical Engineering',
                     'CT': 'Computer Technology',
                     'EE': 'Electrical Engineering',
@@ -3593,18 +3815,18 @@
                 };
                 const yearMapping = {
                     'FY': 'First',
-                    'SY': 'Second', 
+                    'SY': 'Second',
                     'TY': 'Third',
                     'BE': 'Final'
                 };
-                
+
                 const targetBranch = departmentMapping[department];
                 const targetYear = yearMapping[year];
-                
+
                 // Get existing students in target range
                 const allStudentsSnapshot = await firebase.database().ref('students').once('value');
                 const existingRollNumbers = new Set();
-                
+
                 allStudentsSnapshot.forEach(snapshot => {
                     const student = snapshot.val();
                     if (student.branch === targetBranch && student.year === targetYear) {
@@ -3614,7 +3836,7 @@
                         }
                     }
                 });
-                
+
                 // Find available roll numbers in target batch
                 const availableRollNumbers = [];
                 for (let i = targetRange.start; i <= targetRange.end; i++) {
@@ -3622,25 +3844,25 @@
                         availableRollNumbers.push(i);
                     }
                 }
-                
+
                 if (availableRollNumbers.length < studentIds.length) {
                     alert(`Not enough space in Batch ${targetBatch}!\nAvailable slots: ${availableRollNumbers.length}\nStudents to shift: ${studentIds.length}`);
                     return;
                 }
-                
+
                 // Shift students with new roll numbers
                 for (let i = 0; i < studentIds.length; i++) {
                     const studentId = studentIds[i];
                     const newRollNo = availableRollNumbers[i];
-                    
+
                     try {
                         // Get student data
                         const studentSnapshot = await firebase.database().ref(`students/${studentId}`).once('value');
                         const studentData = studentSnapshot.val();
-                        
+
                         if (studentData) {
                             const oldRollNo = studentData.rollNo;
-                            
+
                             // Update student's roll number and batch info
                             await firebase.database().ref(`students/${studentId}`).update({
                                 rollNo: newRollNo,
@@ -3650,7 +3872,7 @@
                                 shiftedAt: Date.now(),
                                 shiftedBy: 'admin'
                             });
-                            
+
                             console.log(`✅ Shifted student ${studentData.name}: Roll ${oldRollNo} → Roll ${newRollNo} (Batch ${currentBatch} → Batch ${targetBatch})`);
                             successCount++;
                         }
@@ -3659,19 +3881,19 @@
                         errorCount++;
                     }
                 }
-                
+
                 alert(`Shift completed!\nSuccess: ${successCount} students moved to Batch ${targetBatch}\nErrors: ${errorCount} students\n\nStudents now have new roll numbers in the target batch range.`);
                 closeShiftStudentModal();
-                
+
                 // Refresh the current batch to show updated data
                 loadBatchStudents();
-                
+
             } catch (error) {
                 console.error('❌ Error during batch shift:', error);
                 alert('Error shifting students: ' + error.message);
             }
         }
-        
+
         // Show Add Student Modal (keeping original for reference)
         function showAddStudentModal() {
             const modal = document.createElement('div');
@@ -3688,7 +3910,7 @@
                 align-items: center;
                 z-index: 1000;
             `;
-            
+
             modal.innerHTML = `
                 <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -3758,10 +3980,10 @@
                     </form>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
         }
-        
+
         // Close Add Student Modal
         function closeAddStudentModal() {
             const modal = document.getElementById('addStudentModal');
@@ -3769,42 +3991,42 @@
                 modal.remove();
             }
         }
-        
+
         // Add New Student to Firebase
         async function addNewStudent(event) {
             event.preventDefault();
-            
+
             const name = document.getElementById('studentName').value.trim().toUpperCase();
             const rollNo = parseInt(document.getElementById('studentRollNo').value);
             const email = document.getElementById('studentEmail').value.trim().toLowerCase();
             const branch = document.getElementById('studentDepartment').value;
             const year = document.getElementById('studentYear').value;
             const division = document.getElementById('studentDivision').value;
-            
+
             if (!name || !rollNo || !email || !branch || !year) {
                 alert('Please fill all required fields!');
                 return;
             }
-            
+
             try {
                 console.log('🎯 Adding new student:', { name, rollNo, email, branch, year, division });
-                
+
                 // Check if roll number already exists
                 const studentsSnapshot = await firebase.database().ref('students').once('value');
                 const existingStudents = [];
-                
+
                 studentsSnapshot.forEach(snapshot => {
                     const student = snapshot.val();
                     if (student.rollNo === rollNo && student.branch === branch && student.year === year) {
                         existingStudents.push(student);
                     }
                 });
-                
+
                 if (existingStudents.length > 0) {
                     alert(`Roll number ${rollNo} already exists in ${branch} ${year}!`);
                     return;
                 }
-                
+
                 // Create new student object
                 const newStudent = {
                     name: name,
@@ -3816,20 +4038,20 @@
                     createdAt: Date.now(),
                     addedBy: 'admin'
                 };
-                
+
                 // Add to Firebase
                 const newStudentRef = await firebase.database().ref('students').push(newStudent);
                 console.log('✅ Student added successfully:', newStudentRef.key);
-                
+
                 alert(`Student ${name} added successfully!`);
                 closeAddStudentModal();
-                
+
                 // Refresh the current batch if loaded
                 const currentBatch = document.getElementById('batchLetter').value;
                 if (currentBatch) {
                     loadBatchStudents();
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error adding student:', error);
                 alert('Error adding student: ' + error.message);
@@ -3844,10 +4066,10 @@
                     alert('Attendance record not found');
                     return;
                 }
-                
+
                 const record = recordSnapshot.val();
                 const students = record.students || {};
-                
+
                 // Get student details
                 const studentsSnapshot = await window.db.ref('students').once('value');
                 const studentDetails = {};
@@ -3857,7 +4079,7 @@
                         studentDetails[snap.key] = student.name || 'Unknown Student';
                     });
                 }
-                
+
                 let detailsHtml = `
                     <div style="max-width: 800px;">
                         <h4 style="margin-bottom: 1rem; color: var(--primary);">Attendance Details</h4>
@@ -3879,13 +4101,13 @@
                                 </thead>
                                 <tbody>
                 `;
-                
+
                 Object.entries(students).forEach(([studentId, status]) => {
                     const studentName = studentDetails[studentId] || studentId;
                     const statusText = status ? 'Present' : 'Absent';
                     const statusColor = status ? '#10B981' : '#EF4444';
                     const statusIcon = status ? 'fa-check-circle' : 'fa-times-circle';
-                    
+
                     detailsHtml += `
                         <tr style="border-bottom: 1px solid var(--border);">
                             <td style="padding: 0.75rem;">${studentName}</td>
@@ -3897,14 +4119,14 @@
                         </tr>
                     `;
                 });
-                
+
                 detailsHtml += `
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 `;
-                
+
                 // Show in a popup
                 const popup = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
                 popup.document.write(`
@@ -3933,7 +4155,7 @@
                         </body>
                     </html>
                 `);
-                
+
             } catch (error) {
                 console.error('Error viewing attendance details:', error);
                 alert('Error loading attendance details. Please try again.');
@@ -3941,38 +4163,38 @@
         }
 
         // ===== BATCH CONFIGURATION SYSTEM =====
-        
+
         // Global variable to store batch configurations
         let batchConfigurations = {};
-        
+
         // Show Batch Configuration Panel
         function showBatchConfigPanel() {
             console.log('🔧 Opening batch configuration panel...');
-            
+
             // Load existing configuration for current department/year
             loadBatchConfiguration();
-            
+
             // Show the panel
             document.getElementById('batchConfigPanel').style.display = 'block';
-            
+
             // Add event listeners for real-time preview
             addBatchConfigEventListeners();
-            
+
             // Update previews
             updateAllBatchPreviews();
         }
-        
+
         // Close Batch Configuration Panel
         function closeBatchConfig() {
             document.getElementById('batchConfigPanel').style.display = 'none';
         }
-        
+
         // Add Event Listeners for Real-time Preview
         function addBatchConfigEventListeners() {
             const inputs = ['batchAStart', 'batchAEnd', 'batchAExtra', 'batchAExclude',
-                           'batchBStart', 'batchBEnd', 'batchBExtra', 'batchBExclude',
-                           'batchCStart', 'batchCEnd', 'batchCExtra', 'batchCExclude'];
-            
+                'batchBStart', 'batchBEnd', 'batchBExtra', 'batchBExclude',
+                'batchCStart', 'batchCEnd', 'batchCExtra', 'batchCExclude'];
+
             inputs.forEach(inputId => {
                 const input = document.getElementById(inputId);
                 if (input) {
@@ -3980,14 +4202,14 @@
                 }
             });
         }
-        
+
         // Update All Batch Previews
         function updateAllBatchPreviews() {
             updateBatchPreview('A');
             updateBatchPreview('B');
             updateBatchPreview('C');
         }
-        
+
         // Update Individual Batch Preview
         function updateBatchPreview(batch) {
             const startInput = document.getElementById(`batch${batch}Start`);
@@ -3995,41 +4217,41 @@
             const extraInput = document.getElementById(`batch${batch}Extra`);
             const excludeInput = document.getElementById(`batch${batch}Exclude`);
             const previewDiv = document.getElementById(`batch${batch}Preview`);
-            
+
             if (!startInput || !endInput || !previewDiv) return;
-            
+
             const start = parseInt(startInput.value) || 1;
             const end = parseInt(endInput.value) || 20;
             const extra = extraInput.value.trim();
             const exclude = excludeInput.value.trim();
-            
+
             // Calculate base range
             const baseCount = Math.max(0, end - start + 1);
-            
+
             // Parse extra students
             const extraNumbers = extra ? extra.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n)) : [];
-            
+
             // Parse exclude students
             const excludeNumbers = exclude ? exclude.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n)) : [];
-            
+
             // Calculate final count
             const finalCount = baseCount + extraNumbers.length - excludeNumbers.length;
-            
+
             // Build preview text
             let previewText = `Range: ${start}-${end} (${baseCount} students)`;
-            
+
             if (extraNumbers.length > 0) {
                 previewText += `\n+ Extra: ${extraNumbers.join(', ')} (${extraNumbers.length} students)`;
             }
-            
+
             if (excludeNumbers.length > 0) {
                 previewText += `\n- Exclude: ${excludeNumbers.join(', ')} (${excludeNumbers.length} students)`;
             }
-            
+
             previewText += `\nTotal: ${finalCount} students`;
-            
+
             previewDiv.innerHTML = previewText.replace(/\n/g, '<br>');
-            
+
             // Color coding based on student count
             if (finalCount <= 0) {
                 previewDiv.style.color = '#EF4444';
@@ -4042,35 +4264,35 @@
                 previewDiv.style.borderColor = '#10B981';
             }
         }
-        
+
         // Load Batch Configuration for Current Department/Year
         function loadBatchConfiguration() {
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
-            
+
             if (!department || !year) {
                 resetBatchConfiguration();
                 return;
             }
-            
+
             const configKey = `${department}_${year}`;
             const savedConfig = batchConfigurations[configKey];
-            
+
             if (savedConfig) {
                 console.log(`📋 Loading saved configuration for ${configKey}:`, savedConfig);
-                
+
                 // Load Batch A
                 document.getElementById('batchAStart').value = savedConfig.A.start || 1;
                 document.getElementById('batchAEnd').value = savedConfig.A.end || 20;
                 document.getElementById('batchAExtra').value = savedConfig.A.extra || '';
                 document.getElementById('batchAExclude').value = savedConfig.A.exclude || '';
-                
+
                 // Load Batch B
                 document.getElementById('batchBStart').value = savedConfig.B.start || 21;
                 document.getElementById('batchBEnd').value = savedConfig.B.end || 40;
                 document.getElementById('batchBExtra').value = savedConfig.B.extra || '';
                 document.getElementById('batchBExclude').value = savedConfig.B.exclude || '';
-                
+
                 // Load Batch C
                 document.getElementById('batchCStart').value = savedConfig.C.start || 41;
                 document.getElementById('batchCEnd').value = savedConfig.C.end || 60;
@@ -4081,7 +4303,7 @@
                 setDefaultBatchConfiguration(department, year);
             }
         }
-        
+
         // Set Default Configuration Based on Department/Year
         function setDefaultBatchConfiguration(department, year) {
             // Set intelligent defaults based on existing hardcoded logic
@@ -4143,7 +4365,7 @@
                 document.getElementById('batchCStart').value = 41;
                 document.getElementById('batchCEnd').value = 60;
             }
-            
+
             // Clear extra/exclude fields for defaults
             if (department !== 'CE' || year !== 'SY') {
                 document.getElementById('batchAExtra').value = '';
@@ -4154,12 +4376,12 @@
                 document.getElementById('batchCExclude').value = '';
             }
         }
-        
+
         // Reset Batch Configuration to Defaults
         function resetBatchConfiguration() {
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
-            
+
             if (department && year) {
                 setDefaultBatchConfiguration(department, year);
             } else {
@@ -4168,34 +4390,34 @@
                 document.getElementById('batchAEnd').value = 20;
                 document.getElementById('batchAExtra').value = '';
                 document.getElementById('batchAExclude').value = '';
-                
+
                 document.getElementById('batchBStart').value = 21;
                 document.getElementById('batchBEnd').value = 40;
                 document.getElementById('batchBExtra').value = '';
                 document.getElementById('batchBExclude').value = '';
-                
+
                 document.getElementById('batchCStart').value = 41;
                 document.getElementById('batchCEnd').value = 60;
                 document.getElementById('batchCExtra').value = '';
                 document.getElementById('batchCExclude').value = '';
             }
-            
+
             updateAllBatchPreviews();
             alert('✅ Batch configuration reset to defaults!');
         }
-        
+
         // Preview Batch Configuration
         function previewBatchConfiguration() {
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
-            
+
             if (!department || !year) {
                 alert('⚠️ Please select department and year first!');
                 return;
             }
-            
+
             const config = getCurrentBatchConfiguration();
-            
+
             // Create preview modal
             const modal = document.createElement('div');
             modal.id = 'batchPreviewModal';
@@ -4211,7 +4433,7 @@
                 align-items: center;
                 z-index: 1000;
             `;
-            
+
             modal.innerHTML = `
                 <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -4241,23 +4463,23 @@
                     </div>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
         }
-        
+
         // Generate Batch Preview Card
         function generateBatchPreviewCard(batch, config) {
             const colors = {
                 'A': '#10B981',
-                'B': '#F59E0B', 
+                'B': '#F59E0B',
                 'C': '#EF4444'
             };
-            
+
             const baseCount = Math.max(0, config.end - config.start + 1);
             const extraCount = config.extraNumbers ? config.extraNumbers.length : 0;
             const excludeCount = config.excludeNumbers ? config.excludeNumbers.length : 0;
             const totalCount = baseCount + extraCount - excludeCount;
-            
+
             return `
                 <div style="border: 2px solid ${colors[batch]}; border-radius: 8px; padding: 1rem; background: white;">
                     <h4 style="margin: 0 0 1rem 0; color: ${colors[batch]}; display: flex; align-items: center; gap: 0.5rem;">
@@ -4275,7 +4497,7 @@
                 </div>
             `;
         }
-        
+
         // Close Batch Preview Modal
         function closeBatchPreviewModal() {
             const modal = document.getElementById('batchPreviewModal');
@@ -4283,7 +4505,7 @@
                 modal.remove();
             }
         }
-        
+
         // Get Current Batch Configuration from Form
         function getCurrentBatchConfiguration() {
             return {
@@ -4313,61 +4535,61 @@
                 }
             };
         }
-        
+
         // Parse Number List from String
         function parseNumberList(str) {
             if (!str || str.trim() === '') return [];
             return str.split(',')
-                     .map(n => parseInt(n.trim()))
-                     .filter(n => !isNaN(n) && n > 0);
+                .map(n => parseInt(n.trim()))
+                .filter(n => !isNaN(n) && n > 0);
         }
-        
+
         // Save Batch Configuration
         async function saveBatchConfiguration() {
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
-            
+
             if (!department || !year) {
                 alert('⚠️ Please select department and year first!');
                 return;
             }
-            
+
             const config = getCurrentBatchConfiguration();
             const configKey = `${department}_${year}`;
-            
+
             try {
                 // Save to global configurations
                 batchConfigurations[configKey] = config;
-                
+
                 // Save to localStorage for persistence
                 localStorage.setItem('batchConfigurations', JSON.stringify(batchConfigurations));
-                
+
                 // Optionally save to Firebase
                 if (window.db && typeof window.db.ref === 'function') {
                     await window.db.ref(`batchConfigurations/${configKey}`).set(config);
                     console.log(`💾 Batch configuration saved to Firebase for ${configKey}`);
                 }
-                
+
                 console.log(`✅ Batch configuration saved for ${configKey}:`, config);
                 alert(`✅ Batch configuration saved successfully for ${department} ${year}!`);
-                
+
                 // Close the configuration panel
                 closeBatchConfig();
-                
+
                 // Reload students if currently viewing this department/year
                 const currentDept = document.getElementById('batchDepartment').value;
                 const currentYear = document.getElementById('batchYear').value;
-                
+
                 if (currentDept === department && currentYear === year) {
                     loadBatchStudents();
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error saving batch configuration:', error);
                 alert('❌ Error saving configuration: ' + error.message);
             }
         }
-        
+
         // Load Batch Configurations from Storage
         async function loadBatchConfigurationsFromStorage() {
             try {
@@ -4377,7 +4599,7 @@
                     batchConfigurations = JSON.parse(localConfig);
                     console.log('📋 Loaded batch configurations from localStorage:', batchConfigurations);
                 }
-                
+
                 // Load from Firebase (if available)
                 if (window.db && typeof window.db.ref === 'function') {
                     const snapshot = await window.db.ref('batchConfigurations').once('value');
@@ -4387,37 +4609,37 @@
                         console.log('📋 Loaded batch configurations from Firebase:', firebaseConfig);
                     }
                 }
-                
+
             } catch (error) {
                 console.error('⚠️ Error loading batch configurations:', error);
             }
         }
-        
+
         // Apply Custom Batch Configuration to Student Loading
         function applyCustomBatchConfiguration(students, batchLetter, department, year) {
             const configKey = `${department}_${year}`;
             const savedConfig = batchConfigurations[configKey];
-            
+
             console.log(`🔍 applyCustomBatchConfiguration Debug:`);
             console.log(`   - ConfigKey: ${configKey}`);
             console.log(`   - BatchLetter: ${batchLetter}`);
             console.log(`   - SavedConfig:`, savedConfig);
             console.log(`   - Students count: ${students.length}`);
-            
+
             if (!savedConfig || !savedConfig[batchLetter]) {
                 console.log(`📋 No custom configuration found for ${configKey} Batch ${batchLetter}, using default logic`);
                 return null; // Fall back to existing hardcoded logic
             }
-            
+
             const batchConfig = savedConfig[batchLetter];
             console.log(`🎯 Applying custom configuration for ${configKey} Batch ${batchLetter}:`, batchConfig);
-            
+
             // Filter students by roll number range
             let batchStudents = students.filter(student => {
                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                 return rollNum >= batchConfig.start && rollNum <= batchConfig.end;
             });
-            
+
             // Add extra students
             if (batchConfig.extraNumbers && batchConfig.extraNumbers.length > 0) {
                 const extraStudents = students.filter(student => {
@@ -4427,7 +4649,7 @@
                 batchStudents = batchStudents.concat(extraStudents);
                 console.log(`➕ Added ${extraStudents.length} extra students: ${batchConfig.extraNumbers.join(', ')}`);
             }
-            
+
             // Remove excluded students
             if (batchConfig.excludeNumbers && batchConfig.excludeNumbers.length > 0) {
                 const beforeCount = batchStudents.length;
@@ -4438,30 +4660,30 @@
                 const excludedCount = beforeCount - batchStudents.length;
                 console.log(`➖ Excluded ${excludedCount} students: ${batchConfig.excludeNumbers.join(', ')}`);
             }
-            
+
             // Remove duplicates (in case extra students were already in range)
-            const uniqueStudents = batchStudents.filter((student, index, self) => 
+            const uniqueStudents = batchStudents.filter((student, index, self) =>
                 index === self.findIndex(s => s.id === student.id)
             );
-            
+
             console.log(`✅ Custom batch configuration applied: ${uniqueStudents.length} students in Batch ${batchLetter}`);
             return uniqueStudents;
         }
-        
+
         // Clear all batch configurations (for debugging)
         function clearAllBatchConfigurations() {
             if (confirm('⚠️ This will clear all custom batch configurations. Are you sure?')) {
                 batchConfigurations = {};
                 localStorage.removeItem('batchConfigurations');
-                
+
                 // Clear from Firebase if available
                 if (window.db && typeof window.db.ref === 'function') {
                     window.db.ref('batchConfigurations').remove();
                 }
-                
+
                 console.log('🗑️ All batch configurations cleared');
                 alert('✅ All batch configurations cleared. Students will now use default batch logic.');
-                
+
                 // Reload current batch if viewing
                 const currentDept = document.getElementById('batchDepartment').value;
                 const currentYear = document.getElementById('batchYear').value;
@@ -4470,16 +4692,16 @@
                 }
             }
         }
-        
+
         // Load Batch Options based on Department and Year
         function loadBatchOptions() {
             const department = document.getElementById('batchDepartment').value;
             const year = document.getElementById('batchYear').value;
             const batchSelect = document.getElementById('batchLetter');
-            
+
             // Clear existing options
             batchSelect.innerHTML = '<option value="">-- Select Batch --</option>';
-            
+
             if (!department || !year) {
                 console.log('🔍 Department or Year not selected, showing default batches');
                 // Show default batches if department/year not selected
@@ -4488,9 +4710,9 @@
                 batchSelect.innerHTML += '<option value="C">Batch C</option>';
                 return;
             }
-            
+
             console.log(`🔍 Loading batch options for ${department} ${year}`);
-            
+
             // CE SY: Only Batch A and B (remove Batch C)
             if (department === 'CE' && year === 'SY') {
                 batchSelect.innerHTML += '<option value="A">Batch A (1-22 + 27)</option>';
@@ -4498,14 +4720,14 @@
                 console.log('🎯 CE SY: Only showing Batch A and B (Batch C removed)');
                 return;
             }
-            
+
             // CE TY: Only Batch A (rolls 3001-3026)
             if (department === 'CE' && year === 'TY') {
                 batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3026)</option>';
                 console.log('🎯 CE TY: Only showing Batch A');
                 return;
             }
-            
+
             // ET TY: Only Batch A and B (no Batch C)
             if (department === 'ET' && year === 'TY') {
                 batchSelect.innerHTML += '<option value="A">Batch A (1-20)</option>';
@@ -4513,7 +4735,7 @@
                 console.log('🎯 ET TY: Only showing Batch A and B (Batch C removed)');
                 return;
             }
-            
+
             // EE TY: Only Batch A and B (no Batch C)
             if (department === 'EE' && year === 'TY') {
                 batchSelect.innerHTML += '<option value="A">Batch A (1-23)</option>';
@@ -4521,7 +4743,7 @@
                 console.log('🎯 EE TY: Only showing Batch A and B (Batch C removed)');
                 return;
             }
-            
+
             // ME SY: Only Batch A and B (no Batch C)
             if (department === 'ME' && year === 'SY') {
                 batchSelect.innerHTML += '<option value="A">Batch A (1-22)</option>';
@@ -4529,18 +4751,19 @@
                 console.log('🎯 ME SY: Only showing Batch A and B (Batch C removed)');
                 return;
             }
-            
+
             // Default: Show all three batches for other departments/years
             batchSelect.innerHTML += '<option value="A">Batch A</option>';
             batchSelect.innerHTML += '<option value="B">Batch B</option>';
             batchSelect.innerHTML += '<option value="C">Batch C</option>';
             console.log(`🎯 ${department} ${year}: Showing all batches (A, B, C)`);
         }
-        
+
         // Initialize batch configurations on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadBatchConfigurationsFromStorage();
         });
     </script>
 </body>
-</html> 
+
+</html>
