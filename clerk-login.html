@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BVIT Attendance System - Clerk Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
     <style>
         :root {
             --primary: #6366F1;
@@ -123,7 +132,7 @@
             transition: all 0.3s ease;
         }
 
-        .input-group input:focus + i {
+        .input-group input:focus+i {
             color: var(--primary);
         }
 
@@ -214,7 +223,7 @@
             body {
                 padding: 15px;
             }
-            
+
             .login-container {
                 max-width: 100%;
                 border-radius: 16px;
@@ -227,21 +236,21 @@
             .login-header img {
                 width: 140px;
             }
-            
+
             .login-header h1 {
                 font-size: 22px;
             }
-            
+
             .login-header p {
                 font-size: 13px;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
             }
-            
+
             .login-container {
                 border-radius: 12px;
             }
@@ -254,12 +263,12 @@
                 width: 120px;
                 margin-bottom: 15px;
             }
-            
+
             .login-header h1 {
                 font-size: 20px;
                 letter-spacing: 0.5px;
             }
-            
+
             .login-header p {
                 font-size: 12px;
             }
@@ -267,11 +276,11 @@
             .login-form {
                 padding: 0 15px 20px;
             }
-            
+
             .form-group {
                 margin-bottom: 15px;
             }
-            
+
             .form-group label {
                 font-size: 13px;
                 margin-bottom: 6px;
@@ -300,10 +309,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
+            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png"
+                alt="BVIT Logo">
             <h1>WELCOME TO BVIT</h1>
             <p>Clerk Login Portal</p>
         </div>
@@ -333,15 +344,11 @@
             <div id="clerkError" class="error-message"></div>
         </form>
 
-        
+
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const clerkForm = document.getElementById('clerkForm');
             if (clerkForm) {
                 clerkForm.addEventListener('submit', handleClerkLogin);
@@ -351,15 +358,15 @@
         // Clerk login (मराठीत व अधिक robust)
         async function handleClerkLogin(event) {
             event.preventDefault();
-            
+
             const clerkId = document.getElementById('clerkId').value.trim().toLowerCase();
             const password = document.getElementById('clerkPassword').value.trim();
-            
+
             if (!clerkId || !password) {
                 alert('कृपया क्लर्क आयडी आणि पासवर्ड टाका');
                 return;
             }
-            
+
             try {
                 // Clerk डेटा Firebase मधून घ्या
                 const clerksSnapshot = await firebase.database().ref('clerks').once('value');
@@ -415,4 +422,5 @@
         }
     </script>
 </body>
-</html> 
+
+</html>

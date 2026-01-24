@@ -60,8 +60,7 @@
       ".indexOn": [
         "date",
         "class",
-        "department",
-        "teacherId"
+        "department"
       ]
     },
     "activities": {
