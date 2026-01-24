@@ -43,51 +43,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="mobile-fixes.css">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-dark: #4338CA;
-            --secondary: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --info: #3B82F6;
-            --dark: #1F2937;
-            --darker: #111827;
-            --light: #F3F4F6;
-            --lighter: #F9FAFB;
-            --border: #E5E7EB;
-            --text-dark: #1F2937;
-            --text-light: #6B7280;
-            --text-lighter: #9CA3AF;
-            --sidebar-width: 280px;
-            --header-height: 70px;
+            --primary: #6366f1;
+            --primary-light: rgba(99, 102, 241, 0.1);
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --sidebar-bg: #0f172a;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --radius-lg: 1.5rem;
+            --radius-md: 1rem;
+            --shadow-premium: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            background: var(--light);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
             display: flex;
+            color: var(--text-main);
         }
 
-        /* Sidebar Styles */
+        /* Sidebar Styles - Premium Look */
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--darker);
+            width: 280px;
+            background: var(--sidebar-bg);
             min-height: 100vh;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
+            padding: 2rem 1.5rem;
             position: fixed;
             left: 0;
             top: 0;
-            bottom: 0;
-            z-index: 100;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-header {
@@ -110,6 +110,42 @@
             font-weight: 600;
         }
 
+        /* Sidebar Header */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Back to Dashboard Link */
+        .back-nav {
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            border-color: var(--primary);
+        }
+
         .nav-menu {
             list-style: none;
         }
@@ -121,31 +157,43 @@
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            color: var(--text-lighter);
+            gap: 1.25rem;
+            padding: 1rem 1.25rem;
+            color: #94a3b8;
             text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            border-radius: var(--radius-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            margin: 0.25rem 0;
         }
 
-        .nav-link:hover,
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            transform: translateX(5px);
+        }
+
         .nav-link.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
         }
 
         .nav-link i {
             font-size: 1.25rem;
-            width: 1.5rem;
-            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            color: var(--primary);
         }
 
         /* Main Content Styles */
         .main-content {
             flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
+            margin-left: 280px;
+            padding: 2.5rem;
+            max-width: calc(100vw - 280px);
         }
 
         .header {
@@ -156,9 +204,13 @@
         }
 
         .page-title {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            font-size: 2.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-main) 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
         }
 
         .header-actions {
@@ -196,59 +248,67 @@
         }
 
         .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            padding: 2.25rem 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-premium);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .stat-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
-        .stat-students {
-            background: rgba(79, 70, 229, 0.1);
-            color: var(--primary);
+        /* Specific Card Themes */
+        .stat-students .stat-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            color: white;
         }
 
-        .stat-teachers {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
+        .stat-teachers .stat-icon {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
         }
 
-        .stat-attendance {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
+        .stat-attendance .stat-icon {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
         }
 
-        .stat-performance {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+        .stat-performance .stat-icon {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
         }
 
         .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
         }
 
         .stat-label {
-            color: var(--text-light);
             font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         /* Charts Grid */
@@ -260,10 +320,12 @@
         }
 
         .chart-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         .chart-header {
@@ -293,13 +355,13 @@
 
         /* Recent Activity Styles */
         .activity-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
             padding: 0;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             margin-top: 2rem;
         }
 
@@ -451,48 +513,80 @@
             color: var(--text-dark);
         }
 
-        /* Responsive Design */
+        /* Mobile Responsive Navigation Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
+        /* Mobile Hamburger Button */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            width: 45px;
+            height: 45px;
+            background: var(--sidebar-bg);
+            color: white;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Responsive Sidebar Override */
         @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
             .sidebar {
-                width: 5rem;
-                padding: 1rem;
+                left: -280px;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 280px !important;
+                /* Keep fixed width when active */
+                padding: 2rem 1.5rem !important;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .sidebar.active~.sidebar-overlay {
+                display: block;
             }
 
             .logo-text,
             .nav-text {
-                display: none;
+                display: block !important;
+                /* Re-enable text in slide-out menu */
             }
 
             .main-content {
-                margin-left: 5rem;
+                margin-left: 0 !important;
+                padding-top: 5rem;
+                max-width: 100%;
             }
 
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .page-title {
+                font-size: 1.75rem;
             }
 
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                padding: 1rem;
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
         }
 
@@ -642,8 +736,16 @@
 </head>
 
 <body>
+    <!-- Mobile Toggle Button -->
+    <div class="mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="fas fa-graduation-cap logo-icon"></i>
             <span class="logo-text">BVIT Admin</span>
@@ -693,9 +795,6 @@
             </li>
 
 
-            <li class="nav-section">
-                <span class="nav-section-title">Settings</span>
-            </li>
             <li class="nav-item">
                 <a href="settings.html" class="nav-link">
                     <i class="fas fa-cog"></i>
@@ -755,23 +854,6 @@
             </div>
 
 
-            <!-- Quick Actions -->
-            <!--
-        <div class="quick-actions">
-            <div class="action-card" onclick="window.location.href='student-management.html'">
-                <i class="fas fa-user-plus action-icon"></i>
-                <div class="action-title">Add Student</div>
-            </div>
-            <div class="action-card" onclick="window.location.href='teacher-management.html'">
-                <i class="fas fa-user-tie action-icon"></i>
-                <div class="action-title">Add Teacher</div>
-            </div>
-            <div class="action-card" onclick="window.location.href='view-reports.html'">
-                <i class="fas fa-file-alt action-icon"></i>
-                <div class="action-title">View Reports</div>
-            </div>
-        </div>
-        -->
 
             <!-- Charts Section -->
             <div class="charts-grid">
@@ -1075,9 +1157,6 @@
                                         Lecture Type</th>
                                     <th
                                         style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
-                                        Batch</th>
-                                    <th
-                                        style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
                                         Teacher</th>
                                     <th
                                         style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border);">
@@ -1101,7 +1180,7 @@
                             </thead>
                             <tbody id="subjectsTableBody">
                                 <tr>
-                                    <td colspan="10"
+                                    <td colspan="9"
                                         style="padding: 2rem; text-align: center; color: var(--text-light);">
                                         Select filters and click "Check Attendance" to view results
                                     </td>
@@ -1423,33 +1502,111 @@
     <script>
         console.log('Firebase services ready');
 
-        // Function to update dashboard stats
+        // 💾 DASHBOARD CACHING SYSTEM - Reduce Firebase reads
+        const dashboardCache = {
+            students: null,
+            teachers: null,
+            attendance: null,
+            cacheTime: 0,
+            CACHE_DURATION: 10 * 60 * 1000, // 10 minutes cache
+
+            isValid() {
+                return this.cacheTime && (Date.now() - this.cacheTime) < this.CACHE_DURATION;
+            },
+
+            clear() {
+                this.students = null;
+                this.teachers = null;
+                this.attendance = null;
+                this.cacheTime = 0;
+                console.log('🗑️ Dashboard cache cleared');
+            }
+        };
+
+        // Global fetch tracking to prevent double-fetching same data at same time
+        const activeFetches = {};
+
+        // Function to get cached or fresh data
+        async function getCachedData(ref, cacheKey) {
+            if (dashboardCache.isValid() && dashboardCache[cacheKey]) {
+                return dashboardCache[cacheKey];
+            }
+
+            // If a fetch is already in progress for this key, wait for it
+            if (activeFetches[cacheKey]) {
+                return activeFetches[cacheKey];
+            }
+
+            // Start fresh fetching and track it
+            activeFetches[cacheKey] = (async () => {
+                try {
+                    const snapshot = await window.db.ref(ref).once('value');
+                    dashboardCache[cacheKey] = snapshot.val();
+                    dashboardCache.cacheTime = Date.now();
+                    return dashboardCache[cacheKey];
+                } finally {
+                    delete activeFetches[cacheKey];
+                }
+            })();
+
+            return activeFetches[cacheKey];
+        }
+
+
+        // Show Toast Message
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'dashboard-toast';
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i> ${message}`;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: ${type === 'success' ? '#10B981' : '#4F46E5'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Function to update dashboard stats (with caching and optimization)
         async function updateDashboardStats() {
             try {
-                // Wait for Firebase initialization from firebase-config.js
                 if (typeof window.waitForFirebase === 'function') {
                     await window.waitForFirebase();
                 }
-                console.log('Fetching dashboard stats...');
 
-                // Get total students count
-                const studentsSnapshot = await window.db.ref('students').once('value');
-                const totalStudents = studentsSnapshot.exists() ? Object.keys(studentsSnapshot.val()).length : 0;
+                // PARALLEL FETCHING - Much faster
+                const [studentsData, teachersData, attendanceData] = await Promise.all([
+                    getCachedData('students', 'students'),
+                    getCachedData('teachers', 'teachers'),
+                    getCachedData('attendance', 'attendance')
+                ]);
+
+                // Update Students count
+                const totalStudents = studentsData ? Object.keys(studentsData).length : 0;
                 document.getElementById('totalStudents').textContent = totalStudents;
 
-                // Get total teachers count
-                const teachersSnapshot = await window.db.ref('teachers').once('value');
-                const totalTeachers = teachersSnapshot.exists() ? Object.keys(teachersSnapshot.val()).length : 0;
+                // Update Teachers count
+                const totalTeachers = teachersData ? Object.keys(teachersData).length : 0;
                 document.getElementById('totalTeachers').textContent = totalTeachers;
 
                 // Calculate average attendance
-                const attendanceSnapshot = await window.db.ref('attendance').once('value');
                 let totalAttendance = 0;
                 let attendanceCount = 0;
 
-                if (attendanceSnapshot.exists()) {
-                    attendanceSnapshot.forEach(dateSnapshot => {
-                        const students = dateSnapshot.val().students || {};
+                if (attendanceData) {
+                    const entries = Object.values(attendanceData);
+                    entries.forEach(dateData => {
+                        const students = dateData.students || {};
                         const presentCount = Object.values(students).filter(status => status === true).length;
                         const totalCount = Object.keys(students).length;
                         if (totalCount > 0) {
@@ -1461,17 +1618,7 @@
 
                 const averageAttendance = attendanceCount > 0 ? (totalAttendance / attendanceCount).toFixed(1) : 0;
                 document.getElementById('averageAttendance').textContent = averageAttendance + '%';
-
-                // Calculate performance rate (based on attendance for now)
-                const performanceRate = averageAttendance > 0 ? averageAttendance : 0;
-                document.getElementById('performanceRate').textContent = performanceRate + '%';
-
-                console.log('Dashboard stats updated:', {
-                    totalStudents,
-                    totalTeachers,
-                    averageAttendance,
-                    performanceRate
-                });
+                document.getElementById('performanceRate').textContent = averageAttendance + '%';
 
             } catch (error) {
                 console.error('Error updating dashboard stats:', error);
@@ -1484,94 +1631,53 @@
                 await waitForFirebase();
                 const activityList = document.getElementById('activityList');
 
-                // Check if element exists
-                if (!activityList) {
-                    console.warn('activityList element not found, skipping recent activities update');
-                    return;
-                }
+                if (!activityList) return;
 
-                // Get recent attendance records from Firebase
-                const attendanceSnapshot = await window.db.ref('attendance')
-                    .orderByChild('timestamp')
-                    .limitToLast(10)
-                    .once('value');
+                // Get attendance data (CACHED)
+                const attendanceData = await getCachedData('attendance', 'attendance');
+                const teachersData = await getCachedData('teachers', 'teachers');
 
-                // Clear loading state
                 activityList.innerHTML = '';
 
-                if (attendanceSnapshot.exists()) {
+                if (attendanceData) {
                     // Convert to array and sort by timestamp
-                    const activities = [];
-                    attendanceSnapshot.forEach(snap => {
-                        const data = snap.val();
-                        if (data.teacherId) {
-                            activities.push({
-                                id: snap.key,
-                                ...data,
-                                timestamp: data.timestamp || Date.now()
-                            });
-                        }
-                    });
+                    const activities = Object.entries(attendanceData).map(([id, data]) => ({
+                        id,
+                        ...data,
+                        timestamp: data.timestamp || 0
+                    })).filter(a => a.teacherId);
 
                     // Sort by timestamp descending
                     activities.sort((a, b) => b.timestamp - a.timestamp);
 
-                    // Get teacher details
-                    const teacherIds = [...new Set(activities.map(a => a.teacherId))];
-                    const teacherDetails = {};
+                    // Get top 10 activities
+                    const recentActivities = activities.slice(0, 10);
 
-                    for (const teacherId of teacherIds) {
-                        const teacherSnap = await window.db.ref('teachers/' + teacherId).once('value');
-                        if (teacherSnap.exists()) {
-                            const teacher = teacherSnap.val();
-                            if (!teacher.firstName || !teacher.lastName) {
-                                console.warn('Missing name for teacherId:', teacherId, teacher);
-                            }
-                            let displayName = '';
-                            if (teacher.firstName && teacher.lastName) {
-                                displayName = `${teacher.firstName} ${teacher.lastName}`;
-                            } else if (teacher.firstName) {
-                                displayName = teacher.firstName;
-                            } else if (teacher.lastName) {
-                                displayName = teacher.lastName;
-                            } else {
-                                displayName = 'Teacher';
-                            }
-                            teacherDetails[teacherId] = displayName;
-                        } else {
-                            console.warn('Teacher not found for teacherId:', teacherId);
-                            teacherDetails[teacherId] = 'Teacher';
-                        }
+                    if (recentActivities.length === 0) {
+                        activityList.innerHTML = '<li class="activity-item"><div class="activity-title">No attendance records found</div></li>';
+                        return;
                     }
 
-                    // Add activities to the list
-                    activities.slice(0, 10).forEach(activity => {
+                    recentActivities.forEach(activity => {
                         const timeAgo = getTimeAgo(activity.timestamp);
-                        const teacherName = teacherDetails[activity.teacherId] || 'Teacher';
+                        const teacher = teachersData ? teachersData[activity.teacherId] : null;
+
+                        let teacherName = 'Teacher';
+                        if (teacher) {
+                            if (teacher.firstName && teacher.lastName) teacherName = `${teacher.firstName} ${teacher.lastName}`;
+                            else if (teacher.firstName) teacherName = teacher.firstName;
+                        }
 
                         const li = document.createElement('li');
                         li.className = 'activity-item';
                         li.innerHTML = `
-                            <div class="activity-icon">
-                                <i class="fas fa-clipboard-check"></i>
-                            </div>
+                            <div class="activity-icon"><i class="fas fa-clipboard-check"></i></div>
                             <div class="activity-content">
-                                <div class="activity-title">
-                                    ${teacherName} took attendance
-                                </div>
+                                <div class="activity-title">${teacherName} took attendance</div>
                                 <div class="activity-details">
-                                    <span class="activity-detail">
-                                        <i class="fas fa-users"></i>
-                                        ${activity.class || 'N/A'}
-                                    </span>
-                                    <span class="activity-detail">
-                                        <i class="fas fa-book"></i>
-                                        ${activity.subject || 'N/A'}
-                                    </span>
-                                    <span class="activity-detail">
-                                        <i class="fas fa-clock"></i>
-                                        ${activity.lectureType || 'N/A'}
-                                    </span>
+                                    <span class="activity-detail"><i class="fas fa-users"></i> ${activity.class || 'N/A'}</span>
+                                    <span class="activity-detail"><i class="fas fa-book"></i> ${activity.subject || 'N/A'}</span>
+                                    <span class="activity-detail"><i class="fas fa-clock"></i> ${activity.lectureType || 'N/A'}</span>
                                 </div>
                                 <div class="activity-time">${timeAgo}</div>
                             </div>
@@ -1579,36 +1685,13 @@
                         activityList.appendChild(li);
                     });
                 } else {
-                    // Show no activities message
-                    activityList.innerHTML = `
-                        <li class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">No attendance records found</div>
-                            </div>
-                        </li>
-                    `;
+                    activityList.innerHTML = '<li class="activity-item"><div class="activity-title">No attendance records found</div></li>';
                 }
             } catch (error) {
-                console.error('Error updating recent activities:', error);
-                // Show error message only if element exists
-                const activityList = document.getElementById('activityList');
-                if (activityList) {
-                    activityList.innerHTML = `
-                        <li class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Error loading attendance records</div>
-                            </div>
-                        </li>
-                    `;
-                }
+                console.error('Error updating activities:', error);
             }
         }
+
 
         // Helper function to get time ago
         function getTimeAgo(timestamp) {
@@ -1644,89 +1727,122 @@
         // Update stats and activities when page loads
         document.addEventListener('DOMContentLoaded', async function () {
             try {
-                // Update stats and activities
-                updateDashboardStats();
-                updateRecentActivities();
+                // Initialize Charts and Stats in Parallel
+                const statsPromise = updateDashboardStats();
+                const activitiesPromise = updateRecentActivities();
 
-                // Initialize charts
                 const attendanceChart = document.getElementById('attendanceChart');
                 const departmentChart = document.getElementById('departmentChart');
 
                 if (attendanceChart && departmentChart) {
-                    try {
-                        // Get attendance data for last 6 months
-                        const attendanceData = await getAttendanceData();
+                    // Run Data Fetching in Parallel
+                    const [attendanceData, departmentData] = await Promise.all([
+                        getAttendanceData(),
+                        getDepartmentData()
+                    ]);
 
-                        // Get department data
-                        const departmentData = await getDepartmentData();
+                    // Initialize Attendance Trend Chart
+                    new Chart(attendanceChart, {
+                        type: 'line',
+                        data: {
+                            labels: attendanceData.labels,
+                            datasets: [{
+                                data: attendanceData.values,
+                                borderColor: '#6366f1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true, max: 100 } }
+                        }
+                    });
 
-                        // Attendance Trend Chart
-                        new Chart(attendanceChart, {
-                            type: 'line',
-                            data: {
-                                labels: attendanceData.labels,
-                                datasets: [{
-                                    label: 'Attendance Rate',
-                                    data: attendanceData.values,
-                                    borderColor: '#4F46E5',
-                                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                                    tension: 0.4,
-                                    fill: true
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 100
-                                    }
-                                }
-                            }
-                        });
-
-                        // Department Chart
-                        new Chart(departmentChart, {
-                            type: 'bar',
-                            data: {
-                                labels: departmentData.labels,
-                                datasets: [{
-                                    label: 'Students',
-                                    data: departmentData.values,
-                                    backgroundColor: [
-                                        'rgba(79, 70, 229, 0.7)',
-                                        'rgba(16, 185, 129, 0.7)',
-                                        'rgba(245, 158, 11, 0.7)',
-                                        'rgba(239, 68, 68, 0.7)',
-                                        'rgba(59, 130, 246, 0.7)'
-                                    ],
-                                    borderRadius: 8
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
-                                }
-                            }
-                        });
-                    } catch (error) {
-                        console.error('Error initializing charts:', error);
-                    }
+                    // Initialize Department Statistics Chart
+                    new Chart(departmentChart, {
+                        type: 'bar',
+                        data: {
+                            labels: departmentData.labels,
+                            datasets: [{
+                                data: departmentData.values,
+                                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'],
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
                 }
+
+                await Promise.all([statsPromise, activitiesPromise]);
+
             } catch (error) {
-                console.error('Error in DOMContentLoaded:', error);
+                console.error('Error in Dashboard Init:', error);
             }
         });
+
+        // Function to get department data
+        async function getDepartmentData() {
+            try {
+                await waitForFirebase();
+                // Get students (CACHED)
+                const students = await getCachedData('students', 'students') || {};
+
+                const departments = {
+                    'CT': 0,
+                    'IT': 0,
+                    'ME': 0,
+                    'CE': 0,
+                    'EE': 0,
+                    'ET': 0,
+                    'AI': 0
+                };
+
+                const fullNames = {
+                    'CT': 'Computer Technology',
+                    'IT': 'Information Technology',
+                    'ME': 'Mechanical Engineering',
+                    'CE': 'Civil Engineering',
+                    'EE': 'Electrical Engineering',
+                    'ET': 'Electronics & Telecommunication',
+                    'AI': 'Artificial Intelligence'
+                };
+
+                // Count students
+                Object.values(students).forEach(student => {
+                    let dept = student.department;
+                    // Handle full names mapping to codes
+                    if (dept === 'Computer Technology') dept = 'CT';
+                    else if (dept === 'Information Technology') dept = 'IT';
+                    else if (dept === 'Mechanical Engineering') dept = 'ME';
+                    else if (dept === 'Civil Engineering') dept = 'CE';
+                    else if (dept === 'Electrical Engineering') dept = 'EE';
+                    else if (dept === 'Electronics & Telecommunication') dept = 'ET';
+                    else if (dept === 'Artificial Intelligence') dept = 'AI';
+
+                    if (departments[dept] !== undefined) {
+                        departments[dept]++;
+                    }
+                });
+
+                return {
+                    labels: Object.keys(departments).map(code => fullNames[code] || code),
+                    values: Object.values(departments)
+                };
+            } catch (error) {
+                console.error('Error getting department data:', error);
+                return { labels: [], values: [] };
+            }
+        }
 
         // Function to get attendance data for last 6 months
         async function getAttendanceData() {
@@ -1742,9 +1858,9 @@
                     months.push(month.toLocaleString('default', { month: 'short' }));
                 }
 
-                // Get attendance data for each month
-                const attendanceSnapshot = await window.db.ref('attendance').once('value');
-                const attendanceData = attendanceSnapshot.val() || {};
+                // Get attendance data (CACHED)
+                const attendanceData = await getCachedData('attendance', 'attendance') || {};
+
 
                 // Calculate monthly averages
                 months.forEach(month => {
@@ -2686,7 +2802,6 @@
                                         subjectsData.push({
                                             subject: record.subject || 'N/A',
                                             lectureType: record.lectureType || 'N/A',
-                                            batch: extractBatchFromClass(record.class) || '-',
                                             teacher: teacherName,
                                             time: record.time || 'N/A',
                                             present: presentCount,
@@ -2734,7 +2849,6 @@
                                     subjectsData.push({
                                         subject: record.subject || 'N/A',
                                         lectureType: record.lectureType || 'N/A',
-                                        batch: '-',
                                         teacher: teacherName,
                                         time: record.time || 'N/A',
                                         present: presentCount,
@@ -2827,11 +2941,6 @@
                             <i class="fas ${subject.lectureType === 'theory' ? 'fa-chalkboard' : 'fa-flask'}"></i> ${subject.lectureType}
                         </span>
                     </td>
-                    <td style="padding: 1rem;">
-                        <span style="padding: 0.25rem 0.5rem; background: var(--light); color: var(--text-dark); border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
-                            ${subject.batch}
-                        </span>
-                    </td>
                     <td style="padding: 1rem;">${subject.teacher}</td>
                     <td style="padding: 1rem;">
                         <span style="padding: 0.25rem 0.5rem; background: rgba(59, 130, 246, 0.1); color: var(--info); border-radius: 4px; font-size: 0.875rem;">
@@ -2886,44 +2995,10 @@
         }
 
         function extractDivisionFromClass(classCode) {
-            if (!classCode) return 'ALL';
-            const parts = classCode.split('-');
-            for (const part of parts) {
-                if (part === 'A') return 'A';
-                if (part === 'B') return 'B';
-                if (part === 'C') return 'C';
-            }
+            if (classCode.includes('-A')) return 'A';
+            if (classCode.includes('-B')) return 'B';
+            if (classCode.includes('-C')) return 'C';
             return 'ALL';
-        }
-
-        function extractBatchFromClass(classCode) {
-            if (!classCode) return '-';
-            // Check explicit markers first
-            if (classCode.includes('BatchA')) return 'A';
-            if (classCode.includes('BatchB')) return 'B';
-            if (classCode.includes('BatchC')) return 'C';
-
-            // Check implicit suffixes
-            const parts = classCode.split('-');
-            const lastPart = parts[parts.length - 1];
-
-            if (['A', 'B', 'C'].includes(lastPart)) {
-                const dept = extractDepartmentFromClass(classCode);
-
-                // If CT, format is usually YearDept-Div-Batch or YearDept-Div
-                if (dept === 'CT') {
-                    // If 3 parts (e.g. TYCT-A-A), last is batch
-                    if (parts.length >= 3) return lastPart;
-                    // If 2 parts (e.g. TYCT-A), last is division, so no batch
-                    return '-';
-                }
-
-                // For other departments, format is usually YearDept-Batch or YearDept
-                // If 2 parts (e.g. TYCE-A), last is batch (since no division in CE)
-                if (parts.length >= 2) return lastPart;
-            }
-
-            return '-';
         }
 
         // ========== BATCH MANAGEMENT FUNCTIONS ==========
@@ -3041,13 +3116,11 @@
                     </tr>
                 `;
 
-                console.log('📡 Fetching students from Firebase...');
-
-                // Get all students using firebase.database()
-                const studentsSnapshot = await firebase.database().ref('students').once('value');
+                // Get all students (CACHED)
+                const studentsData = await getCachedData('students', 'students');
                 const allStudents = [];
 
-                if (!studentsSnapshot.exists()) {
+                if (!studentsData) {
                     console.log('❌ No students found in database');
                     tbody.innerHTML = `
                         <tr>
@@ -3059,10 +3132,8 @@
                     return;
                 }
 
-                studentsSnapshot.forEach(snapshot => {
-                    const student = snapshot.val();
-                    student.id = snapshot.key;
-                    allStudents.push(student);
+                Object.entries(studentsData).forEach(([id, data]) => {
+                    allStudents.push({ id, ...data });
                 });
 
                 console.log(`📊 Total students in database: ${allStudents.length}`);
@@ -4762,6 +4833,34 @@
         // Initialize batch configurations on page load
         document.addEventListener('DOMContentLoaded', function () {
             loadBatchConfigurationsFromStorage();
+        });
+    </script>
+    <script>
+        // Sidebar Toggle Logic
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            const icon = mobileToggle.querySelector('i');
+            if (sidebar.classList.contains('active')) {
+                icon.classList.replace('fa-bars', 'fa-times');
+            } else {
+                icon.classList.replace('fa-times', 'fa-bars');
+            }
+        }
+
+        mobileToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on nav link click (mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    toggleSidebar();
+                }
+            });
         });
     </script>
 </body>

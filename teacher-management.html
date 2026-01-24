@@ -1,1118 +1,990 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Management - BVIT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="mobile-fixes.css">
     <style>
+        :root {
+            --primary: #6366F1;
+            --primary-light: #EEF2FF;
+            --primary-dark: #4F46E5;
+            --secondary: #10B981;
+            --secondary-light: #ECFDF5;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --danger-light: #FEF2F2;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --bg-body: #F8FAFC;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(229, 231, 235, 0.5);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --radius-md: 12px;
+            --radius-lg: 24px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --text-dark: #1F2937;
-            --text-light: #6B7280;
-            --bg-light: #F3F4F6;
-            --white: #FFFFFF;
-            --danger: #EF4444;
-            --border-color: #E5E7EB;
-            --primary-light: #E0E7FF; /* Added for new table styling */
-            --text-medium: #4B5563; /* Added for new table styling */
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
+            background-color: var(--bg-body);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.05) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.05) 0, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
-            color: var(--text-dark);
-            padding: 40px 0;
-            line-height: 1.6;
-            position: relative;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(45deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%),
-                linear-gradient(-45deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
-            z-index: -1;
-        }
-
-        /* Add animated shapes in the background */
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 30%);
-            animation: float 15s ease-in-out infinite;
-            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
+            padding: 2rem;
         }
 
-        .page-title {
-            text-align: center;
-            margin: 0 auto 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-            color: var(--white);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
-            font-size: 24px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .page-title i {
-            font-size: 28px;
-        }
-
-        .form-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05),
-                       0 0 100px rgba(99, 102, 241, 0.1);
-            margin-bottom: 40px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Header Styles - Premium Glass */
+        .header {
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+            margin-top: 2rem;
         }
 
-        .form-container:hover {
+        .header h1 {
+            background: linear-gradient(to right, #4F46E5, #9333EA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0;
+            letter-spacing: -0.05em;
+        }
+
+        .header-actions {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Card Styles - Premium Depth */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(6px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1),
-                       0 0 120px rgba(99, 102, 241, 0.15);
+            box-shadow: var(--shadow-lg);
         }
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-            color: var(--white);
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FAFBFC;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
-        .section-title i {
-            font-size: 1.8rem;
-            color: var(--white);
+        .card-body {
+            padding: 2rem;
         }
 
-        .form-row {
+        /* Form Grid */
+        .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: var(--bg-light);
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            background: var(--white);
-        }
-
-        select[multiple] {
-            height: 120px;
-            padding: 8px;
-        }
-
-        select[multiple] option {
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            transition: all 0.2s ease;
-        }
-
-        select[multiple] option:checked {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .btn {
-            background: var(--primary);
-            color: var(--white);
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn i {
-            font-size: 1.2rem;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
-        }
-
-        .import-section {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            padding: 25px;
-            background: var(--bg-light);
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
-            align-items: center;
-        }
-
-        .import-btn {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--secondary);
-            color: var(--white);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .import-btn:hover {
-            background: #0EA271;
-            transform: translateY(-50%) scale(1.05);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-        }
-
-        .download-template {
-            color: var(--primary);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .download-template:hover {
-            background: rgba(99, 102, 241, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Table Styling */
-        .teacher-list {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05),
-                       0 0 100px rgba(99, 102, 241, 0.1);
-            overflow: auto;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            min-width: 1000px;
-        }
-
-        th {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 16px;
-            text-align: left;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        td {
-            padding: 16px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        tr:hover {
-            background-color: var(--primary-light);
-        }
-
-        /* Name column */
-        td:first-child {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        /* Department badges */
-        .department-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            background: var(--primary-light);
-            color: var(--primary);
-            margin: 2px;
-        }
-
-        /* Class and Division tags */
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin: 2px;
-            background: #f3f4f6;
-            color: var(--text-medium);
-        }
-
-        /* Action buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-edit, .btn-delete {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-edit {
-            background-color: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .btn-edit:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-delete {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .btn-delete:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-light);
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--text-light);
-        }
-
-        .empty-state p {
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-        }
-
-        /* Responsive table */
-        @media (max-width: 1024px) {
-            .table-container {
-                margin: 0 -20px;
-            }
-
-            table {
-                min-width: 800px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 0;
-            }
-
-            .container {
-                padding: 0 15px;
-            }
-
-            .page-title {
-                font-size: 2rem;
-                margin-bottom: 30px;
-            }
-
-            .form-container, .teacher-list {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-
-            .section-title {
-                font-size: 1.3rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            th, td {
-                padding: 12px;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Password cell styling */
-        .password-cell {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f3f4f6;
-            padding: 8px 12px;
-            border-radius: 6px;
-            max-width: 200px;
-        }
-
-        .password-text {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .copy-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .copy-btn i {
-            font-size: 14px;
-        }
-
-        /* Password status styling */
-        .password-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 20px;
-            color: #10B981;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .password-status i {
-            font-size: 1rem;
-        }
-
-        .help-text {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: 0.5rem;
-        }
-
-        select[multiple] {
-            height: 200px;
-            padding: 8px;
-        }
-
-        select[multiple] option {
-            padding: 8px 12px;
-            margin-bottom: 4px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        select[multiple] option:checked {
-            background: var(--primary);
-            color: white;
-        }
-
-        select[multiple] option:hover {
-            background: var(--primary-light);
-        }
-
-        .multiselect-container {
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .multiselect-container label {
+        .field-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .field-label {
             display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
             margin-bottom: 0.5rem;
-            color: var(--text-dark);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(255, 255, 255, 0.5);
             font-weight: 500;
         }
 
-        .multiselect-container select {
-            width: 100%;
-            height: 200px;
-            padding: 8px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            background: white;
-        }
-
-        .multiselect-container select:focus {
+        .input-field:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background-color: #FFFFFF;
+            transform: scale(1.01);
         }
 
-        .multiselect-container select option {
-            padding: 8px 12px;
-            margin-bottom: 4px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        select.input-field {
+            padding-left: 1rem;
+            /* Selects look better without left icons sometimes, or handle differently */
         }
 
-        .multiselect-container select option:checked {
-            background: var(--primary) !important;
-            color: white;
+        .btn {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        .multiselect-container select option:hover {
-            background: var(--primary-light);
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+            z-index: -1;
         }
 
-        /* Selected items preview */
-        .selected-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
+        .btn:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
         }
 
-        .selected-item {
-            background: var(--primary-light);
+        .search-input-wrapper {
+            transition: transform 0.3s ease, flex 0.3s ease;
+        }
+
+        .search-input-wrapper:focus-within {
+            flex: 1.5;
+            transform: translateY(-2px);
+        }
+
+        .search-input-wrapper:focus-within .search-icon {
             color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.9rem;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-export {
+            background-color: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            background-color: #F9FAFB;
+            color: var(--text-main);
+            border-color: #D1D5DB;
+        }
+
+        .btn-back {
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+        }
+
+        .data-table th {
+            background-color: #F8FAFC;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748B;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 1.25rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            background-color: white;
+        }
+
+        .data-table tr:hover td {
+            background-color: #F9FAFB;
+        }
+
+        /* Profile & Tags */
+        .teacher-profile {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 1rem;
         }
 
-        .selected-item i {
+        .teacher-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .teacher-info-stack {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .teacher-name-text {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+
+        .tag {
+            background-color: #F3F4F6;
+            color: #4B5563;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-role {
+            background-color: #EEF2FF;
+            color: #4F46E5;
+            margin-top: 0.25rem;
+        }
+
+        .badge-dept {
+            background-color: #F0F9FF;
+            color: #0369A1;
+        }
+
+        /* Action Buttons */
+        .action-cell {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .icon-btn {
+            padding: 0.5rem;
+            border-radius: 6px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            background: white;
             cursor: pointer;
-            font-size: 0.8rem;
         }
 
-        .selected-item i:hover {
+        .icon-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn.delete:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* Password Cell */
+        .pass-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: monospace;
+            color: var(--text-muted);
+            background: #F8FAFC;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            width: fit-content;
+        }
+
+        .copy-pill {
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 0.875rem;
+        }
+
+        /* Dept Banner */
+        .dept-banner {
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0 0.5rem 0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Search Filter Section */
+        .search-filter-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-end;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .search-input-wrapper input {
+            padding-left: 2.75rem;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .clear-search:hover {
+            background: rgba(0, 0, 0, 0.05);
             color: var(--danger);
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            overflow-y: auto;
+        body.dark-mode .clear-search:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .modal-content {
-            background-color: var(--white);
-            margin: 40px auto;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 800px;
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
+        /* Result Counter */
+        .result-stats {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        @keyframes modalSlideIn {
+        .stat-badge {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
             from {
-                transform: translateY(-20px);
+                transform: translateY(10px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
 
+        .animate-slide {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
         }
 
         .close {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--text-light);
+            font-size: 1.5rem;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: color 0.2s;
         }
 
         .close:hover {
             color: var(--danger);
-            transform: scale(1.1);
         }
 
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: var(--bg-light);
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-label:hover {
-            background: var(--primary-light);
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-
-        /* Add separate styles for form section title */
+        /* Form Section Title */
         .form-section-title {
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin-bottom: 30px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
         .form-section-title i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--primary);
         }
 
-        /* Keep the gradient background only for list section title */
-        .list-section-title {
-            text-align: center;
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-            color: var(--white);
+        /* Stats Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            font-size: 1.5rem;
         }
 
-        .list-section-title i {
-            font-size: 1.8rem;
-            color: var(--white);
+        .stat-info {
+            display: flex;
+            flex-direction: column;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
-            position: relative;
-            overflow: hidden;
+        @keyframes countUp {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: rotate 20s linear infinite;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.25rem;
         }
 
-        .header h1 {
-            color: white;
-            font-size: 32px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 1;
-        }
-
-        .header-actions {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            z-index: 2;
-        }
-
-        .btn-export {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary) 0%, #9333EA 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
         }
 
-        .btn-export:hover {
-            background-color: #0ea271;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.6);
         }
 
-        .btn-export i {
-            font-size: 16px;
+        /* Enhanced Empty State */
+        .empty-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
         }
 
+        .empty-icon {
+            font-size: 5rem;
+            background: linear-gradient(to bottom, #E5E7EB, transparent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Dark Mode Overrides */
+        body.dark-mode {
+            --bg-body: #0F172A;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: rgba(51, 65, 85, 0.5);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .input-field {
+            background-color: rgba(15, 23, 42, 0.5);
+            color: white;
+        }
+
+        body.dark-mode .card-header {
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        body.dark-mode .data-table th {
+            background-color: rgba(15, 23, 42, 0.5);
+            color: #94A3B8;
+        }
+
+        body.dark-mode .data-table td {
+            background-color: transparent;
+            color: #E2E8F0;
+        }
+
+        body.dark-mode .tag {
+            background-color: rgba(51, 65, 85, 0.5);
+            color: #CBD5E1;
+            border-color: rgba(71, 85, 105, 0.5);
+        }
+
+        body.dark-mode .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        body.dark-mode .modal-content {
+            background: #1E293B;
+            border: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .modal-header {
+            background: #1E293B;
+        }
+
+        /* Scroll Progress Bar */
+        #scrollProgress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), #9333EA);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .header {
-                padding: 15px 30px;
+            .container {
+                padding: 1rem;
             }
+
             .header h1 {
-                font-size: 24px;
+                font-size: 1.75rem;
             }
-            .header-actions {
-                position: static;
-                text-align: center;
-                margin-top: 20px;
-            }
-            .btn-export {
-                width: 100%;
-                justify-content: center;
-            }
-        }
 
-        /* Add mobile-specific styles */
-        @media (max-width: 768px) {
-            .action-buttons {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter-section {
                 flex-direction: column;
-                gap: 10px;
-                width: 100%;
+                align-items: stretch;
             }
-
-            .btn-edit, .btn-delete {
-                width: 100%;
-                padding: 12px;
-                justify-content: center;
-                font-size: 1rem;
-                min-height: 44px; /* Minimum touch target size */
-                white-space: nowrap;
-            }
-
-            .table-container {
-                margin: 0 -20px;
-                padding: 0 20px;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            }
-
-            table {
-                min-width: 800px;
-            }
-
-            td {
-                min-width: 120px; /* Ensure cells don't get too narrow */
-                padding: 16px 12px;
-            }
-
-            /* Make the actions column wider on mobile */
-            td:last-child {
-                min-width: 150px;
-                padding-right: 20px;
-            }
-
-            /* Ensure buttons are easily tappable */
-            .btn-edit, .btn-delete {
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            /* Add some visual feedback for touch */
-            .btn-edit:active, .btn-delete:active {
-                transform: scale(0.98);
-                opacity: 0.9;
-            }
-        }
-
-        /* Add styles for better table scrolling on mobile */
-        @media (max-width: 480px) {
-            .table-container {
-                position: relative;
-                margin: 0 -15px;
-                padding: 0 15px;
-            }
-
-            .table-container::after {
-                content: '';
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                width: 20px;
-                background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
-                pointer-events: none;
-            }
-
-            /* Make buttons even more prominent on smaller screens */
-            .action-buttons {
-                padding: 5px 0;
-            }
-
-            .btn-edit, .btn-delete {
-                padding: 14px;
-                font-size: 1.1rem;
-            }
-        }
-
-        /* Mobile styles */
-        @media (max-width: 768px) {
-            .table-container {
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 0;
-                margin: 0 -15px;
-            }
-
-            table {
-                min-width: 800px;
-                border-collapse: separate;
-                border-spacing: 0;
-            }
-
-            .action-buttons {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                padding: 10px;
-            }
-
-            .btn-edit, .btn-delete {
-                width: 100%;
-                height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
-                padding: 10px;
-                margin: 2px 0;
-                border-radius: 8px;
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            .btn-edit:active, .btn-delete:active {
-                opacity: 0.8;
-                transform: scale(0.98);
-            }
-
-            /* Make department headers more visible */
-            .department-header td {
-                padding: 15px !important;
-            }
-
-            .department-header-content {
-                padding: 15px !important;
-                margin: 5px 0 !important;
-            }
-
-            /* Improve text readability */
-            td {
-                font-size: 14px;
-                padding: 12px 8px;
-            }
-
-            .teacher-name {
-                font-size: 15px;
-                font-weight: 600;
-            }
-
-            .teacher-email {
-                font-size: 13px;
-                color: var(--text-light);
-            }
-
-            /* Fix table header */
-            thead {
-                position: sticky;
-                top: 0;
-                background: white;
-                z-index: 1;
-            }
-
-            /* Add shadow to indicate scrollable content */
-            .table-container::after {
-                content: '';
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                width: 15px;
-                background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
-                pointer-events: none;
-            }
-
-            /* Make form more mobile-friendly */
-            .form-container {
-                padding: 20px;
-            }
-
-            .form-group {
-                margin-bottom: 15px;
-            }
-
-            input, select {
-                height: 44px;
-                font-size: 16px;
-            }
-
-            /* Make department badges and tags more readable */
-            .department-badge, .tag {
-                display: inline-block;
-                margin: 2px;
-                padding: 4px 8px;
-                font-size: 12px;
-                white-space: nowrap;
-            }
-        }
-
-        /* Even smaller screens */
-        @media (max-width: 480px) {
-            .btn-edit, .btn-delete {
-                height: 48px;
-                font-size: 18px;
-            }
-
-            .department-header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-
-            .teacher-count {
-                align-self: flex-start;
-            }
-        }
-
-        /* Search Container Styles */
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-            max-width: 400px;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 12px 45px 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 16px;
-            background: var(--white);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-container input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .search-container i {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: 16px;
-            pointer-events: none;
-        }
-
-        .search-container input::placeholder {
-            color: var(--text-light);
-            font-style: italic;
         }
     </style>
 </head>
+
 <body>
+    <div id="scrollProgress"></div>
     <div class="container">
-        <div class="header">
-            <h1>Teacher Management</h1>
-        </div>
-        
-        <div class="header-actions">
-            <button onclick="exportTeacherData()" class="btn-export">
-                <i class="fas fa-file-export"></i> Export Teachers
-            </button>
+        <a href="admin-dashboard.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <header class="header">
+            <div>
+                <h1>Teacher Management Hub</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Manage faculty profiles,
+                    assignments, and credentials.</p>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleTheme()" class="btn btn-outline" id="themeToggleBtn"
+                    title="Toggle Dark/Light Mode" style="width: 44px; padding: 0;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button onclick="exportTeacherData()" class="btn btn-export">
+                    <i class="fas fa-file-excel"></i> Export Database
+                </button>
+            </div>
+        </header>
+
+        <!-- Quick Stats Dashboard -->
+        <div class="stats-dashboard"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+            <div class="stat-card"
+                style="background: var(--bg-card); backdrop-filter: blur(12px); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease;">
+                <div class="stat-icon"
+                    style="width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: white; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalFacultyCount"
+                        style="font-size: 2.25rem; font-weight: 800; color: var(--text-main);">0</span>
+                    <span class="stat-label"
+                        style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 0.5rem;">Total
+                        Faculty</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                style="background: var(--bg-card); backdrop-filter: blur(12px); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease;">
+                <div class="stat-icon"
+                    style="width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="hodCount"
+                        style="font-size: 2.25rem; font-weight: 800; color: var(--text-main);">0</span>
+                    <span class="stat-label"
+                        style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 0.5rem;">Head
+                        of Depts.</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                style="background: var(--bg-card); backdrop-filter: blur(12px); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease;">
+                <div class="stat-icon"
+                    style="width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="labAssistantCount"
+                        style="font-size: 2.25rem; font-weight: 800; color: var(--text-main);">0</span>
+                    <span class="stat-label"
+                        style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 0.5rem;">Lab
+                        Assistants</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                style="background: var(--bg-card); backdrop-filter: blur(12px); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease;">
+                <div class="stat-icon"
+                    style="width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" id="deptCountDisplay"
+                        style="font-size: 2.25rem; font-weight: 800; color: var(--text-main);">7</span>
+                    <span class="stat-label"
+                        style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 0.5rem;">Active
+                        Depts.</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Add Teacher Form -->
-        <div class="form-container">
-            <h2 class="form-section-title">
-                <i class="fas fa-user-plus"></i>
-                Add New Teacher
-            </h2>
-            <form id="addTeacherForm">
-                <!-- Basic Info -->
-                    <div class="form-row">
-                        <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" required>
+
+        <!-- List Card -->
+        <div class="card animate-slide" style="animation-delay: 0.1s;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-database" style="color: var(--primary)"></i>
+                    Faculty Database
+                </h2>
+                <a href="import-teachers.html" class="btn btn-outline">
+                    <i class="fas fa-file-import"></i> Bulk Import
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="search-filter-section">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="teacherSearch" class="input-field"
+                            placeholder="Search by name, email, phone..." style="padding-right: 3rem;">
+                        <i class="fas fa-times-circle clear-search" id="clearSearch" title="Clear Search"></i>
+                    </div>
+                    <div class="filter-group">
+                        <label class="field-label">Department Filter</label>
+                        <select id="departmentFilter" class="input-field" style="min-width: 200px;">
+                            <option value="">-- Select Department --</option>
+                            <option value="CT">Computer Technology</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="ME">Mechanical Engineering</option>
+                            <option value="CE">Civil Engineering</option>
+                            <option value="EE">Electrical Engineering</option>
+                            <option value="ET">Electronics & Telecommunication</option>
+                            <option value="AI">Artificial Intelligence</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="filterResultCounter" class="result-stats">
+                    <!-- Stat badges go here -->
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table" id="teacherTable">
+                        <thead>
+                            <tr>
+                                <th>Faculty Member</th>
+                                <th>System ID</th>
+                                <th>Contact</th>
+                                <th>Academic Year</th>
+                                <th>Divisions</th>
+                                <th>Credentials</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="fas"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Edit Teacher Modal -->
+    <div id="editTeacherModal" class="modal">
+        <div class="modal-content animate-slide">
+            <div class="modal-header">
+                <h2 class="form-section-title">
+                    <i class="fas fa-user-edit"></i>
+                    Update Faculty Details
+                </h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="card-body">
+                <form id="editTeacherForm">
+                    <input type="hidden" id="editTeacherId">
+
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" for="editFirstName">First Name</label>
+                            <input type="text" id="editFirstName" class="input-field" required>
                         </div>
-                        <div class="form-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" required>
+                        <div class="field-group">
+                            <label class="field-label" for="editLastName">Last Name</label>
+                            <input type="text" id="editLastName" class="input-field" required>
                         </div>
                     </div>
 
-                <!-- Contact Info -->
-                    <div class="form-row">
-                        <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" required>
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" for="editEmail">Email Address</label>
+                            <input type="email" id="editEmail" class="input-field" required readonly
+                                style="background: #F3F4F6; cursor: not-allowed;">
+                            <small class="multi-select-hint">Email cannot be changed</small>
                         </div>
-                        <div class="form-group">
-                            <label for="phone">Mobile Number</label>
-                            <div class="phone-input-container">
-                                <input type="tel" id="phone" required placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" maxlength="10">
-                                <small class="help-text">Teacher will receive attendance notifications on this number</small>
-                            </div>
+                        <div class="field-group">
+                            <label class="field-label" for="editPhone">Mobile Number</label>
+                            <input type="tel" id="editPhone" class="input-field" required>
                         </div>
-                        <div class="form-group">
-                            <label for="role">Role</label>
-                            <select id="role" required>
+                        <div class="field-group">
+                            <label class="field-label" for="editRole">Staff Designation</label>
+                            <select id="editRole" class="input-field" required>
                                 <option value="Lecturer">Lecturer</option>
                                 <option value="Lab Assistant">Lab Assistant</option>
                                 <option value="HOD">HOD (Head of Department)</option>
@@ -1120,208 +992,188 @@
                         </div>
                     </div>
 
-                <!-- Department Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Departments</label>
-                        <select id="departmentSelect" class="form-control" multiple onchange="updateDivisionVisibility()">
-                            <option value="CT">Computer Technology (CT)</option>
-                            <option value="IT">Information Technology (IT)</option>
-                            <option value="ME">Mechanical Engineering (ME)</option>
-                            <option value="CE">Civil Engineering (CE)</option>
-                            <option value="EE">Electrical Engineering (EE)</option>
-                            <option value="ET">Electronics & Telecommunication (ET)</option>
-                            <option value="AI">Artificial Intelligence (AI)</option>
-                        </select>
-                        <div class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple departments</div>
-                    </div>
-                </div>
-
-                <!-- Division Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Divisions</label>
-                        <div class="checkbox-group divisions" style="display: none;">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="division" value="A"> Division A
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="division" value="B"> Division B
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="division" value="C"> Division C
-                            </label>
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label">Assigned Departments</label>
+                            <select id="editDepartmentSelect" class="input-field" multiple style="height: 100px;">
+                                <option value="CT">Computer Technology (CT)</option>
+                                <option value="IT">Information Technology (IT)</option>
+                                <option value="ME">Mechanical Engineering (ME)</option>
+                                <option value="CE">Civil Engineering (CE)</option>
+                                <option value="EE">Electrical Engineering (EE)</option>
+                                <option value="ET">Electronics & Telecommunication (ET)</option>
+                                <option value="AI">Artificial Intelligence (AI)</option>
+                            </select>
+                            <small class="multi-select-hint">Hold Ctrl/Cmd to select multiple</small>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">Year/Classes</label>
+                            <select id="editClassSelect" class="input-field" multiple style="height: 100px;">
+                                <option value="FY">First Year (FY)</option>
+                                <option value="SY">Second Year (SY)</option>
+                                <option value="TY">Third Year (TY)</option>
+                                <option value="BE">Final Year (BE)</option>
+                            </select>
+                        </div>
+                        <div class="field-group edit-divisions" style="display: none;">
+                            <label class="field-label">Mandatory Divisions</label>
+                            <div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;"
+                                    class="tag">
+                                    <input type="checkbox" name="editDivision" value="A"> Div A
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;"
+                                    class="tag">
+                                    <input type="checkbox" name="editDivision" value="B"> Div B
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;"
+                                    class="tag">
+                                    <input type="checkbox" name="editDivision" value="C"> Div C
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Class Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Classes</label>
-                        <select id="classSelect" class="form-control" multiple>
-                            <option value="FY">First Year (FY)</option>
-                            <option value="SY">Second Year (SY)</option>
-                            <option value="TY">Third Year (TY)</option>
-                            <option value="BE">Final Year (BE)</option>
-                        </select>
-                        <div class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple classes</div>
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" class="btn btn-outline"
+                            onclick="document.getElementById('editTeacherModal').style.display='none'">
+                            Cancel
+                        </button>
+                        <button type="submit" id="editSubmitBtn" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
                     </div>
-                </div>
-
-                <button type="submit" class="btn" id="submitBtn">
-                    <i class="fas fa-plus-circle"></i>
-                    <span id="submitBtnText">Add Teacher</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- Teacher List -->
-        <div class="teacher-list">
-            <div class="section-title" style="position: relative;">
-                <div class="left">
-                <i class="fas fa-users"></i>
-                    <span>Teacher List</span>
-                </div>
-                <a href="import-teachers.html" class="import-btn">
-                    <i class="fas fa-file-import"></i>
-                    Import Teachers
-                </a>
-            </div>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search teachers...">
-                <i class="fas fa-search"></i>
-            </div>
-            <div class="table-container">
-                <table id="teacherTable">
-                    <thead>
-                        <tr>
-                            <th>Teacher Details</th>
-                            <th>Teacher ID</th>
-                            <th>Contact</th>
-                            <th>Department</th>
-                            <th>Classes</th>
-                            <th>Divisions</th>
-                            <th>Password</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="teacherTableBody">
-                        <!-- Teachers will be listed here -->
-                    </tbody>
-                </table>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Teacher Modal -->
-    <div id="editTeacherModal" class="modal">
-        <div class="modal-content">
+    <!-- Add Teacher Modal -->
+    <div id="addTeacherModal" class="modal">
+        <div class="modal-content animate-slide">
             <div class="modal-header">
                 <h2 class="form-section-title">
-                    <i class="fas fa-user-edit"></i>
-                    Edit Teacher
+                    <i class="fas fa-user-plus"></i>
+                    Register New Faculty
                 </h2>
-                <span class="close">&times;</span>
+                <span class="close" onclick="closeAddTeacherModal()">&times;</span>
             </div>
-            <form id="editTeacherForm">
-                <input type="hidden" id="editTeacherId">
-                <!-- Basic Info -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editFirstName">First Name</label>
-                        <input type="text" id="editFirstName" required>
+            <div class="card-body">
+                <form id="addTeacherForm">
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" for="firstName">First Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="firstName" class="input-field" placeholder="e.g. Rahul" required>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="lastName">Last Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-signature input-icon"></i>
+                                <input type="text" id="lastName" class="input-field" placeholder="e.g. Patil" required>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="email">Institutional Email</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="email" class="input-field" placeholder="name@college.edu"
+                                    required>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="editLastName">Last Name</label>
-                        <input type="text" id="editLastName" required>
-                    </div>
-                </div>
 
-                <!-- Contact Info -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input type="email" id="editEmail" required readonly>
-                        <div class="help-text">Email cannot be changed</div>
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" for="phone">Mobile Number</label>
+                            <div class="input-group">
+                                <i class="fas fa-phone-alt input-icon"></i>
+                                <input type="tel" id="phone" class="input-field" placeholder="10-digit number"
+                                    pattern="[0-9]{10}" maxlength="10" required>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="role">Staff Designation</label>
+                            <select id="role" class="input-field" required>
+                                <option value="Lecturer">Lecturer</option>
+                                <option value="Lab Assistant">Lab Assistant</option>
+                                <option value="HOD">HOD (Head of Department)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="editPhone">Phone Number</label>
-                        <input type="tel" id="editPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRole">Role</label>
-                        <select id="editRole" required>
-                            <option value="Lecturer">Lecturer</option>
-                            <option value="Lab Assistant">Lab Assistant</option>
-                            <option value="HOD">HOD (Head of Department)</option>
-                        </select>
-                    </div>
-                </div>
 
-                <!-- Department Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Departments</label>
-                        <select id="editDepartmentSelect" class="form-control" multiple>
-                            <option value="CT">Computer Technology (CT)</option>
-                            <option value="IT">Information Technology (IT)</option>
-                            <option value="ME">Mechanical Engineering (ME)</option>
-                            <option value="CE">Civil Engineering (CE)</option>
-                            <option value="EE">Electrical Engineering (EE)</option>
-                            <option value="ET">Electronics & Telecommunication (ET)</option>
-                            <option value="AI">Artificial Intelligence (AI)</option>
-                        </select>
-                        <div class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple departments</div>
-                    </div>
-                </div>
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label">Assigned Departments</label>
+                            <select id="departmentSelect" class="input-field" multiple style="height: 120px;">
+                                <option value="CT">Computer Technology (CT)</option>
+                                <option value="IT">Information Technology (IT)</option>
+                                <option value="ME">Mechanical Engineering (ME)</option>
+                                <option value="CE">Civil Engineering (CE)</option>
+                                <option value="EE">Electrical Engineering (EE)</option>
+                                <option value="ET">Electronics & Telecommunication (ET)</option>
+                                <option value="AI">Artificial Intelligence (AI)</option>
+                            </select>
+                            <small class="multi-select-hint">Hold Ctrl (Windows) or Command (Mac) to select multiple
+                                departments</small>
+                        </div>
 
-                <!-- Division Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Divisions</label>
-                        <div class="checkbox-group edit-divisions">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="editDivision" value="A"> Division A
+                        <div class="field-group">
+                            <label class="field-label">Year/Classes</label>
+                            <select id="classSelect" class="input-field" multiple style="height: 120px;">
+                                <option value="FY">First Year (FY)</option>
+                                <option value="SY">Second Year (SY)</option>
+                                <option value="TY">Third Year (TY)</option>
+                                <option value="BE">Final Year (BE)</option>
+                            </select>
+                            <small class="multi-select-hint">Hold Ctrl/Cmd to select multiple classes</small>
+                        </div>
+                    </div>
+
+                    <!-- Division Selection -->
+                    <div class="field-group divisions" style="display: none;">
+                        <label class="field-label">Mandatory Divisions (For CT Dept)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label" class="tag">
+                                <input type="checkbox" name="division" value="A"> Div A
                             </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="editDivision" value="B"> Division B
+                            <label class="checkbox-label" class="tag">
+                                <input type="checkbox" name="division" value="B"> Div B
                             </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="editDivision" value="C"> Division C
+                            <label class="checkbox-label" class="tag">
+                                <input type="checkbox" name="division" value="C"> Div C
                             </label>
                         </div>
                     </div>
-                </div>
 
-                <!-- Class Selection -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Select Classes</label>
-                        <select id="editClassSelect" class="form-control" multiple>
-                            <option value="FY">First Year (FY)</option>
-                            <option value="SY">Second Year (SY)</option>
-                            <option value="TY">Third Year (TY)</option>
-                            <option value="BE">Final Year (BE)</option>
-                        </select>
-                        <div class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple classes</div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" id="submitBtn"
+                            style="width: auto; padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 50px; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);">
+                            <i class="fas fa-user-plus"></i>
+                            <span id="submitBtnText">Create Account</span>
+                        </button>
                     </div>
-                </div>
-
-                <button type="submit" class="btn" id="editSubmitBtn">
-                    <i class="fas fa-save"></i>
-                    <span>Save Changes</span>
-                </button>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
+
+    <!-- Floating Action Button -->
+    <div onclick="openAddTeacherModal()" class="fab" title="Register New Faculty">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Load Firebase first -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
-    
+
     <!-- Then load our scripts -->
     <script>
         // Override firebase-config.js timeout behavior for teacher management
@@ -1352,50 +1204,55 @@
         // Add Teacher Form Submit
         document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const role = document.getElementById('role').value;
 
-            // Get selected departments
-            const departmentSelect = document.getElementById('departmentSelect');
-            const selectedDepartments = Array.from(departmentSelect.selectedOptions).map(option => ({
-                code: option.value,
-                name: option.text
-            }));
-
-            // Get selected classes
-            const classSelect = document.getElementById('classSelect');
-            const selectedClasses = Array.from(classSelect.selectedOptions).map(option => option.value);
-
-            // Get selected divisions
-            const divisions = Array.from(document.querySelectorAll('input[name="division"]:checked'))
-                .map(checkbox => checkbox.value);
-
-            // Validate form data
-            if (selectedDepartments.length === 0) {
-                showErrorMessage('Please select at least one department');
-                return;
-            }
-
-            if (selectedClasses.length === 0) {
-                showErrorMessage('Please select at least one class');
-                return;
-            }
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const originalText = submitBtnText.textContent;
 
             try {
+                // Disable button and show loading
+                submitBtn.disabled = true;
+                submitBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const role = document.getElementById('role').value;
+
+                // Get selected departments
+                const departmentSelect = document.getElementById('departmentSelect');
+                const selectedDepartments = Array.from(departmentSelect.selectedOptions).map(option => ({
+                    code: option.value,
+                    name: option.text
+                }));
+
+                // Get selected classes
+                const classSelect = document.getElementById('classSelect');
+                const selectedClasses = Array.from(classSelect.selectedOptions).map(option => option.value);
+
+                // Get selected divisions
+                const divisions = Array.from(document.querySelectorAll('input[name="division"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                // Validate form data
+                if (selectedDepartments.length === 0) {
+                    throw new Error('Please select at least one department');
+                }
+
+                if (selectedClasses.length === 0) {
+                    throw new Error('Please select at least one class');
+                }
+
                 // Check if email exists in database
                 const teachersSnapshot = await firebase.database()
                     .ref('teachers')
                     .orderByChild('email')
                     .equalTo(email)
                     .once('value');
-                    
+
                 if (teachersSnapshot.exists()) {
-                    showErrorMessage('A teacher with this email already exists');
-                    return;
+                    throw new Error('A teacher with this email already exists');
                 }
 
                 // Generate a random password
@@ -1420,6 +1277,17 @@
                     initialPassword: password
                 };
 
+                if (window.confetti) {
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#6366F1', '#10B981', '#F59E0B']
+                    });
+                }
+
+                showToast('शिक्षक यशस्वीरित्या जोडला!', 'success');
+
                 await firebase.database()
                     .ref('teachers/' + uid)
                     .set(teacherData);
@@ -1433,25 +1301,30 @@
                     Please share these credentials with the teacher securely.
                     Ask them to change their password after first login.
                 `;
-                
+
                 alert(message);
-                
+
                 // Reset form
                 document.getElementById('addTeacherForm').reset();
                 document.querySelectorAll('input[name="division"]').forEach(checkbox => {
                     checkbox.checked = false;
                 });
                 updateDivisionVisibility();
-                
+
                 // Reload page
                 window.location.reload();
 
             } catch (error) {
                 console.error('Error:', error);
-                if (error.code === 'auth/email-already-in-use') {
+
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtnText.textContent = 'Create Teacher Account';
+
+                if (error.code === 'auth/email-already-in-use' || error.message.includes('already exists')) {
                     showErrorMessage('A teacher with this email already exists');
                 } else {
-                    showErrorMessage('Error creating teacher account: ' + error.message);
+                    showErrorMessage(error.message || 'Error creating teacher account');
                 }
             }
         });
@@ -1465,24 +1338,24 @@
             const length = 10;
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
             let password = '';
-            
+
             // Add at least one uppercase letter
             password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
-            
+
             // Add at least one lowercase letter
             password += 'abcdefghijklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 26));
-            
+
             // Add at least one number
             password += '0123456789'.charAt(Math.floor(Math.random() * 10));
-            
+
             // Add at least one special character
             password += '!@#$%^&*'.charAt(Math.floor(Math.random() * 8));
-            
+
             // Fill the rest with random characters
             for (let i = password.length; i < length; i++) {
                 password += charset.charAt(Math.floor(Math.random() * charset.length));
             }
-            
+
             // Shuffle the password
             return password.split('').sort(() => Math.random() - 0.5).join('');
         }
@@ -1491,37 +1364,107 @@
         function updateDivisionVisibility() {
             const departmentSelect = document.getElementById('departmentSelect');
             const divisionGroup = document.querySelector('.divisions');
-            
+
             // Check if any selected department has mandatory divisions
             const hasMandatoryDivisions = Array.from(departmentSelect.selectedOptions)
                 .some(option => departmentHasMandatoryDivisions(option.value));
-            
+
             // Show divisions only if CT is selected
             divisionGroup.style.display = hasMandatoryDivisions ? 'flex' : 'none';
         }
 
-        function copyPassword(password) {
+        function copyPassword(password, el) {
             navigator.clipboard.writeText(password).then(() => {
-                alert('Password copied to clipboard!');
+                showToast('Password copied to clipboard!', 'success');
+                if (el) {
+                    const originalClass = el.className;
+                    el.className = 'fas fa-check-circle text-success';
+                    setTimeout(() => {
+                        el.className = originalClass;
+                    }, 2000);
+                }
             }).catch(err => {
                 console.error('Failed to copy password:', err);
+                showToast('Failed to copy password', 'error');
             });
         }
 
-        // Initialize division visibility and event listeners
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+
+            if (!toast || !icon || !msg) return;
+
+            toast.className = `toast show toast-${type}`;
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            msg.textContent = message;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Theme Toggle Logic
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggleBtn');
+            const icon = btn.querySelector('i');
+
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+
+            showToast(`${isDark ? 'Dark' : 'Light'} Mode activated`, 'success');
+        }
+
+        // Apply saved theme
         document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggleBtn').querySelector('i').className = 'fas fa-sun';
+            }
             updateDivisionVisibility();
+
+            // Modal Listeners
+            const modals = document.querySelectorAll('.modal');
+            const closeBtns = document.querySelectorAll('.close');
+
+            closeBtns.forEach(btn => {
+                btn.onclick = function () {
+                    modals.forEach(modal => modal.style.display = "none");
+                }
+            });
+
+            window.onclick = function (event) {
+                modals.forEach(modal => {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            }
         });
+
+        function openAddTeacherModal() {
+            document.getElementById('addTeacherModal').style.display = 'flex';
+        }
+
+        function closeAddTeacherModal() {
+            document.getElementById('addTeacherModal').style.display = 'none';
+        }
 
         // Function to export teacher data
         async function exportTeacherData() {
             try {
                 showLoadingMessage('Preparing teacher data for export...');
-                
+
                 // Get all teachers
                 const snapshot = await firebase.database().ref('teachers').once('value');
                 const teachers = snapshot.val();
-                
+
                 if (!teachers) {
                     showErrorMessage('No teachers found to export');
                     return;
@@ -1555,7 +1498,7 @@
 
                 // Save file
                 XLSX.writeFile(wb, filename);
-                
+
                 showSuccessMessage('Teacher data exported successfully');
             } catch (error) {
                 console.error('Error exporting teacher data:', error);
@@ -1572,7 +1515,7 @@
                 <span>${message}</span>
             `;
             document.body.appendChild(loadingDiv);
-            
+
             // Remove after 3 seconds or when success/error message shows
             setTimeout(() => {
                 loadingDiv.remove();
@@ -1588,7 +1531,7 @@
                 <span>${message}</span>
             `;
             document.body.appendChild(messageDiv);
-            
+
             setTimeout(() => {
                 messageDiv.remove();
             }, 3000);
@@ -1603,7 +1546,7 @@
                 <span>${message}</span>
             `;
             document.body.appendChild(messageDiv);
-            
+
             setTimeout(() => {
                 messageDiv.remove();
             }, 3000);
@@ -1690,7 +1633,17 @@
         // Add SheetJS (XLSX) library
         const xlsxScript = document.createElement('script');
         xlsxScript.src = 'https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js';
-        document.head.appendChild(xlsxScript);
+        // Scroll Progress
+        window.onscroll = function () {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const scrollProgress = document.getElementById("scrollProgress");
+            if (scrollProgress) {
+                scrollProgress.style.width = scrolled + "%";
+            }
+        };
     </script>
 </body>
+
 </html>

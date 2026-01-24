@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BVIT Attendance System - Student Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
     <style>
         :root {
             --primary: #F59E0B;
@@ -123,7 +132,7 @@
             transition: all 0.3s ease;
         }
 
-        .input-group input:focus + i {
+        .input-group input:focus+i {
             color: var(--primary);
         }
 
@@ -214,7 +223,7 @@
             body {
                 padding: 15px;
             }
-            
+
             .login-container {
                 max-width: 100%;
                 border-radius: 16px;
@@ -227,21 +236,21 @@
             .login-header img {
                 width: 140px;
             }
-            
+
             .login-header h1 {
                 font-size: 22px;
             }
-            
+
             .login-header p {
                 font-size: 13px;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
             }
-            
+
             .login-container {
                 border-radius: 12px;
             }
@@ -254,12 +263,12 @@
                 width: 120px;
                 margin-bottom: 15px;
             }
-            
+
             .login-header h1 {
                 font-size: 20px;
                 letter-spacing: 0.5px;
             }
-            
+
             .login-header p {
                 font-size: 12px;
             }
@@ -267,11 +276,11 @@
             .login-form {
                 padding: 0 15px 20px;
             }
-            
+
             .form-group {
                 margin-bottom: 15px;
             }
-            
+
             .form-group label {
                 font-size: 13px;
                 margin-bottom: 6px;
@@ -300,10 +309,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
+            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png"
+                alt="BVIT Logo">
             <h1>WELCOME TO BVIT</h1>
             <p>Student Login Portal</p>
         </div>
@@ -333,15 +344,11 @@
             <div id="studentError" class="error-message"></div>
         </form>
 
-        
+
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const studentForm = document.getElementById('studentForm');
             if (studentForm) {
                 studentForm.addEventListener('submit', handleStudentLogin);
@@ -351,15 +358,15 @@
         // Handle student login
         async function handleStudentLogin(event) {
             event.preventDefault();
-            
+
             const rollNo = document.getElementById('studentRollNo').value.trim();
             const password = document.getElementById('studentPassword').value.trim();
-            
+
             if (!rollNo || !password) {
                 alert('कृपया रोल नंबर आणि पासवर्ड टाका');
                 return;
             }
-            
+
             try {
                 // Clear previous error
                 const errorDiv = document.getElementById('studentError');
@@ -377,19 +384,19 @@
 
                 // Wait for Firebase to initialize
                 await waitForFirebase();
-                
+
                 // Get student data from Firebase
                 const studentsSnapshot = await firebase.database().ref('students').once('value');
                 const students = studentsSnapshot.val();
-                
+
                 if (!students) {
                     throw new Error('कोणतेही विद्यार्थी डेटा सापडला नाही');
                 }
-                
+
                 // Find student by roll number
                 let studentFound = false;
                 let studentData = null;
-                
+
                 Object.entries(students).forEach(([key, student]) => {
                     // Match by rollNo field directly (not email)
                     if (student.rollNo && student.rollNo.toString().toLowerCase() === rollNo.toLowerCase()) {
@@ -401,12 +408,12 @@
                         }
                     }
                 });
-                
+
                 if (studentFound && studentData) {
                     // Store student data in session
                     sessionStorage.setItem('isStudentLoggedIn', 'true');
                     sessionStorage.setItem('studentData', JSON.stringify(studentData));
-                    
+
                     // Start auto logout timer
                     if (typeof startAutoLogoutTimer === 'function') {
                         startAutoLogoutTimer('student');
@@ -414,7 +421,7 @@
                     if (typeof setupActivityListeners === 'function') {
                         setupActivityListeners('student');
                     }
-                    
+
                     // Redirect to student dashboard
                     window.location.href = 'student-dashboard.html';
                 } else {
@@ -423,7 +430,7 @@
             } catch (error) {
                 console.error('Login error:', error);
                 alert('लॉगिन करताना त्रुटी: ' + error.message);
-                
+
                 // Reset button state
                 const submitBtn = event.target.querySelector('button[type="submit"]');
                 if (submitBtn) {
@@ -450,4 +457,5 @@
         }
     </script>
 </body>
-</html> 
+
+</html>

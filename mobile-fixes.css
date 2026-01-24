@@ -294,4 +294,44 @@
         white-space: nowrap !important;
         flex: 1 !important;
     }
-} 
+
+    /* Generic Admin Page Fixes */
+    .header, .page-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 1.5rem !important;
+        gap: 1.5rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .header-actions, .header-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+
+    .btn-back {
+        width: fit-content !important;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Form Grids */
+    .filter-grid, .form-grid, .stats-grid, .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Cards */
+    .card, .content-card, .table-glass-wrapper, .stat-card, .chart-card {
+        border-radius: 12px !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Table Wrapping */
+    .table-container, .table-glass-wrapper, .table-wrapper {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        margin-bottom: 2rem !important;
+    }
+}
