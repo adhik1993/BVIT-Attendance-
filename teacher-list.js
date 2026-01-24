@@ -7,24 +7,24 @@ function generatePassword() {
     const length = 10;
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     let password = '';
-    
+
     // Add at least one uppercase letter
     password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
-    
+
     // Add at least one lowercase letter
     password += 'abcdefghijklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 26));
-    
+
     // Add at least one number
     password += '0123456789'.charAt(Math.floor(Math.random() * 10));
-    
+
     // Add at least one special character
     password += '!@#$%^&*'.charAt(Math.floor(Math.random() * 8));
-    
+
     // Fill the rest with random characters
     for (let i = password.length; i < length; i++) {
         password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
-    
+
     // Shuffle the password
     return password.split('').sort(() => Math.random() - 0.5).join('');
 }
@@ -42,13 +42,13 @@ async function checkIsAdmin(userId) {
 
 // Department colors mapping
 const departmentColors = {
-    'CT': { bg: '#E8F5E9', text: '#2E7D32', icon: '#43A047' },  // Green shades
-    'IT': { bg: '#E3F2FD', text: '#1565C0', icon: '#1E88E5' },  // Blue shades
-    'ME': { bg: '#FFF3E0', text: '#E65100', icon: '#F57C00' },  // Orange shades
-    'CE': { bg: '#F3E5F5', text: '#6A1B9A', icon: '#8E24AA' },  // Purple shades
-    'EE': { bg: '#FFEBEE', text: '#C62828', icon: '#EF5350' },  // Red shades
-    'ET': { bg: '#E0F7FA', text: '#00838F', icon: '#00ACC1' },  // Cyan shades
-    'AI': { bg: '#F3E5F5', text: '#4A148C', icon: '#6A1B9A' }   // Deep Purple shades
+    'CT': { bg: '#E8F5E9', text: '#2E7D32', icon: 'fas fa-laptop-code' },   // Computer
+    'IT': { bg: '#E3F2FD', text: '#1565C0', icon: 'fas fa-network-wired' }, // IT
+    'ME': { bg: '#FFF3E0', text: '#E65100', icon: 'fas fa-tools' },          // Mechanical
+    'CE': { bg: '#F3E5F5', text: '#6A1B9A', icon: 'fas fa-hard-hat' },      // Civil
+    'EE': { bg: '#FFEBEE', text: '#C62828', icon: 'fas fa-bolt' },          // Electrical
+    'ET': { bg: '#E0F7FA', text: '#00838F', icon: 'fas fa-microchip' },     // E&TC
+    'AI': { bg: '#F3E5F5', text: '#4A148C', icon: 'fas fa-brain' }         // AI
 };
 
 // Default colors for departments not in the mapping
@@ -114,11 +114,11 @@ async function updateTeacherRoles() {
     try {
         const snapshot = await window.firebase.database().ref('teachers').once('value');
         const teachers = snapshot.val();
-        
+
         if (!teachers) return;
 
         const updates = {};
-        
+
         Object.entries(teachers).forEach(([id, teacher]) => {
             const isAssistant = isLabAssistant(teacher.firstName, teacher.lastName);
             if (isAssistant && (!teacher.role || teacher.role !== 'Lab Assistant')) {
@@ -133,7 +133,7 @@ async function updateTeacherRoles() {
             console.log('Updated roles for', Object.keys(updates).length, 'teachers');
             return true;
         }
-        
+
         return false;
     } catch (error) {
         console.error('Error updating roles:', error);
@@ -164,7 +164,7 @@ async function updateTeacherDetails(teacherId) {
         // Get current teacher data
         const snapshot = await window.firebase.database().ref('teachers/' + teacherId).once('value');
         const teacher = snapshot.val();
-        
+
         if (!teacher) {
             alert('Teacher not found!');
             return;
@@ -173,7 +173,7 @@ async function updateTeacherDetails(teacherId) {
         // Get the modal
         const modal = document.getElementById('editTeacherModal');
         const closeBtn = modal.querySelector('.close');
-        
+
         // Fill form with current data
         document.getElementById('editTeacherId').value = teacherId;
         document.getElementById('editFirstName').value = teacher.firstName;
@@ -185,19 +185,19 @@ async function updateTeacherDetails(teacherId) {
         // Set departments
         const departmentSelect = document.getElementById('editDepartmentSelect');
         Array.from(departmentSelect.options).forEach(option => {
-            option.selected = teacher.departments && 
+            option.selected = teacher.departments &&
                 teacher.departments.some(dept => dept.code === option.value);
         });
 
         // Show/hide divisions based on whether CT is selected
-        const hasCTDepartment = teacher.departments && 
+        const hasCTDepartment = teacher.departments &&
             teacher.departments.some(dept => dept.code === 'CT');
         const divisionGroup = document.querySelector('.edit-divisions');
         divisionGroup.style.display = hasCTDepartment ? 'flex' : 'none';
 
         // Set divisions only if CT department is selected
         document.querySelectorAll('input[name="editDivision"]').forEach(checkbox => {
-            checkbox.checked = hasCTDepartment && teacher.divisions && 
+            checkbox.checked = hasCTDepartment && teacher.divisions &&
                 teacher.divisions.includes(checkbox.value);
         });
 
@@ -208,7 +208,7 @@ async function updateTeacherDetails(teacherId) {
         });
 
         // Add event listener for department changes
-        departmentSelect.addEventListener('change', function() {
+        departmentSelect.addEventListener('change', function () {
             const selectedDepts = Array.from(this.selectedOptions).map(opt => opt.value);
             const hasCT = selectedDepts.includes('CT');
             divisionGroup.style.display = hasCT ? 'flex' : 'none';
@@ -221,12 +221,12 @@ async function updateTeacherDetails(teacherId) {
         modal.style.display = 'block';
 
         // Close modal when clicking (x)
-        closeBtn.onclick = function() {
+        closeBtn.onclick = function () {
             modal.style.display = 'none';
         }
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
             }
@@ -234,7 +234,7 @@ async function updateTeacherDetails(teacherId) {
 
         // Handle form submission
         const form = document.getElementById('editTeacherForm');
-        form.onsubmit = async function(e) {
+        form.onsubmit = async function (e) {
             e.preventDefault();
 
             try {
@@ -285,19 +285,19 @@ async function updateTeacherDetails(teacherId) {
                 // 🔍 DEBUG: Log what we're trying to save
                 console.log('🔍 Updating teacher with data:', updatedData);
                 console.log('🔍 Role being saved:', updatedData.role);
-                
+
                 // Update in database
                 await window.firebase.database().ref('teachers/' + teacherId).update(updatedData);
-                
+
                 // 🔍 DEBUG: Verify the update worked
                 const verifySnapshot = await window.firebase.database().ref('teachers/' + teacherId).once('value');
                 const updatedTeacher = verifySnapshot.val();
                 console.log('🔍 After update, teacher data:', updatedTeacher);
                 console.log('🔍 Role in database after update:', updatedTeacher.role);
-                
+
                 // Show success message
                 alert('शिक्षकाची माहिती यशस्वीरित्या अपडेट केली!\n\nRole: ' + updatedData.role);
-                
+
                 // Close modal and refresh
                 modal.style.display = 'none';
                 window.location.reload();
@@ -320,10 +320,14 @@ class TeacherList {
         this.teachersRef = null;
         this.tableBody = document.getElementById('teacherTableBody');
         this.table = document.getElementById('teacherTable');
-        this.searchInput = document.getElementById('searchInput');
+        this.searchInput = document.getElementById('teacherSearch');
         this.allTeachers = null;
+        this.teachersCache = null;
+        this.teachersCacheTime = 0;
+        this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+        this.searchTimer = null;
         this.originalAddTeacherRow = null;
-        
+
         // Show loading state initially
         if (this.tableBody) {
             this.tableBody.innerHTML = `
@@ -335,79 +339,41 @@ class TeacherList {
                 </tr>
             `;
         }
-        
+
         if (!this.tableBody || !this.table) {
             console.error('Required elements not found - tableBody:', !!this.tableBody, 'table:', !!this.table);
             // Don't return, continue with initialization
         }
 
-        // Add department filter
-        this.addDepartmentFilter();
-        
-        // Add search event listener
+
+        // Attach listeners to existing elements
         if (this.searchInput) {
-            this.searchInput.addEventListener('input', () => this.filterTeachers());
+            const clearBtn = document.getElementById('clearSearch');
+
+            this.searchInput.addEventListener('input', () => {
+                if (clearBtn) {
+                    clearBtn.style.display = this.searchInput.value ? 'block' : 'none';
+                }
+                clearTimeout(this.searchTimer);
+                this.searchTimer = setTimeout(() => this.filterTeachers(), 300);
+            });
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    this.searchInput.value = '';
+                    clearBtn.style.display = 'none';
+                    this.searchInput.focus();
+                    this.filterTeachers();
+                });
+            }
+        }
+
+        const deptFilter = document.getElementById('departmentFilter');
+        if (deptFilter) {
+            deptFilter.addEventListener('change', () => this.filterTeachers());
         }
     }
 
-    addDepartmentFilter() {
-        // Create filter container
-        const filterContainer = document.createElement('div');
-        filterContainer.className = 'filter-container';
-        filterContainer.style.cssText = `
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-        `;
-
-        // Create department filter
-        const departmentFilter = document.createElement('select');
-        departmentFilter.id = 'departmentFilter';
-        departmentFilter.className = 'department-filter';
-        departmentFilter.style.cssText = `
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            background: white;
-            cursor: pointer;
-        `;
-
-        // Add default option
-        departmentFilter.innerHTML = `
-            <option value="">All Departments</option>
-            ${Object.entries(departmentFullNames).map(([code, name]) => `
-                <option value="${code}">${name}</option>
-            `).join('')}
-        `;
-
-        // Add filter label
-        const filterLabel = document.createElement('label');
-        filterLabel.htmlFor = 'departmentFilter';
-        filterLabel.innerHTML = '<i class="fas fa-filter"></i> Filter by Department:';
-        filterLabel.style.cssText = `
-            font-weight: 500;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        `;
-
-        // Add event listener
-        departmentFilter.addEventListener('change', () => this.filterTeachers());
-
-        // Add to container
-        filterContainer.appendChild(filterLabel);
-        filterContainer.appendChild(departmentFilter);
-
-        // Add to page
-        const searchContainer = document.querySelector('.search-container');
-        if (searchContainer) {
-            searchContainer.parentNode.insertBefore(filterContainer, searchContainer);
-        }
-    }
 
     filterTeachers() {
         if (!this.allTeachers) return;
@@ -415,42 +381,51 @@ class TeacherList {
         const searchTerm = this.searchInput ? this.searchInput.value.toLowerCase() : '';
         const selectedDepartment = document.getElementById('departmentFilter')?.value;
 
+        // If no department is selected, don't show anyone (unless searching specifically)
+        if (!selectedDepartment) {
+            this.tableBody.innerHTML = '';
+            this.showEmptyState('कृपया शिक्षक पाहण्यासाठी प्रथम विभाग निवडा (Please select a department to view teachers)');
+            this.updateResultCounter(0, Object.keys(this.allTeachers).length);
+            return;
+        }
+
         // Clear existing rows
         this.tableBody.innerHTML = '';
 
         // Group teachers by department
         const teachersByDept = {};
-        
+
         // Initialize all departments (except CM, as it will be merged with CT)
         Object.keys(departmentFullNames)
             .filter(code => code !== 'CM')
             .forEach(deptCode => {
                 teachersByDept[deptCode] = [];
             });
-        
+
         // Filter and group teachers
         Object.entries(this.allTeachers).forEach(([id, teacher]) => {
-            // Get teacher's full name for search (with null checks)
             const firstName = teacher.firstName || '';
             const lastName = teacher.lastName || '';
             const email = teacher.email || '';
-            const phone = String(teacher.phone || ''); // Convert to string to avoid includes error
+            const phone = String(teacher.phone || '');
             const teacherFullName = `${firstName} ${lastName}`.trim();
-        
+            const teacherId = teacher.teacherId || '';
+
             // Check if teacher matches search term
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 firstName.toLowerCase().includes(searchTerm) ||
                 lastName.toLowerCase().includes(searchTerm) ||
                 teacherFullName.toLowerCase().includes(searchTerm) ||
                 email.toLowerCase().includes(searchTerm) ||
+                teacherId.toLowerCase().includes(searchTerm) ||
                 phone.includes(searchTerm);
 
             // Get assigned departments for this teacher
             const assignedDepartments = teacherDepartments[teacherFullName] || [];
 
             // Check if teacher matches selected department
-            const matchesDepartment = !selectedDepartment || 
-                (teacher.departments && teacher.departments.some(dept => 
+            const matchesDepartment = !selectedDepartment ||
+                (teacher.departments && teacher.departments.some(dept =>
                     normalizeDepartmentCode(dept.code) === selectedDepartment
                 )) ||
                 assignedDepartments.includes(selectedDepartment);
@@ -488,7 +463,7 @@ class TeacherList {
                             teachersByDept[selectedDepartment] = [];
                         }
                         if (!teachersByDept[selectedDepartment].some(t => t.id === id)) {
-                            teachersByDept[selectedDepartment].push({id, ...teacher});
+                            teachersByDept[selectedDepartment].push({ id, ...teacher });
                         }
                     } else {
                         if (teacher.departments && teacher.departments.length > 0) {
@@ -498,14 +473,14 @@ class TeacherList {
                                     teachersByDept[deptCode] = [];
                                 }
                                 if (!teachersByDept[deptCode].some(t => t.id === id)) {
-                                    teachersByDept[deptCode].push({id, ...teacher});
+                                    teachersByDept[deptCode].push({ id, ...teacher });
                                 }
                             });
                         } else {
                             if (!teachersByDept['none']) {
                                 teachersByDept['none'] = [];
                             }
-                            teachersByDept['none'].push({id, ...teacher});
+                            teachersByDept['none'].push({ id, ...teacher });
                         }
                     }
                 }
@@ -536,36 +511,26 @@ class TeacherList {
         sortedDepts.forEach(deptCode => {
             // Get department colors
             const colors = departmentColors[deptCode] || defaultColors;
-            
+
             // Add department header
             const deptName = deptCode === 'none' ? 'Unassigned' : getDepartmentFullName(deptCode);
             const headerRow = document.createElement('tr');
             headerRow.className = 'department-header';
             headerRow.innerHTML = `
-                <td colspan="7">
-                    <div class="department-header-content" style="
-                        background: ${colors.bg};
-                        color: ${colors.text};
-                        padding: 15px 20px;
-                        border-radius: 8px;
-                        margin: 10px 0;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    ">
-                        <i class="fas fa-building" style="color: ${colors.icon}"></i>
-                        <span style="font-weight: 600;">${deptName}</span>
-                        <span class="teacher-count" style="
-                            background: ${colors.text};
-                            color: white;
-                            padding: 4px 12px;
-                            border-radius: 20px;
-                            font-size: 0.85rem;
-                            margin-left: 10px;
-                        ">${teachersByDept[deptCode].length} Teachers</span>
+                <td colspan="6">
+                    <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text};">
+                        <div>
+                            <i class="${deptCode === 'none' ? 'fas fa-question-circle' : 'fas fa-graduation-cap'}"></i>
+                            ${deptName}
+                        </div>
+                        <span class="badge" style="background: ${colors.text}; color: white;">
+                            ${teachersByDept[deptCode].length} Assignments
+                        </span>
                     </div>
                 </td>
             `;
             this.tableBody.appendChild(headerRow);
-            
+
             // Sort teachers - lab faculty first, then others alphabetically
             const sortedTeachers = teachersByDept[deptCode].sort((a, b) => {
                 if (a.isLabFaculty && !b.isLabFaculty) return -1;
@@ -578,19 +543,49 @@ class TeacherList {
                 this.addTeacherRow(teacher.id, teacher, teacher.isLabFaculty);
             });
         });
+
+        // Update result counter
+        this.updateResultCounter(Object.values(teachersByDept).flat().length, Object.keys(this.allTeachers || {}).length);
+    }
+
+    updateResultCounter(filteredEntries, uniqueCount) {
+        const counterDiv = document.getElementById('filterResultCounter');
+        if (!counterDiv) return;
+
+        // Update dashboard stats
+        const totalFaculty = Object.keys(this.allTeachers || {}).length;
+        const hodCount = Object.values(this.allTeachers || {}).filter(t => t.role === 'HOD').length;
+        const labAssistantCount = Object.values(this.allTeachers || {}).filter(t => t.role === 'Lab Assistant').length;
+
+        document.getElementById('totalFacultyCount').textContent = totalFaculty;
+        document.getElementById('hodCount').textContent = hodCount;
+        document.getElementById('labAssistantCount').textContent = labAssistantCount;
+
+        counterDiv.innerHTML = `
+            <div class="stat-badge" style="background: var(--primary-light); color: var(--primary); border: none; font-weight: 700;">
+                <i class="fas fa-search"></i> Found: ${filteredEntries} Entries
+            </div>
+            ${filteredEntries === 0 ? `
+                <div class="stat-badge" style="border-color: var(--danger); color: var(--danger)">
+                    <i class="fas fa-exclamation-circle"></i> No matches in this department
+                </div>
+            ` : ''}
+        `;
     }
 
     showEmptyState(message = 'कोणताही शिक्षक सापडला नाही') {
-        if (!this.tableBody) {
-            console.error('Table body not found');
-            return;
-        }
+        if (!this.tableBody) return;
         this.tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center" style="padding: 40px; color: #EF4444; font-size: 1.1rem;">
-                    <div>
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
-                        <p style="font-size: 1.1rem;">${message}</p>
+                <td colspan="7">
+                    <div class="empty-container animate-slide">
+                        <i class="fas fa-users-viewfinder empty-icon"></i>
+                        <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.75rem; letter-spacing: -0.02em;">
+                            No Teachers to show
+                        </h3>
+                        <p style="max-width: 440px; margin: 0 auto; line-height: 1.6; color: var(--text-muted); font-weight: 500;">
+                            ${message}
+                        </p>
                     </div>
                 </td>
             </tr>
@@ -603,7 +598,7 @@ class TeacherList {
             // Wait for Firebase
             await waitForFirebase();
             console.log('Firebase ready');
-            
+
             // Wait for auth state
             const user = await new Promise((resolve) => {
                 const unsubscribe = window.firebase.auth().onAuthStateChanged((user) => {
@@ -611,7 +606,7 @@ class TeacherList {
                     resolve(user);
                 });
             });
-            
+
             if (!user) {
                 console.error('No user found');
                 if (this.tableBody) {
@@ -621,7 +616,7 @@ class TeacherList {
                 return;
             }
             console.log('User found:', user.uid);
-            
+
             // Check if admin
             const isAdmin = await checkIsAdmin(user.uid);
             if (!isAdmin) {
@@ -633,13 +628,13 @@ class TeacherList {
                 return;
             }
             console.log('Admin verified');
-            
+
             // Update roles first
             await updateTeacherRoles();
-            
+
             // Then set up teachers listener
             this.setupTeachersListener();
-            
+
         } catch (error) {
             console.error('Error initializing teacher list:', error);
             if (this.tableBody) {
@@ -648,50 +643,69 @@ class TeacherList {
             setTimeout(() => window.location.href = 'admin-login.html', 3000);
         }
     }
-    
+
     setupTeachersListener() {
         console.log('Setting up teachers listener...');
-        
+
         // Remove existing listener if any
         if (this.teachersRef) {
             this.teachersRef.off();
         }
-        
-        // Set up new listener
+
+        // Check if we have a valid cache
+        const now = Date.now();
+        if (this.teachersCache && (now - this.teachersCacheTime) < this.CACHE_DURATION) {
+            console.log('✅ Pulling teachers from local cache');
+            this.allTeachers = this.teachersCache;
+            this.filterTeachers();
+            return;
+        }
+
+        // Set up new listener (using once for initial load to control cache)
         this.teachersRef = window.firebase.database().ref('teachers');
-        this.teachersRef.on('value', 
+        this.teachersRef.once('value',
             (snapshot) => {
-                this.allTeachers = snapshot.val(); // Store all teachers
-                this.filterTeachers(); // Apply current filters
+                this.allTeachers = snapshot.val();
+                this.teachersCache = this.allTeachers;
+                this.teachersCacheTime = Date.now();
+                this.filterTeachers();
             },
-            (error) => console.error('Teachers listener error:', error)
+            (error) => console.error('Teachers fetch error:', error)
         );
+
+        // Optional: Keep live listener but ONLY for background updates, not table refreshes
+        this.teachersRef.on('value', (snapshot) => {
+            this.allTeachers = snapshot.val();
+            this.teachersCache = this.allTeachers;
+            this.teachersCacheTime = Date.now();
+            // Don't auto-refresh to avoid UI jump, unless we're in a specific state
+        });
     }
-    
+
     handleTeachersUpdate(snapshot) {
         console.log('Handling teachers update...');
         const teachers = snapshot.val();
         console.log('Teachers data:', teachers);
-        
+
         // Check if tableBody exists
         if (!this.tableBody) {
             console.error('Table body element not found');
             return;
         }
-        
+
         // Clear existing rows
         this.tableBody.innerHTML = '';
-        
+
         if (!teachers || Object.keys(teachers).length === 0) {
             console.log('No teachers found');
             if (this.table) this.table.style.display = 'none';
             this.showEmptyState('कोणताही शिक्षक सापडला नाही');
             return;
         }
-        
+
         // Show table
         this.table.style.display = 'table';
-        
+
         // Group teachers by department
         const teachersByDept = {};
         Object.entries(teachers).forEach(([id, teacher]) => {
@@ -701,64 +715,54 @@ class TeacherList {
                     if (!teachersByDept[deptCode]) {
                         teachersByDept[deptCode] = [];
                     }
-                    teachersByDept[deptCode].push({id, ...teacher});
+                    teachersByDept[deptCode].push({ id, ...teacher });
                 });
             } else {
                 // For teachers with no department
                 if (!teachersByDept['none']) {
                     teachersByDept['none'] = [];
                 }
-                teachersByDept['none'].push({id, ...teacher});
+                teachersByDept['none'].push({ id, ...teacher });
             }
         });
-        
+
         // Sort departments alphabetically
         const sortedDepts = Object.keys(teachersByDept).sort((a, b) => {
             if (a === 'none') return 1;
             if (b === 'none') return -1;
             return getDepartmentFullName(a).localeCompare(getDepartmentFullName(b));
         });
-        
+
         // Add teachers to table by department
         sortedDepts.forEach(deptCode => {
             // Get department colors
             const colors = departmentColors[deptCode] || defaultColors;
-            
+
             // Add department header
             const deptName = deptCode === 'none' ? 'Unassigned' : getDepartmentFullName(deptCode);
             const headerRow = document.createElement('tr');
             headerRow.className = 'department-header';
             headerRow.innerHTML = `
                 <td colspan="7">
-                    <div class="department-header-content" style="
-                        background: ${colors.bg};
-                        color: ${colors.text};
-                        padding: 15px 20px;
-                        border-radius: 8px;
-                        margin: 10px 0;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    ">
-                        <i class="fas fa-building" style="color: ${colors.icon}"></i>
-                        <span style="font-weight: 600;">${deptName}</span>
-                        <span class="teacher-count" style="
-                            background: ${colors.text};
-                            color: white;
-                            padding: 4px 12px;
-                            border-radius: 20px;
-                            font-size: 0.85rem;
-                            margin-left: 10px;
-                        ">${teachersByDept[deptCode].length} Teachers</span>
+                    <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text};">
+                        <div>
+                            <i class="${deptCode === 'none' ? 'fas fa-question-circle' : (colors.icon || 'fas fa-graduation-cap')}"></i>
+                            ${deptName}
+                        </div>
+                        <span class="badge" style="background: ${colors.text}; color: white;">
+                            ${teachersByDept[deptCode].length} Teachers
+                        </span>
                     </div>
                 </td>
             `;
             this.tableBody.appendChild(headerRow);
-            
+
             // Add teachers for this department
             teachersByDept[deptCode].forEach(teacher => {
                 this.addTeacherRow(teacher.id, teacher);
             });
         });
-        
+
         // Add styles for department headers
         const style = document.createElement('style');
         style.textContent = `
@@ -774,193 +778,201 @@ class TeacherList {
             }
         `;
         document.head.appendChild(style);
-        
+
         console.log('Teachers table updated');
     }
-    
+
     addTeacherRow(id, teacher, isLabFaculty = false) {
         const row = document.createElement('tr');
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(10px)';
+        row.style.transition = 'all 0.4s ease-out';
+
+        const initials = `${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}`.toUpperCase();
+        const role = teacher.role || (isLabFaculty ? 'Lab Assistant' : 'Lecturer');
+        const roleClass = role === 'HOD' ? 'badge-rose' : (role === 'Lab Assistant' ? 'badge-amber' : 'badge-indigo');
+        const isHOD = role === 'HOD';
+
+        // Dynamic avatar color based on name
+        const colors = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+        const avatarColor = isHOD ? '#F59E0B' : colors[teacher.firstName.length % colors.length];
+
         row.innerHTML = `
-            <td>
-                <div class="teacher-name">
-                    ${teacher.firstName} ${teacher.lastName}
-                    ${(teacher.role === 'Lab Assistant' || isLabFaculty) ?
-                        '<div style="color: #D97706; font-size: 0.9rem; margin-top: 4px;"><i class="fas fa-flask"></i> Lab Assistant</div>' :
-                        '<div style="color: #2563EB; font-size: 0.9rem; margin-top: 4px;"><i class="fas fa-chalkboard-teacher"></i> Lecturer</div>'
-                    }
-                    <div class="teacher-email">${teacher.email}</div>
+            <td style="${isHOD ? 'border-left: 4px solid #F59E0B;' : ''}">
+                <div class="teacher-profile">
+                    <div class="teacher-avatar" style="background: ${avatarColor}20; color: ${avatarColor}; ${isHOD ? 'box-shadow: 0 0 0 2px #F59E0B40;' : ''}">
+                        ${initials}
+                    </div>
+                    <div class="teacher-info-stack">
+                        <div class="teacher-name-text">
+                            ${teacher.firstName} ${teacher.lastName}
+                            ${isHOD ? '<i class="fas fa-crown" style="color: #F59E0B; margin-left: 4px; font-size: 0.8rem;" title="Department Head"></i>' : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span class="badge ${roleClass}" style="padding: 1px 6px; font-size: 0.65rem;">
+                                ${role.toUpperCase()}
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted)">${teacher.email}</span>
+                        </div>
+                    </div>
                 </div>
             </td>
             <td>
-                <div class="teacher-id-cell">
-                    ${(teacher.teacherId && teacher.teacherId !== '') ? teacher.teacherId : (id || 'N/A')}
+                <div style="font-weight: 700; color: var(--primary); font-size: 0.9rem; font-family: 'Outfit', sans-serif;">
+                    ${(teacher.teacherId && teacher.teacherId !== '') ? teacher.teacherId : (id?.substring(0, 8) || 'AUTO')}
                 </div>
             </td>
             <td>
-                <div class="contact-info">
-                    <i class="fas fa-phone"></i> ${teacher.phone}
+                <div style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main); font-weight: 500;">
+                    <i class="fas fa-phone-alt" style="color: var(--secondary); font-size: 0.8rem;"></i>
+                    ${teacher.phone}
                 </div>
             </td>
             <td>
-                <div class="department-info">
-                    ${teacher.departments ?
-                        teacher.departments.map(dept =>
-                            `<span class="tag">${dept.name || dept}</span>`
-                        ).join('') :
-                        '<span class="tag">None</span>'
-                    }
+                <div class="tag-group">
+                    ${teacher.classes ? teacher.classes.map(cls => `<span class="tag">${cls}</span>`).join('') : '<span class="tag">None</span>'}
                 </div>
             </td>
             <td>
-                <div class="class-info">
-                    ${teacher.classes ?
-                        teacher.classes.map(cls =>
-                            `<span class="tag">${cls}</span>`
-                        ).join('') :
-                        '<span class="tag">None</span>'
-                    }
+                <div class="tag-group">
+                    ${teacher.divisions && teacher.divisions.length > 0 ? teacher.divisions.map(div => `<span class="tag" style="border-color: var(--primary); color: var(--primary); background: var(--primary-light)">Div ${div}</span>`).join('') : '<span class="tag">N/A</span>'}
                 </div>
             </td>
             <td>
-                <div class="division-info">
-                    ${teacher.divisions ?
-                        teacher.divisions.map(div =>
-                            `<span class="tag">${div}</span>`
-                        ).join('') :
-                        '<span class="tag">None</span>'
-                    }
-                </div>
-            </td>
-            <td>
-                <div class="password-cell">
-                    <span class="password-text">${teacher.initialPassword || 'Not Available'}</span>
+                <div class="pass-cell" style="border: 1px dashed var(--border-color); background: transparent;">
+                    <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em;">${teacher.initialPassword || '••••••••'}</span>
                     ${teacher.initialPassword ? `
-                        <button class="copy-btn" onclick="copyPassword('${teacher.initialPassword}')">
-                            <i class="fas fa-copy"></i>
-                        </button>
+                        <i class="fas fa-copy copy-pill" onclick="copyPassword('${teacher.initialPassword}', this)" title="Copy Password"></i>
                     ` : ''}
                 </div>
             </td>
             <td>
-                <div class="action-buttons">
-                    <button class="btn-edit" onclick="updateTeacherDetails('${id}')">
-                        <i class="fas fa-edit"></i> Edit
+                <div class="action-cell">
+                    <button class="icon-btn" onclick="updateTeacherDetails('${id}')" title="Edit Profile" style="background: #f8fafc;">
+                        <i class="fas fa-pen-nib"></i>
                     </button>
-                    <button class="btn-delete" onclick="deleteTeacher('${id}')">
-                        <i class="fas fa-trash"></i> Delete
+                    <button class="icon-btn delete" onclick="deleteTeacher('${id}')" title="Delete Account" style="background: #fff1f2;">
+                        <i class="fas fa-user-minus"></i>
                     </button>
                 </div>
             </td>
         `;
         this.tableBody.appendChild(row);
+
+        // Trigger animation
+        setTimeout(() => {
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, 50);
+        this.tableBody.appendChild(row);
     }
 
-async initialize() {
-    console.log('Initializing teacher list...');
-    try {
-        // Wait for Firebase
-        await waitForFirebase();
-        console.log('Firebase ready');
-        
-        // Wait for auth state
-        const user = await new Promise((resolve) => {
-            const unsubscribe = window.firebase.auth().onAuthStateChanged((user) => {
-                unsubscribe();
-                resolve(user);
+    async initialize() {
+        console.log('Initializing teacher list...');
+        try {
+            // Wait for Firebase
+            await waitForFirebase();
+            console.log('Firebase ready');
+
+            // Wait for auth state
+            const user = await new Promise((resolve) => {
+                const unsubscribe = window.firebase.auth().onAuthStateChanged((user) => {
+                    unsubscribe();
+                    resolve(user);
+                });
             });
-        });
-        
-        if (!user) {
-            console.error('No user found');
-            window.location.href = 'admin-login.html';
-            return;
-        }
-        console.log('User found:', user.uid);
-        
-        // Check if admin
-        const isAdmin = await checkIsAdmin(user.uid);
-        if (!isAdmin) {
-            console.error('User is not admin');
-            window.location.href = 'admin-login.html';
-            return;
-        }
-        console.log('Admin verified');
-        
-        // Update roles first
-        await updateTeacherRoles();
-        
-        // Then set up teachers listener
-        this.setupTeachersListener();
-        
-        // Fix existing teachers without teacherId
-        await this.fixExistingTeachers();
-    } catch (error) {
-        console.error('Error initializing teacher list:', error);
-    }
-}
 
-// Fix existing teachers without teacherId
-async fixExistingTeachers() {
-    try {
-        console.log('Checking for teachers without teacherId...');
-        const snapshot = await window.firebase.database().ref('teachers').once('value');
-        
-        if (!snapshot.exists()) return;
-        
-        const updates = {};
-        const departmentCounts = {};
-        
-        snapshot.forEach(childSnapshot => {
-            const teacher = childSnapshot.val();
-            const teacherKey = childSnapshot.key;
-            
-            // If teacher doesn't have teacherId, generate one
-            if (!teacher.teacherId || teacher.teacherId.trim() === '') {
-                let deptCode = '';
-                if (teacher.departments && teacher.departments.length > 0) {
-                    deptCode = typeof teacher.departments[0] === 'string' ? 
-                        teacher.departments[0] : teacher.departments[0].code;
-                }
-                deptCode = deptCode.trim().toUpperCase();
-                
-                if (!departmentCounts[deptCode]) departmentCounts[deptCode] = 0;
-                departmentCounts[deptCode]++;
-                
-                const teacherId = deptCode + String(departmentCounts[deptCode]).padStart(3, '0');
-                updates[`teachers/${teacherKey}/teacherId`] = teacherId;
-                
-                console.log(`Generated teacherId ${teacherId} for teacher ${teacher.email}`);
+            if (!user) {
+                console.error('No user found');
+                window.location.href = 'admin-login.html';
+                return;
             }
-        });
-        
-        if (Object.keys(updates).length > 0) {
-            await window.firebase.database().ref().update(updates);
-            console.log(`Updated ${Object.keys(updates).length} teachers with teacherId`);
-        } else {
-            console.log('All teachers already have teacherId');
+            console.log('User found:', user.uid);
+
+            // Check if admin
+            const isAdmin = await checkIsAdmin(user.uid);
+            if (!isAdmin) {
+                console.error('User is not admin');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            console.log('Admin verified');
+
+            // Update roles first
+            await updateTeacherRoles();
+
+            // Then set up teachers listener
+            this.setupTeachersListener();
+
+            // Fix existing teachers without teacherId
+            await this.fixExistingTeachers();
+        } catch (error) {
+            console.error('Error initializing teacher list:', error);
         }
-    } catch (error) {
-        console.error('Error fixing existing teachers:', error);
     }
-}
+
+    // Fix existing teachers without teacherId
+    async fixExistingTeachers() {
+        try {
+            console.log('Checking for teachers without teacherId...');
+            const snapshot = await window.firebase.database().ref('teachers').once('value');
+
+            if (!snapshot.exists()) return;
+
+            const updates = {};
+            const departmentCounts = {};
+
+            snapshot.forEach(childSnapshot => {
+                const teacher = childSnapshot.val();
+                const teacherKey = childSnapshot.key;
+
+                // If teacher doesn't have teacherId, generate one
+                if (!teacher.teacherId || teacher.teacherId.trim() === '') {
+                    let deptCode = '';
+                    if (teacher.departments && teacher.departments.length > 0) {
+                        deptCode = typeof teacher.departments[0] === 'string' ?
+                            teacher.departments[0] : teacher.departments[0].code;
+                    }
+                    deptCode = deptCode.trim().toUpperCase();
+
+                    if (!departmentCounts[deptCode]) departmentCounts[deptCode] = 0;
+                    departmentCounts[deptCode]++;
+
+                    const teacherId = deptCode + String(departmentCounts[deptCode]).padStart(3, '0');
+                    updates[`teachers/${teacherKey}/teacherId`] = teacherId;
+
+                    console.log(`Generated teacherId ${teacherId} for teacher ${teacher.email}`);
+                }
+            });
+
+            if (Object.keys(updates).length > 0) {
+                await window.firebase.database().ref().update(updates);
+                console.log(`Updated ${Object.keys(updates).length} teachers with teacherId`);
+            } else {
+                console.log('All teachers already have teacherId');
+            }
+        } catch (error) {
+            console.error('Error fixing existing teachers:', error);
+        }
+    }
 
 } // Close the class
 
 // Add touch event handlers
 function addTouchHandlers() {
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('touchstart', function(e) {
+        button.addEventListener('touchstart', function (e) {
             e.preventDefault();
             this.style.opacity = '0.8';
         });
 
-        button.addEventListener('touchend', function(e) {
+        button.addEventListener('touchend', function (e) {
             e.preventDefault();
             this.style.opacity = '1';
             this.click();
         });
 
-        button.addEventListener('touchcancel', function(e) {
+        button.addEventListener('touchcancel', function (e) {
             this.style.opacity = '1';
         });
     });
@@ -983,18 +995,18 @@ async function deleteTeacher(teacherId) {
         if (!confirm('तुम्हाला खात्री आहे की तुम्ही या शिक्षकाला डिलीट करू इच्छिता?')) {
             return;
         }
-        
+
         // Get teacher data
         const snapshot = await window.firebase.database().ref('teachers/' + teacherId).once('value');
         const teacher = snapshot.val();
-        
+
         if (!teacher) {
             throw new Error('Teacher not found');
         }
-        
+
         // Delete from database
         await window.firebase.database().ref('teachers/' + teacherId).remove();
-        
+
         // Try to delete from authentication
         try {
             const userRecord = await window.firebase.auth().getUserByEmail(teacher.email);
@@ -1004,10 +1016,10 @@ async function deleteTeacher(teacherId) {
         } catch (authError) {
             console.error('Error deleting auth user:', authError);
         }
-        
+
         alert('शिक्षक यशस्वीरित्या डिलीट केला!');
         window.location.reload();
-        
+
     } catch (error) {
         showError(error, 'Error deleting teacher');
     }
@@ -1019,7 +1031,7 @@ async function editTeacher(teacherId) {
         // Get current teacher data
         const snapshot = await window.firebase.database().ref('teachers/' + teacherId).once('value');
         const teacher = snapshot.val();
-        
+
         if (!teacher) {
             alert('Teacher not found!');
             return;
@@ -1034,7 +1046,7 @@ async function editTeacher(teacherId) {
 
         // Keep email and other fields unchanged
         await window.firebase.database().ref('teachers/' + teacherId).update(updatedData);
-        
+
         alert('Teacher updated successfully!');
         window.location.reload();
 
@@ -1047,7 +1059,7 @@ async function editTeacher(teacherId) {
 // Add Teacher Form Submit
 document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
@@ -1066,8 +1078,8 @@ document.getElementById('addTeacherForm').addEventListener('submit', async (e) =
 
     // Get selected divisions - only if CT department is selected
     const hasCTDepartment = selectedDepartments.some(dept => dept.code === 'CT');
-    const divisions = hasCTDepartment ? 
-        Array.from(document.querySelectorAll('input[name="division"]:checked')).map(checkbox => checkbox.value) 
+    const divisions = hasCTDepartment ?
+        Array.from(document.querySelectorAll('input[name="division"]:checked')).map(checkbox => checkbox.value)
         : [];
 
     // Validate form data
