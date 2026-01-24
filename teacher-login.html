@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <script>
-// Global Firebase Offline Fallback (must be first)
-(function() {
-    if (typeof window.firebase === 'undefined') {
-        window.firebaseOfflineMode = false;
-        window.firebase = {
-            database: function() {
-                window.firebaseOfflineMode = true;
-                return {
-                    ref: function() { return { on: function() {}, once: function() {}, off: function() {}, set: function() {}, update: function() {}, remove: function() {} }; }
-                };
-            },
-            auth: function() {
-                window.firebaseOfflineMode = true;
-                return {
-                    onAuthStateChanged: function(cb) { cb(null); return function(){}; },
-                    signOut: function() { return Promise.resolve(); },
-                    currentUser: null
-                };
-            },
-            apps: [],
-        };
-    }
-})();
+    // Global Firebase Offline Fallback (must be first)
+    (function () {
+        if (typeof window.firebase === 'undefined') {
+            window.firebaseOfflineMode = false;
+            window.firebase = {
+                database: function () {
+                    window.firebaseOfflineMode = true;
+                    return {
+                        ref: function () { return { on: function () { }, once: function () { }, off: function () { }, set: function () { }, update: function () { }, remove: function () { } }; }
+                    };
+                },
+                auth: function () {
+                    window.firebaseOfflineMode = true;
+                    return {
+                        onAuthStateChanged: function (cb) { cb(null); return function () { }; },
+                        signOut: function () { return Promise.resolve(); },
+                        currentUser: null
+                    };
+                },
+                apps: [],
+            };
+        }
+    })();
 </script>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -151,7 +152,7 @@
             transition: all 0.3s ease;
         }
 
-        .input-group input:focus + i {
+        .input-group input:focus+i {
             color: var(--primary);
         }
 
@@ -175,7 +176,7 @@
         }
 
         .input-group input[type="password"],
-        .input-group input[type="text"]:focus + .password-toggle ~ input {
+        .input-group input[type="text"]:focus+.password-toggle~input {
             padding-right: 50px;
         }
 
@@ -240,6 +241,27 @@
             transform: translateY(0);
         }
 
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            animation: rotate 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Error Message Styling */
         .error-message {
             background: rgba(239, 68, 68, 0.1);
@@ -301,7 +323,7 @@
             body {
                 padding: 15px;
             }
-            
+
             .login-container {
                 max-width: 100%;
                 border-radius: 16px;
@@ -314,21 +336,21 @@
             .login-header img {
                 width: 140px;
             }
-            
+
             .login-header h1 {
                 font-size: 22px;
             }
-            
+
             .login-header p {
                 font-size: 13px;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
             }
-            
+
             .login-container {
                 border-radius: 12px;
             }
@@ -341,12 +363,12 @@
                 width: 120px;
                 margin-bottom: 15px;
             }
-            
+
             .login-header h1 {
                 font-size: 20px;
                 letter-spacing: 0.5px;
             }
-            
+
             .login-header p {
                 font-size: 12px;
             }
@@ -354,11 +376,11 @@
             .login-form {
                 padding: 0 15px 20px;
             }
-            
+
             .form-group {
                 margin-bottom: 15px;
             }
-            
+
             .form-group label {
                 font-size: 13px;
                 margin-bottom: 6px;
@@ -387,10 +409,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
+            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png"
+                alt="BVIT Logo">
             <h1>WELCOME TO BVIT</h1>
             <p>Teacher Login Portal</p>
         </div>
@@ -413,14 +437,14 @@
                     </button>
                 </div>
             </div>
-            <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Login as Teacher
+            <button type="submit" class="btn-login" id="loginBtn">
+                <span id="btnIcon"><i class="fas fa-sign-in-alt"></i></span>
+                <span id="btnText">Login as Teacher</span>
             </button>
             <div id="teacherError" class="error-message"></div>
         </form>
 
-        
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -428,7 +452,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const teacherForm = document.getElementById('teacherForm');
             if (teacherForm) {
                 teacherForm.addEventListener('submit', handleTeacherLogin);
@@ -438,31 +462,42 @@
         // Handle teacher login
         async function handleTeacherLogin(event) {
             event.preventDefault();
-            
+
             const teacherId = document.getElementById('teacherId').value;
             const password = document.getElementById('teacherPassword').value;
-            
+
+            // Set loading state
+            const loginBtn = document.getElementById('loginBtn');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
+            const originalIcon = btnIcon.innerHTML;
+            const originalText = btnText.innerText;
+
+            loginBtn.disabled = true;
+            btnIcon.innerHTML = '<i class="fas fa-spinner fa-spin spinner"></i>';
+            btnText.innerText = 'Signing in...';
+
             try {
                 // Wait for Firebase to be ready
                 if (typeof window.waitForFirebase === 'function') {
                     await window.waitForFirebase();
                 }
-                
+
                 // Get teacher data from Firebase
                 const teachersSnapshot = await firebase.database().ref('teachers').once('value');
                 const teachers = teachersSnapshot.val();
-                
+
                 // Find teacher by ID
                 let teacherFound = false;
                 let teacherData = null;
-                
+
                 Object.entries(teachers).forEach(([key, teacher]) => {
                     if (teacher.teacherId === teacherId && teacher.initialPassword === password) {
                         teacherFound = true;
                         teacherData = { ...teacher, uid: key };
                     }
                 });
-                
+
                 if (teacherFound && teacherData) {
                     try {
                         // Try to sign in with email and password
@@ -482,7 +517,7 @@
                     sessionStorage.setItem('teacherData', JSON.stringify(teacherData));
                     console.log('LOGIN SET teacherKey:', teacherData.uid);
                     console.log('LOGIN SET teacherData:', teacherData);
-                    
+
                     // Start auto logout timer
                     if (typeof startAutoLogoutTimer === 'function') {
                         startAutoLogoutTimer('teacher');
@@ -490,20 +525,25 @@
                     if (typeof setupActivityListeners === 'function') {
                         setupActivityListeners('teacher');
                     }
-                    
-                    // Show success message
-                    showSuccessMessage('Login successful! Redirecting...');
-                    
+
                     // Redirect to teacher panel
                     setTimeout(() => {
                         window.location.href = 'teacher-panel.html';
-                    }, 1000);
+                    }, 500);
                 } else {
                     showErrorMessage('Invalid teacher ID or password. Please check your credentials.');
+                    // Restore button state
+                    loginBtn.disabled = false;
+                    btnIcon.innerHTML = originalIcon;
+                    btnText.innerText = originalText;
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 showErrorMessage('Login failed: ' + error.message);
+                // Restore button state
+                loginBtn.disabled = false;
+                btnIcon.innerHTML = originalIcon;
+                btnText.innerText = originalText;
             }
         }
 
@@ -512,7 +552,7 @@
             const errorDiv = document.getElementById('teacherError');
             errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
             errorDiv.classList.add('show');
-            
+
             // Hide after 5 seconds
             setTimeout(() => {
                 errorDiv.classList.remove('show');
@@ -545,11 +585,12 @@
             }
         }
     </script>
-    
+
     <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+
 </body>
+
 </html>

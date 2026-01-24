@@ -2720,11 +2720,74 @@
             loadTotalStudentsCount();
         }
 
+        // 💾 FIREBASE OPTIMIZATION - Caching to reduce reads/writes
+        let studentsCache = null;
+        let studentsCacheTime = 0;
+        let attendanceCache = null;
+        let attendanceCacheTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
+        window.loadStudentsWithCache = async function () {
+            console.log('📚 Loading students with cache optimization...');
+
+            // Check if cache is valid
+            const now = Date.now();
+            if (studentsCache && (now - studentsCacheTime) < CACHE_DURATION) {
+                console.log('✅ Using cached students data (saves Firebase read)');
+                return studentsCache;
+            }
+
+            try {
+                console.log('🔄 Fetching fresh students data from Firebase');
+                const snapshot = await firebase.database().ref('students').once('value');
+                studentsCache = snapshot.val() || {};
+                studentsCacheTime = now;
+                console.log(`💾 Students cached for ${CACHE_DURATION / 60000} minutes`);
+                return studentsCache;
+            } catch (error) {
+                console.error('Error loading students:', error);
+                return studentsCache || {}; // Return cached data if available
+            }
+        };
+
+        window.loadAttendanceOptimized = async function (teacherId = null) {
+            console.log('📊 Loading attendance with optimization...');
+
+            // Check if cache is valid
+            const now = Date.now();
+            if (attendanceCache && (now - attendanceCacheTime) < CACHE_DURATION) {
+                console.log('✅ Using cached attendance data (saves Firebase read)');
+                return attendanceCache;
+            }
+
+            try {
+                console.log('🔄 Fetching fresh attendance data from Firebase');
+                let query = firebase.database().ref('attendance');
+
+                // Optimize: Only load teacher-specific data if teacherId provided
+                if (teacherId) {
+                    query = query.orderByChild('teacherId').equalTo(teacherId);
+                    console.log('🎯 Loading only teacher-specific attendance (reduces data transfer)');
+                }
+
+                const snapshot = await query.once('value');
+                attendanceCache = snapshot.val() || {};
+                attendanceCacheTime = now;
+                console.log(`💾 Attendance cached for ${CACHE_DURATION / 60000} minutes`);
+                return attendanceCache;
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+                return attendanceCache || {}; // Return cached data if available
+            }
+        };
+
         // 🚀 OPTIMIZED FIREBASE WRITES - Batch operations to reduce costs
         window.saveAttendanceWithOfflineSupport = async function (data) {
             console.log('💾 Saving attendance with optimization...');
             try {
-                // Clear relevant caches if needed (optional since we rely on queries for attendance mostly)
+                // Clear cache after write to ensure fresh data on next read
+                attendanceCache = null;
+                attendanceCacheTime = 0;
 
                 // Use set() with specific key instead of push() for better control
                 const attendanceKey = `${data.date}_${data.teacherId}_${Date.now()}`;
@@ -2737,8 +2800,6 @@
                 return { success: false, error: error.message };
             }
         };
-
-
 
         // 📦 BATCH OPERATIONS - Reduce multiple Firebase calls
         window.batchUpdateAttendance = async function (updates) {
@@ -2820,16 +2881,15 @@
             if (!totalStudentsElement || !window.teacherData) return;
 
             try {
-                console.log('📊 Loading total students...');
-                // 💰 COST WARNING: This fetches ALL students. Optimized version reverted per user request.
-                const snapshot = await firebase.database().ref('students').once('value');
-                const students = snapshot.val() || {};
+                console.log('📊 Loading total students with cache optimization...');
+                // 💰 COST OPTIMIZATION: Use cached data to reduce Firebase reads
+                const students = await window.loadStudentsWithCache();
                 let totalStudents = 0;
 
-                // Rest of the logic remains the same as it filters client-side
+                // Only count if we have valid cached data
                 if (!students || Object.keys(students).length === 0) {
                     totalStudentsElement.textContent = '0';
-                    console.log('⚠️ No students data available');
+                    console.log('⚠️ No students data available (cache miss)');
                     return;
                 }
 
@@ -2837,13 +2897,6 @@
                 const teacherClasses = window.teacherData.classes || [];
                 const teacherDepartments = window.teacherData.departments || [];
                 const teacherDivisions = window.teacherData.divisions || [];
-
-                console.log('=== TEACHER DATA DEBUG ===');
-                console.log('Teacher Classes:', teacherClasses);
-                console.log('Teacher Departments:', teacherDepartments);
-                console.log('Teacher Divisions:', teacherDivisions);
-                console.log('Total students in database:', Object.keys(students).length);
-                console.log('=========================');
 
                 Object.values(students).forEach(student => {
                     // Get student details - use 'branch' field for department
@@ -2888,24 +2941,11 @@
                     // Count student if all criteria match
                     if (matchesClass && matchesDepartment && matchesDivision) {
                         totalStudents++;
-                        console.log('Matched student:', {
-                            name: student.name,
-                            rollNo: student.rollNo,
-                            year: yearCode,
-                            branch: studentBranch,
-                            dept: deptCode,
-                            div: studentDiv,
-                            teacherClasses: teacherClasses,
-                            teacherDepts: teacherDepartments
-                        });
                     }
                 });
 
-                console.log('Total students for teacher:', totalStudents);
-
                 // Fallback: If no students matched, show total students in database
                 if (totalStudents === 0 && Object.keys(students).length > 0) {
-                    console.log('No students matched criteria, showing total database count as fallback');
                     totalStudents = Object.keys(students).length;
                 }
 
@@ -2935,11 +2975,12 @@
                     return;
                 }
 
-                const snapshot = await firebase.database().ref('attendance').once('value');
+                // 🚀 OPTIMIZED: Use cached attendance data with teacher filtering
+                const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
                 let totalPresent = 0;
                 let totalStudents = 0;
 
-                const attendanceData = snapshot.val() || {};
+                // let snapshot is removed, using attendanceData from optimized cache above
                 Object.values(attendanceData).forEach(record => {
                     // Check if record is for today and by current teacher
                     if (record.date === today && record.teacherId === currentUser.uid) {
@@ -2972,10 +3013,9 @@
                     return;
                 }
 
-                console.log('📈 Loading average attendance...');
-                // Fetch all attendance for average calculation (Reverted optimization)
-                const snapshot = await firebase.database().ref('attendance').once('value');
-                const attendanceData = snapshot.val() || {};
+                console.log('📈 Loading average attendance with optimization...');
+                // Use cached attendance data to reduce Firebase reads
+                const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
                 let totalPresent = 0;
                 let totalStudents = 0;
                 let recordCount = 0;
@@ -3117,10 +3157,9 @@
                     return;
                 }
 
-                console.log('📅 Loading today\'s attendance...');
-                // Fetch fresh attendance data (Reverted optimization)
-                const snapshot = await firebase.database().ref('attendance').once('value');
-                const attendanceData = snapshot.val() || {};
+                console.log('📅 Loading today\'s attendance with optimization...');
+                // Use optimized attendance loading with teacher filter
+                const attendanceData = await window.loadAttendanceOptimized(teacherKey);
                 let totalPresent = 0;
                 let totalStudents = 0;
                 Object.values(attendanceData).forEach(record => {
@@ -3219,15 +3258,12 @@
             if (!divisionSelect) return;
 
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
-            console.log('👨‍🏫 Loading teacher divisions for panel:', teacherData);
 
             // Clear existing options except "All Divisions"
             divisionSelect.innerHTML = '<option value="">All Divisions</option>';
 
             // Get teacher's assigned divisions
             const assignedDivisions = teacherData?.divisions || [];
-
-            console.log('📚 Teacher assigned divisions:', assignedDivisions);
 
             // If teacher has assigned divisions, add them to dropdown
             if (assignedDivisions && assignedDivisions.length > 0) {
@@ -3236,11 +3272,9 @@
                     option.value = division;
                     option.textContent = `Division ${division}`;
                     divisionSelect.appendChild(option);
-                    console.log('✅ Added division option to panel:', division);
                 });
             } else {
                 // If no specific divisions assigned, show all divisions (fallback)
-                console.log('⚠️ No specific divisions assigned, showing all divisions');
                 const allDivisions = ['A', 'B', 'C'];
                 allDivisions.forEach(division => {
                     const option = document.createElement('option');
@@ -3249,8 +3283,6 @@
                     divisionSelect.appendChild(option);
                 });
             }
-
-            console.log('🎯 Division dropdown populated successfully in panel');
         }
 
         // Function to handle lecture type change and update batch dropdown
@@ -3263,7 +3295,6 @@
 
             // Check if elements exist before proceeding
             if (!lectureType || !batchRow || !batchSelect || !department || !year) {
-                console.log('⚠️ Elements not found, skipping batch dropdown update');
                 return;
             }
 
@@ -3279,8 +3310,7 @@
 
                 // Special handling for CE TY - only Batch A
                 if (departmentValue === 'CE' && yearValue === 'TY') {
-                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3027)</option>';
-                    console.log('🎯 CE TY: Only Batch A (3001-3027) available in dropdown');
+                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3026)</option>';
                 } else {
                     // Default batches for other departments/years
                     batchSelect.innerHTML += '<option value="A">Batch A</option>';
@@ -3332,140 +3362,97 @@
             const selectedDepartment = departmentSelect.value;
             const selectedYear = yearSelect.value;
 
-            console.log('🔄 Updating batch dropdown for:', {
-                department: selectedDepartment,
-                year: selectedYear
-            });
-
             // Clear current options except the first one
             batchSelect.innerHTML = '<option value="">-- Select Batch --</option>';
 
             // Check if ME (Mechanical Engineering) - handle FY first, then other years
             if (selectedDepartment === 'ME') {
                 if (selectedYear === 'FY') {
-                    console.log('✅ ME FY detected - Showing Batch A, B, and C with proper split ranges');
                     // ME FY: Split students properly - no large ranges in single batch
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1801-1820)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (1821-1840)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (1841 onwards)</option>';
                 } else if (selectedYear === 'SY') {
-                    console.log('🚫 ME SY detected - Only showing Batch A and B (no Batch C)');
                     // ME SY: Batch A (2701-2725), Batch B (2726+)
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (Roll 2701-2725)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (Roll 2726 onwards)</option>';
                 } else if (selectedYear === 'TY') {
-                    console.log('🚫 ME TY detected - Only showing Batch A and B (no Batch C)');
                     // ME TY: Batch A (1-23), Batch B (24-45)
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1-23 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (24-45 students)</option>';
                 } else {
-                    console.log('🚫 ME (other year) - Only showing Batch A and B (no Batch C)');
                     // Other ME years: Standard A & B only
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
                 }
             } else if (selectedDepartment === 'CE' && selectedYear === 'SY') {
-                console.log('🚫 CE SY detected - Only showing Batch A and B (no Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (2001-2022, 2027)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (2023-2026, 2028 onwards)</option>';
             } else if (selectedDepartment === 'CE' && selectedYear === 'FY') {
-                console.log('🎯 CE FY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1101-1120)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1121-1140)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (1141 onwards)</option>';
             } else if (department === 'IT' && year === 'FY') {
-                console.log('🎯 IT FY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (21-40 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (41+ students)</option>';
             } else if (department === 'IT' && year === 'SY') {
-                console.log('🎯 IT SY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (2601-2624)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (2625-2648)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (2649 onwards)</option>';
             } else if (department === 'IT' && year === 'TY') {
-                console.log('🎯 IT TY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-23 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (24-46 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (47-70 students)</option>';
             } else if (selectedDepartment === 'ET' && selectedYear === 'FY') {
-                console.log('🎯 ET FY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (21-40 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (41+ students)</option>';
             } else if (selectedDepartment === 'ET' && selectedYear === 'SY') {
-                console.log('🎯 ET SY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-24 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (25-48 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (2549 onwards)</option>';
             } else if (selectedDepartment === 'ET' && selectedYear === 'TY') {
-                console.log('🚫 ET TY detected - Only showing Batch A and B (NO Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (21-37 students)</option>';
             } else if (selectedDepartment === 'EE' && selectedYear === 'FY') {
-                console.log('🎯 EE FY detected - Custom batch ranges with specific roll numbers');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1501-1522 + 1543 skip 1504)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1523-1544 skip 1543)</option>';
-                batchSelect.innerHTML += '<option value="BatchC">Batch C (1545-1564 + 1504)</option>';
+                batchSelect.innerHTML += '<option value="BatchC">Batch C (1545-1562 + 1504)</option>';
             } else if (selectedDepartment === 'EE' && selectedYear === 'TY') {
-                console.log('🚫 EE TY detected - Only showing Batch A and B (no Batch C)');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1-23 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (24 onwards)</option>';
             } else if (selectedDepartment === 'AI' && selectedYear === 'FY') {
-                console.log('🎯 AI FY detected - Custom batch ranges');
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1001-1022)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1023-1044)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (1045 onwards)</option>';
-            } else if (selectedDepartment === 'CT' && selectedYear === 'TY') {
-                console.log('🎯 CT TY detected - Custom batch ranges');
-                const divisionSelect = document.getElementById('division');
-                const selectedDivision = divisionSelect ? divisionSelect.value : '';
-
-                if (selectedDivision === 'A') {
-                    console.log('🎯 CT TY A Division detected - Custom batch ranges (3101-3120, 3121-3140, 3141-3163)');
-                    batchSelect.innerHTML += '<option value="BatchA">Batch A (3101-3120)</option>';
-                    batchSelect.innerHTML += '<option value="BatchB">Batch B (3121-3140)</option>';
-                    batchSelect.innerHTML += '<option value="BatchC">Batch C (3141-3163)</option>';
-                } else {
-                    batchSelect.innerHTML += '<option value="BatchA">Batch A</option>';
-                    batchSelect.innerHTML += '<option value="BatchB">Batch B</option>';
-                    batchSelect.innerHTML += '<option value="BatchC">Batch C</option>';
-                }
             } else if (selectedDepartment === 'CT' && selectedYear === 'FY') {
-                console.log('🎯 CT FY detected - Custom batch ranges for divisions');
                 const divisionSelect = document.getElementById('division');
                 const selectedDivision = divisionSelect ? divisionSelect.value : '';
 
                 if (selectedDivision === 'A') {
-                    console.log('🎯 CT FY A Division detected - Custom batch ranges (1201-1220, 1221-1240, 1241 onwards)');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1201-1220)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (1221-1240)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (1241 onwards)</option>';
                 } else if (selectedDivision === 'C') {
-                    console.log('🎯 CT FY C Division detected - Custom Batch C range (1441 to onward)');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1-20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (21-40 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (1441 to onward)</option>';
                 } else if (selectedDivision === 'B') {
-                    console.log('🎯 CT FY B Division detected - Custom batch ranges (1301-1320, 1321-1340, 1341 onwards)');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (1301-1320)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (1321-1340)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (1341 onwards)</option>';
                 } else {
-                    console.log('🎯 CT FY (Other Division) - Standard batch ranges');
                     batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (20 students)</option>';
                 }
             } else {
-                console.log('✅ Standard batches - Showing Batch A, B, and C');
                 // Show all batches for other departments/years
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
                 batchSelect.innerHTML += '<option value="BatchC">Batch C (20 students)</option>';
             }
-
-            console.log('✅ Batch dropdown updated successfully');
         }
 
         // Update loadAttendanceContent function
@@ -3869,12 +3856,12 @@
                     return dept;
                 }
 
-                // Query attendance records
+                // 🚀 OPTIMIZED: Query attendance specifically for this teacher
+                // This significantly reduces data transfer by not downloading other teachers' records
                 const snapshot = await firebase.database()
                     .ref('attendance')
-                    .orderByChild('date')
-                    .startAt(startDate)
-                    .endAt(endDate)
+                    .orderByChild('teacherId')
+                    .equalTo(teacherKey)
                     .once('value');
 
                 const records = [];
@@ -3883,14 +3870,8 @@
                     const data = record.val();
                     if (!data) return;
 
-                    // 🔒 TEACHER-SPECIFIC FILTER: Only show records created by current teacher
-                    if (data.teacherId !== teacherKey) {
-                        console.log('⚠️ Skipping record - different teacher:', {
-                            recordTeacher: data.teacherId,
-                            currentTeacher: teacherKey
-                        });
-                        return; // Skip this record
-                    }
+                    // Date filtering (Client-side because Firebase only supports 1 filter reliably)
+                    if (data.date < startDate || data.date > endDate) return;
 
                     console.log('✅ Processing record for current teacher:', data);
 
@@ -4429,7 +4410,6 @@
 
         // Update class options based on selections
         async function updateClassOptions() {
-            console.log('updateClassOptions called');
 
             const department = document.getElementById('department').value;
             const year = document.getElementById('year').value;
@@ -4438,26 +4418,15 @@
             const selectedDate = document.getElementById('date')?.value;
             const selectedLectureType = document.getElementById('lectureType')?.value;
 
-            console.log('Form values:', {
-                department,
-                year,
-                division,
-                subject,
-                selectedDate,
-                selectedLectureType
-            });
 
             // Get teacher data
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
-            console.log('Teacher data:', teacherData);
 
             // Check if teacher has this year assigned
             if (teacherData && teacherData.classes && teacherData.classes.includes(year)) {
-                console.log('Year is assigned to teacher');
 
                 // Generate class code (e.g., "FYME-A")
                 const classCode = year + department + (division ? '-' + division : '');
-                console.log('Generated class code:', classCode);
 
                 // Show loading state while checking fields
                 const tableBody = document.getElementById('attendance-body');
@@ -4476,13 +4445,6 @@
 
                 // Check required fields - division is optional
                 if (!department || !year || !subject || !selectedDate || !selectedLectureType) {
-                    console.log('Missing required fields:', {
-                        department: !!department,
-                        year: !!year,
-                        subject: !!subject,
-                        date: !!selectedDate,
-                        lectureType: !!selectedLectureType
-                    });
 
                     if (tableBody) {
                         tableBody.innerHTML = `
@@ -4499,7 +4461,6 @@
                     }
                 } else {
                     // All required fields are filled, load students
-                    console.log('All required fields filled, loading students');
                     try {
                         await loadStudents(classCode);
                     } catch (error) {
@@ -4520,7 +4481,6 @@
                     }
                 }
             } else {
-                console.log('Year is not assigned to teacher');
                 const tableBody = document.getElementById('attendance-body');
                 if (tableBody) {
                     tableBody.innerHTML = `
@@ -4573,18 +4533,15 @@
             if (lectureType === 'practical') {
                 // Show batch dropdown for practical
                 batchGroup.style.display = 'block';
-                console.log('Batch dropdown shown for practical lecture');
             } else {
                 // Hide batch dropdown for theory
                 batchGroup.style.display = 'none';
                 batchSelect.value = ''; // Reset batch selection
-                console.log('Batch dropdown hidden for theory lecture');
             }
         }
 
         // Function to generate batch-specific students for practical lectures
         async function generateBatchStudents(batch, department, year, division, tableBody) {
-            console.log('Loading real students for batch:', batch);
 
             // Show loading state
             if (tableBody) {
@@ -4642,16 +4599,6 @@
                     const matchesDivision = !division || division === '' ||
                         (student.division && student.division.toUpperCase() === division.toUpperCase());
 
-                    console.log('Student filtering:', {
-                        studentName: student.name,
-                        studentDept: studentDept,
-                        studentYear: studentYear,
-                        studentDivision: student.division,
-                        selectedDivision: division,
-                        matchesDepartment,
-                        matchesYear,
-                        matchesDivision
-                    });
 
                     if (matchesDepartment && matchesYear && matchesDivision) {
                         allStudents.push({
@@ -4665,7 +4612,6 @@
                     }
                 });
 
-                console.log(`Found ${allStudents.length} total students for ${departmentFullName} ${normalizedYear}`);
 
                 // Sort students by roll number
                 allStudents.sort((a, b) => {
@@ -4680,7 +4626,6 @@
 
                 // Check if this is Computer Technology First Year with special division configurations
                 if (department === 'CT' && year === 'FY' && division === 'A') {
-                    console.log('🎯 Applying custom CT FY A Division batch ranges - Roll number based filtering');
 
                     // Apply batch-specific filtering based on roll number ranges
                     let batchStudents = [];
@@ -4692,7 +4637,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1201 && rollNum <= 1220;
                             });
-                            console.log(`CT FY A Division Batch A: Found ${batchStudents.length} students (Roll 1201-1220)`);
                             break;
                         case 'B':
                             // Batch B: Roll numbers 1221-1240
@@ -4700,7 +4644,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1221 && rollNum <= 1240;
                             });
-                            console.log(`CT FY A Division Batch B: Found ${batchStudents.length} students (Roll 1221-1240)`);
                             break;
                         case 'C':
                             // Batch C: Roll numbers 1241 onwards
@@ -4708,7 +4651,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1241;
                             });
-                            console.log(`CT FY A Division Batch C: Found ${batchStudents.length} students (Roll 1241 onwards)`);
                             break;
                         default:
                             // Default to Batch A
@@ -4716,7 +4658,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1201 && rollNum <= 1220;
                             });
-                            console.log(`CT FY A Division Default (Batch A): Found ${batchStudents.length} students (Roll 1201-1220)`);
                             break;
                     }
 
@@ -4765,7 +4706,6 @@
                 }
                 // Check if this is Computer Technology First Year Division B
                 else if (department === 'CT' && year === 'FY' && division === 'B') {
-                    console.log('🎯 Applying custom CT FY B Division batch ranges - Roll number based filtering');
 
                     // Apply batch-specific filtering based on roll number ranges
                     let batchStudents = [];
@@ -4777,7 +4717,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1301 && rollNum <= 1320;
                             });
-                            console.log(`CT FY B Division Batch A: Found ${batchStudents.length} students (Roll 1301-1320)`);
                             break;
                         case 'B':
                             // Batch B: Roll numbers 1321-1340
@@ -4785,7 +4724,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1321 && rollNum <= 1340;
                             });
-                            console.log(`CT FY B Division Batch B: Found ${batchStudents.length} students (Roll 1321-1340)`);
                             break;
                         case 'C':
                             // Batch C: Roll numbers 1341 onwards
@@ -4793,7 +4731,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1341;
                             });
-                            console.log(`CT FY B Division Batch C: Found ${batchStudents.length} students (Roll 1341 onwards)`);
                             break;
                         default:
                             // Default to Batch A
@@ -4801,7 +4738,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1301 && rollNum <= 1320;
                             });
-                            console.log(`CT FY B Division Default (Batch A): Found ${batchStudents.length} students (Roll 1301-1320)`);
                             break;
                     }
 
@@ -4850,7 +4786,6 @@
                 }
                 // Check if this is Computer Technology First Year with special C division configuration
                 else if (department === 'CT' && year === 'FY' && division === 'C') {
-                    console.log('🎯 Applying custom CT FY C Division batch ranges - Batch C (1441 to onward)');
 
                     // Create filtered students array for CT FY C Division with roll numbers 1441+
                     const ctFYCStudents = allStudents.filter(student => {
@@ -4858,7 +4793,6 @@
                         return rollNum >= 1441; // Only students with roll numbers 1441 and above
                     });
 
-                    console.log(`CT FY C Division: Found ${ctFYCStudents.length} students with roll numbers 1441+`);
 
                     // Apply batch-specific filtering
                     let batchStudents = [];
@@ -4867,22 +4801,18 @@
                         case 'A':
                             // Batch A: Standard 1-20 students
                             batchStudents = allStudents.slice(0, 20);
-                            console.log(`CT FY C Division Batch A: Found ${batchStudents.length} students (1-20)`);
                             break;
                         case 'B':
                             // Batch B: Standard 21-40 students
                             batchStudents = allStudents.slice(20, 40);
-                            console.log(`CT FY C Division Batch B: Found ${batchStudents.length} students (21-40)`);
                             break;
                         case 'C':
                             // Batch C: Roll numbers 1441 onwards
                             batchStudents = ctFYCStudents;
-                            console.log(`CT FY C Division Batch C: Found ${batchStudents.length} students (Roll 1441 onwards)`);
                             break;
                         default:
                             // Default to Batch A
                             batchStudents = allStudents.slice(0, 20);
-                            console.log(`CT FY C Division Default (Batch A): Found ${batchStudents.length} students (1-20)`);
                             break;
                     }
 
@@ -4931,7 +4861,6 @@
                 }
                 // Check if this is Computer Technology Second Year
                 else if (department === 'CT' && year === 'SY') {
-                    console.log('🎯 Applying custom CT SY batch ranges for Division:', division);
 
                     if (division === 'A') {
                         // Division A: Batch A (1-24), Batch B (25-49), Batch C (50-72)
@@ -4966,84 +4895,15 @@
                     }
                 } else if (department === 'CT' && year === 'TY') {
                     // 🎯 Computer Technology Third Year custom batch ranges
-                    console.log('🎯 Applying custom CT TY batch ranges for Division:', division);
 
                     if (division === 'A') {
-                        // 🎯 CT TY Division A: Roll number based ranges
-                        console.log('🎯 CT TY Division A: Using roll number based filtering (3101-3120, 3121-3140, 3141-3163)');
-
-                        let batchStudents = [];
-                        const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
-
+                        // Division A: Only Batch C specified (41-61)
                         switch (batchLetter) {
-                            case 'A':
-                                batchStudents = allStudents.filter(s => {
-                                    const r = toNum(s);
-                                    return r >= 3101 && r <= 3120;
-                                });
-                                break;
-                            case 'B':
-                                batchStudents = allStudents.filter(s => {
-                                    const r = toNum(s);
-                                    return r >= 3121 && r <= 3140;
-                                });
-                                break;
-                            case 'C':
-                                batchStudents = allStudents.filter(s => {
-                                    const r = toNum(s);
-                                    return r >= 3141 && r <= 3163;
-                                });
-                                break;
-                            default:
-                                batchStudents = allStudents.filter(s => {
-                                    const r = toNum(s);
-                                    return r >= 3101 && r <= 3120;
-                                });
-                                break;
+                            case 'A': startIndex = 0; endIndex = 20; break;   // Default for Batch A
+                            case 'B': startIndex = 20; endIndex = 40; break;  // Default for Batch B
+                            case 'C': startIndex = 40; endIndex = 61; break;  // Students 41-61
+                            default: startIndex = 0; endIndex = 20; break;
                         }
-
-                        // Display the batch students directly
-                        if (tableBody) {
-                            if (batchStudents.length === 0) {
-                                tableBody.innerHTML = `
-                                    <tr>
-                                        <td colspan="3" class="text-center">
-                                            <div class="empty-state">
-                                                <i class="fas fa-user-slash"></i>
-                                                <p>No students found for CT TY Division A Batch ${batchLetter}</p>
-                                                <div class="subtitle">Roll numbers ${batchLetter === 'A' ? '3101-3120' : batchLetter === 'B' ? '3121-3140' : '3141-3163'}</div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `;
-                            } else {
-                                let studentsHTML = '';
-                                batchStudents.forEach((student, index) => {
-                                    studentsHTML += `
-                                        <tr data-student-id="${student.id}">
-                                            <td>${student.rollNo}</td>
-                                            <td>${student.name}</td>
-                                            <td>
-                                                <div class="attendance-buttons">
-                                                    <button class="btn-attendance present" 
-                                                        onclick="markAttendance('${student.id}', true)">
-                                                        <i class="fas fa-check"></i>
-                                                        Present
-                                                    </button>
-                                                    <button class="btn-attendance absent" 
-                                                        onclick="markAttendance('${student.id}', false)">
-                                                        <i class="fas fa-times"></i>
-                                                        Absent
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                });
-                                tableBody.innerHTML = studentsHTML;
-                            }
-                        }
-                        return; // Exit early since we handled the display
                     } else if (division === 'B') {
                         // Division B: Only Batch C specified (41-55)
                         switch (batchLetter) {
@@ -5069,7 +4929,6 @@
                     }
                 } else if (department === 'ME' && year === 'SY') {
                     // 🎯 Mechanical Engineering Second Year custom batch ranges (Only A & B)
-                    console.log('🎯 Applying custom ME SY batch ranges (A & B only)');
 
                     // Create filtered students array for ME SY with roll numbers 2701+
                     const meStudents = allStudents.filter(student => {
@@ -5077,7 +4936,6 @@
                         return rollNum >= 2701; // Only students with roll numbers 2701 and above
                     });
 
-                    console.log(`ME SY: Found ${meStudents.length} students with roll numbers 2701+`);
 
                     // Apply batch-specific filtering based on roll number ranges
                     let batchStudents = [];
@@ -5089,7 +4947,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2701 && rollNum <= 2725;
                             });
-                            console.log(`ME SY Batch A: Found ${batchStudents.length} students (Roll 2701-2725)`);
                             break;
                         case 'B':
                             // Batch B: Roll numbers 2726 onwards
@@ -5097,7 +4954,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2726;
                             });
-                            console.log(`ME SY Batch B: Found ${batchStudents.length} students (Roll 2726 onwards)`);
                             break;
                         default:
                             // No Batch C for ME - default to Batch A
@@ -5105,7 +4961,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2701 && rollNum <= 2725;
                             });
-                            console.log(`ME SY Default (Batch A): Found ${batchStudents.length} students (Roll 2701-2725)`);
                             break;
                     }
 
@@ -5153,7 +5008,6 @@
                     return; // Exit early since we handled the display
                 } else if (department === 'ME' && year === 'TY') {
                     // 🎯 Mechanical Engineering Third Year custom batch ranges (Only A & B)
-                    console.log('🎯 Applying custom ME TY batch ranges (A & B only)');
 
                     switch (batchLetter) {
                         case 'A':
@@ -5172,7 +5026,6 @@
                     }
                 } else if (department === 'CE' && year === 'SY') {
                     // 🎯 Civil Engineering Second Year custom batch ranges (Only A & B)
-                    console.log('🎯 Applying custom CE SY batch ranges (A & B only)');
 
                     switch (batchLetter) {
                         case 'A':
@@ -5191,7 +5044,6 @@
                     }
                 } else if (department === 'EE' && year === 'FY') {
                     // 🎯 Electrical Engineering First Year custom batch ranges - Roll number based filtering
-                    console.log('🎯 Applying custom EE FY batch ranges - Roll number based filtering');
 
                     // Apply batch-specific filtering based on roll number ranges
                     let batchStudents = [];
@@ -5203,7 +5055,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return ((rollNum >= 1501 && rollNum <= 1522) || rollNum === 1543) && rollNum !== 1504;
                             });
-                            console.log(`EE FY Batch A: Found ${batchStudents.length} students (Roll 1501-1522 + 1543 skip 1504)`);
                             break;
                         case 'B':
                             // Batch B: Roll numbers 1523-1544 skip 1543
@@ -5211,15 +5062,13 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 1523 && rollNum <= 1544 && rollNum !== 1543;
                             });
-                            console.log(`EE FY Batch B: Found ${batchStudents.length} students (Roll 1523-1544 skip 1543)`);
                             break;
                         case 'C':
                             // Batch C: Roll numbers 1545-1562 + 1504
                             batchStudents = allStudents.filter(student => {
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
-                                return (rollNum >= 1545 && rollNum <= 1564) || rollNum === 1504;
+                                return (rollNum >= 1545 && rollNum <= 1562) || rollNum === 1504;
                             });
-                            console.log(`EE FY Batch C: Found ${batchStudents.length} students (Roll 1545-1562 + 1504)`);
                             break;
                         default:
                             // Default to Batch A
@@ -5227,7 +5076,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return ((rollNum >= 1501 && rollNum <= 1522) || rollNum === 1543) && rollNum !== 1504;
                             });
-                            console.log(`EE FY Default (Batch A): Found ${batchStudents.length} students (Roll 1501-1522 + 1543 skip 1504)`);
                             break;
                     }
 
@@ -5240,7 +5088,7 @@
                                         <div class="empty-state">
                                             <i class="fas fa-user-slash"></i>
                                             <p>No students found for EE FY Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1564 + 1504'}</div>
+                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1562 + 1504'}</div>
                                         </div>
                                     </td>
                                 </tr>
@@ -5275,7 +5123,6 @@
                     return; // Exit early since we handled the display
                 } else if (department === 'EE' && year === 'SY') {
                     // 🎯 Electrical Engineering Second Year custom batch ranges
-                    console.log('🎯 Applying custom EE SY batch ranges');
 
                     switch (batchLetter) {
                         case 'A':
@@ -5297,7 +5144,6 @@
                     }
                 } else if (department === 'EE' && year === 'TY') {
                     // 🎯 Electrical Engineering Third Year custom batch ranges (Only A & B)
-                    console.log('🎯 Applying custom EE TY batch ranges (A & B only)');
 
                     switch (batchLetter) {
                         case 'A':
@@ -5316,7 +5162,6 @@
                     }
                 } else if (department === 'IT' && year === 'FY') {
                     // 🎯 Information Technology First Year custom batch ranges
-                    console.log('🎯 Applying custom IT FY batch ranges');
 
                     switch (batchLetter) {
                         case 'A':
@@ -5338,7 +5183,6 @@
                     }
                 } else if (department === 'IT' && year === 'SY') {
                     // 🎯 Information Technology Second Year custom batch ranges by roll numbers
-                    console.log('🎯 Applying custom IT SY batch ranges by roll numbers');
 
                     // Declare batchStudents locally for IT SY
                     let batchStudents = [];
@@ -5350,7 +5194,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2601 && rollNum <= 2624;
                             });
-                            console.log('🎯 IT SY Batch A: Filtered students with roll 2601-2624:', batchStudents.length);
                             break;
                         case 'B':
                             // 🎯 IT SY Batch B: Roll 2625-2648
@@ -5358,7 +5201,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2625 && rollNum <= 2648;
                             });
-                            console.log('🎯 IT SY Batch B: Filtered students with roll 2625-2648:', batchStudents.length);
                             break;
                         case 'C':
                             // 🎯 IT SY Batch C: Roll 2649 onwards
@@ -5366,7 +5208,6 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2649;
                             });
-                            console.log('🎯 IT SY Batch C: Filtered students with roll >= 2649:', batchStudents.length);
                             break;
                         default:
                             // Default to Batch A range
@@ -5419,7 +5260,6 @@
                     return; // Exit early since we handled the display
                 } else if (department === 'IT' && year === 'TY') {
                     // 🎯 Information Technology Third Year custom batch ranges (roll 23 only in Batch A)
-                    console.log('🎯 Applying strict IT TY batch ranges: roll 23 only in Batch A');
                     // Always sort by rollNo (as integer)
                     allStudents.sort((a, b) => {
                         const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
@@ -5448,7 +5288,6 @@
                     // No early returns needed here
 
                 } else if (department === 'EE' && year === 'TY') {
-                    console.log('🚫 EE TY detected - Only showing Batch A and B (no Batch C)');
                     // This is batch filtering logic, not dropdown logic - remove dropdown code
                     switch (batchLetter) {
                         case 'A':
@@ -5482,16 +5321,13 @@
                             const r = toNum(s);
                             return (r >= 2001 && r <= 2022) || r === 2027;
                         });
-                        console.log('🎯 CE SY Batch A: Rolls 2001-2022, 2027 loaded');
                     } else if (batchLetter === 'B') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return (r >= 2023 && r <= 2026) || (r >= 2028);
                         });
-                        console.log('🎯 CE SY Batch B: Rolls 2023-2026, 2028 onwards loaded (skip 2027)');
                     } else {
                         batchStudents = [];
-                        console.log('🚫 CE SY: No Batch C available');
                     }
                 } else if (department === 'ET' && year === 'FY') {
                     // ET FY: A(1-20), B(21-40), C(41+)
@@ -5511,16 +5347,13 @@
                     }
                 } else if (department === 'ET' && year === 'SY') {
                     // 🎯 Electronics & Telecommunication Second Year custom batch ranges
-                    console.log('🎯 Applying custom ET SY batch ranges');
 
                     switch (batchLetter) {
                         case 'A':
                             batchStudents = allStudents.slice(0, 24); // Students 1-24
-                            console.log(`ET SY Batch A: Found ${batchStudents.length} students (1-24)`);
                             break;
                         case 'B':
                             batchStudents = allStudents.slice(24, 48); // Students 25-48
-                            console.log(`ET SY Batch B: Found ${batchStudents.length} students (25-48)`);
                             break;
                         case 'C':
                             // Batch C: Roll numbers 2549 onwards
@@ -5528,11 +5361,9 @@
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2549;
                             });
-                            console.log(`ET SY Batch C: Found ${batchStudents.length} students (Roll 2549 onwards)`);
                             break;
                         default:
                             batchStudents = allStudents.slice(0, 24);
-                            console.log(`ET SY Default (Batch A): Found ${batchStudents.length} students (1-24)`);
                             break;
                     }
                 } else if (department === 'ET' && year === 'TY') {
@@ -5556,13 +5387,11 @@
                         const roll3623Student = allStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623);
                         if (roll3623Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 3623)) {
                             batchStudents.push(roll3623Student);
-                            console.log('🎯 Added roll 3623 to Batch A:', roll3623Student.name);
                         }
                         // Also add roll 23 if present
                         const roll23Student = allStudents.find(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23);
                         if (roll23Student && !batchStudents.some(s => parseInt((s.rollNo || '').replace(/\D/g, '')) === 23)) {
                             batchStudents.push(roll23Student);
-                            console.log('🎯 Added roll 23 to Batch A:', roll23Student.name);
                         }
                         // Sort after adding
                         batchStudents.sort((a, b) => {
@@ -5575,7 +5404,6 @@
                             const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
                             return roll !== 23 && roll !== 3623; // Remove roll 23 and 3623 from Batch B
                         });
-                        console.log('🎯 Batch B: Removed roll 23 and 3623');
                     } else if (batchLetter === 'C') {
                         batchStudents = allStudents.slice(46, 70);
                     } else {
@@ -5589,58 +5417,41 @@
                             const r = toNum(s);
                             return r >= 1001 && r <= 1022;
                         });
-                        console.log('🎯 AI FY Batch A: Rolls 1001-1022 loaded');
                     } else if (batchLetter === 'B') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1023 && r <= 1044;
                         });
-                        console.log('🎯 AI FY Batch B: Rolls 1023-1044 loaded');
                     } else if (batchLetter === 'C') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1045;
                         });
-                        console.log('🎯 AI FY Batch C: Rolls 1045 onwards loaded');
                     } else {
                         batchStudents = [];
-                        console.log('🚫 AI FY: Invalid batch selected');
                     }
                 } else if (department === 'ME' && year === 'FY') {
                     // ME FY roll-based slicing: A = 1801-1820, B = 1821-1840, C = 1841-1861
                     const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
 
-                    // Debug: Show first 5 student roll numbers
-                    console.log('ME FY Debug - First 5 student rolls:', allStudents.slice(0, 5).map(s => ({
-                        name: s.name,
-                        rollNo: s.rollNo,
-                        extracted: toNum(s)
-                    })));
 
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1801 && r <= 1820;
                         });
-                        console.log('ME FY Batch A: Rolls 1801-1820 loaded, found:', batchStudents.length);
                     } else if (batchLetter === 'B') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1821 && r <= 1840;
                         });
-                        console.log('ME FY Batch B: Rolls 1821-1840 loaded, found:', batchStudents.length);
-                        if (batchStudents.length === 0) {
-                            console.log('ME FY Batch B Debug - All roll numbers:', allStudents.map(s => toNum(s)).sort((a, b) => a - b));
-                        }
                     } else if (batchLetter === 'C') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1841;
                         });
-                        console.log('ME FY Batch C: Rolls 1841 onwards loaded, found:', batchStudents.length);
                     } else {
                         batchStudents = [];
-                        console.log('ME FY: Invalid batch selected');
                     }
                 } else if (department === 'CE' && year === 'FY') {
                     // 🎯 CE FY roll-based slicing: A = 1101-1120, B = 1121-1140, C = 1141 onwards
@@ -5650,30 +5461,26 @@
                             const r = toNum(s);
                             return r >= 1101 && r <= 1120;
                         });
-                        console.log('🎯 CE FY Batch A: Rolls 1101-1120 loaded');
                     } else if (batchLetter === 'B') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1121 && r <= 1140;
                         });
-                        console.log('🎯 CE FY Batch B: Rolls 1121-1140 loaded');
                     } else if (batchLetter === 'C') {
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1141;
                         });
-                        console.log('🎯 CE FY Batch C: Rolls 1141 onwards loaded');
                     } else {
                         batchStudents = [];
-                        console.log('🚫 CE FY: Invalid batch selected');
                     }
                 } else if (department === 'CE' && year === 'TY') {
-                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3027
+                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3026
                     if (batchLetter === 'A') {
-                        // Filter students with roll numbers 3001-3027 (including all students)
+                        // Filter students with roll numbers 3001-3026
                         batchStudents = allStudents.filter(s => {
                             const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
-                            return roll >= 3001 && roll <= 3027;
+                            return roll >= 3001 && roll <= 3026;
                         });
                         // Sort by roll number
                         batchStudents.sort((a, b) => {
@@ -5681,35 +5488,12 @@
                             const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
                             return rollA - rollB;
                         });
-                        console.log('🎯 CE TY Batch A: Roll 3001-3027 loaded (' + batchStudents.length + ' students)');
                     } else {
                         // No Batch B or C for CE TY
                         batchStudents = [];
-                        console.log('🚫 CE TY: Only Batch A available, Batch B and C deleted');
                     }
                 } else {
                     batchStudents = allStudents.slice(startIndex, endIndex);
-                }
-
-                // Enhanced logging with actual student ranges
-                if (department === 'CT' && year === 'SY') {
-                    console.log(`🎯 CT SY Division ${division} - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'CT' && year === 'TY') {
-                    console.log(`🎯 CT TY Division ${division} - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'ME' && year === 'SY') {
-                    console.log(`🎯 ME SY - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex === allStudents.length ? 'end' : endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'IT' && year === 'FY') {
-                    console.log(`🎯 IT FY - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex === allStudents.length ? 'end' : endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'IT' && year === 'SY') {
-                    console.log(`🎯 IT SY - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'IT' && year === 'TY') {
-                    console.log(`🎯 IT TY - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex} (${batchStudents.length} students loaded)`);
-                } else if (department === 'AI' && year === 'FY') {
-                    console.log(`🎯 AI FY - Batch ${batchLetter}: Roll-based filtering (${batchStudents.length} students loaded)`);
-                } else if (department === 'ME' && year === 'FY') {
-                    console.log(`ME FY - Batch ${batchLetter}: Roll-based filtering (${batchStudents.length} students loaded)`);
-                } else {
-                    console.log(`📚 ${department} ${year} - Batch ${batchLetter}: Students ${startIndex + 1} to ${endIndex} (${batchStudents.length} students loaded)`);
                 }
 
                 if (batchStudents.length === 0) {
@@ -5758,7 +5542,6 @@
                     tableBody.innerHTML = html;
                 }
 
-                console.log(`Loaded ${batchStudents.length} real students for Batch ${batchLetter}`);
 
             } catch (error) {
                 console.error('Error loading batch students:', error);
@@ -5779,7 +5562,6 @@
         }
 
         async function loadStudents(classCode) {
-            console.log('Loading students for class:', classCode);
 
             const department = document.getElementById('department').value;
             const year = document.getElementById('year').value;
@@ -5794,15 +5576,6 @@
             // For practical lectures, batch is also required
             const batchRequired = selectedLectureType === 'practical';
             if (!department || !year || !subject || !selectedDate || !selectedLectureType || (batchRequired && !batch)) {
-                console.log('Missing required fields:', {
-                    department: !!department,
-                    year: !!year,
-                    subject: !!subject,
-                    date: !!selectedDate,
-                    lectureType: !!selectedLectureType,
-                    batch: !!batch,
-                    batchRequired
-                });
 
                 if (tableBody) {
                     const batchMsg = batchRequired ? ', and Batch (for Practical)' : '';
@@ -5838,103 +5611,70 @@
             await waitForFirebase();
             // For practical lectures with batch, generate batch-specific students
             if (selectedLectureType === 'practical' && batch) {
-                console.log('Generating batch-specific students for:', batch);
                 generateBatchStudents(batch, department, year, division, tableBody);
                 return;
             }
 
-            console.log('Fetching students from Firebase');
-            console.log('Query parameters:', { department, year, division });
-
-            const studentsRef = window.db.ref('students');
+            const departmentFullName = getDepartmentFullName(department);
+            // tableBody is already declared at the top of the function
 
             try {
-                // Reverted: Fetch ALL students to ensure client-side filtering works as before
-                const snapshot = await studentsRef.once('value');
-
+                // 🚀 USE CACHED DATA: Avoid redundant Firebase reads
+                const allStudentsData = await window.loadStudentsWithCache();
                 const students = [];
 
-                if (!snapshot.exists()) {
-                    console.log('No students found');
-                    if (tableBody) {
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-slash"></i>
-                                        <p>No students found</p>
-                                        <div class="subtitle">Add students from the Student Management section</div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                    return;
+                if (!allStudentsData || Object.keys(allStudentsData).length === 0) {
+                    throw new Error('No student data found');
                 }
 
-                // Get department full name
-                const departmentFullName = getDepartmentFullName(department);
-                console.log('Looking for department:', departmentFullName);
-
-                // Normalize selected year
                 const normalizedYear = normalizeYear(year);
-                console.log('Looking for year:', normalizedYear);
 
-                snapshot.forEach((childSnapshot) => {
-                    const student = childSnapshot.val();
+                // Process each student
+                Object.keys(allStudentsData).forEach((studentId) => {
+                    const student = allStudentsData[studentId];
 
-                    // Check department/branch match
-                    const studentDept = student.department || student.branch || '';
-                    const matchesDepartment = studentDept.toLowerCase() === departmentFullName.toLowerCase();
+                    // 🔍 ROBUST FILTERING: Handles multiple department name formats
+                    const studentDept = (student.department || '').toString().toLowerCase();
+                    const studentBranch = (student.branch || '').toString().toLowerCase();
+                    const studentDeptCode = (student.dept || '').toString().toLowerCase();
 
-                    if (!matchesDepartment) {
-                        console.log('Department mismatch:', studentDept, 'vs', departmentFullName);
-                        return;
-                    }
+                    const targetFull = departmentFullName.toLowerCase();
+                    const targetShort = department.toLowerCase();
+
+                    // Matches if ANY field matches Target (Full or Short)
+                    const matchesDept =
+                        studentDept === targetFull || studentDept === targetShort ||
+                        studentBranch === targetFull || studentBranch === targetShort ||
+                        studentDeptCode === targetFull || studentDeptCode === targetShort ||
+                        studentDept.includes('information technology') || // Explicit check for IT
+                        (targetShort === 'it' && studentDept.includes('it'));
+
+                    if (!matchesDept) return;
 
                     // Check year match
                     const studentYear = normalizeYear(student.year);
-                    const matchesYear = studentYear === normalizedYear;
+                    if (studentYear !== normalizedYear) return;
 
-                    if (!matchesYear) {
-                        console.log('Year mismatch:', studentYear, 'vs', normalizedYear);
-                        return;
+                    // Check division only for Computer Technology (CT)
+                    if (department === 'CT' && division) {
+                        const studentDivision = student.division || 'A';
+                        if (studentDivision !== division) return;
                     }
 
-                    // Check division only for Computer Technology
-                    if (departmentFullName === 'Computer Technology' && division) {
-                        const studentDivision = student.division || 'A';  // Default to A if not specified
-                        if (studentDivision !== division) {
-                            console.log('Division mismatch:', studentDivision, 'vs', division);
-                            return;
-                        }
-                    }
-
-                    // Get student name
-                    let firstName = student.firstName;
-                    let lastName = student.lastName;
-
-                    if (!firstName && student.name) {
-                        const nameParts = student.name.split(' ');
-                        firstName = nameParts[0];
-                        lastName = nameParts.slice(1).join(' ');
-                    }
-
+                    // Student passed!
                     students.push({
-                        id: childSnapshot.key,
+                        id: studentId,
                         ...student,
-                        firstName: firstName || 'Unknown',
-                        lastName: lastName || '',
+                        firstName: student.firstName || student.name?.split(' ')[0] || 'Unknown',
+                        lastName: student.lastName || student.name?.split(' ').slice(1).join(' ') || '',
                         rollNo: student.rollNo || '-'
                     });
                 });
 
-                console.log('Found matching students:', students.length);
-
                 // Sort students by roll number
                 students.sort((a, b) => {
-                    const rollA = parseInt(a.rollNo) || 0;
-                    const rollB = parseInt(b.rollNo) || 0;
+                    const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
+                    const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
                     return rollA - rollB;
                 });
 
@@ -5946,7 +5686,7 @@
                                     <div class="empty-state">
                                         <i class="fas fa-user-slash"></i>
                                         <p>No students found</p>
-                                        <div class="subtitle">No students found in selected class</div>
+                                        <div class="subtitle">No Students found in ${department} ${year} ${division || ''}</div>
                                     </div>
                                 </td>
                             </tr>
@@ -5980,9 +5720,7 @@
                     `;
                 });
 
-                if (tableBody) {
-                    tableBody.innerHTML = html;
-                }
+                if (tableBody) tableBody.innerHTML = html;
 
             } catch (error) {
                 console.error('Error loading students:', error);
@@ -6985,28 +6723,41 @@
                 console.log('Teacher Classes:', teacherClasses);
 
                 // Get total students count
-                const studentsSnapshot = await firebase.database().ref('students').once('value');
+                // Get total students count
                 let totalStudents = 0;
-                const students = studentsSnapshot.val() || {};
 
-                Object.values(students).forEach(student => {
-                    // Get student's class code
-                    const studentYear = (student.year || '').toString().toUpperCase();
-                    const studentDept = (student.department || student.branch || '').toString().toUpperCase();
+                // Optimization: Try to get from cache first to reduce database reads
+                const cachedCount = sessionStorage.getItem('dashboard_student_count');
+                const cachedClasses = sessionStorage.getItem('dashboard_teacher_classes');
 
-                    // Convert year format
-                    let yearCode = '';
-                    if (['FIRST', 'FIRST YEAR', '1'].includes(studentYear)) yearCode = 'FY';
-                    else if (['SECOND', 'SECOND YEAR', '2'].includes(studentYear)) yearCode = 'SY';
-                    else if (['THIRD', 'THIRD YEAR', '3'].includes(studentYear)) yearCode = 'TY';
-                    else if (['FOURTH', 'FOURTH YEAR', '4', 'BE'].includes(studentYear)) yearCode = 'BE';
-                    else yearCode = studentYear;
+                // Only use cache if teacher classes haven't changed
+                if (cachedCount && cachedClasses === JSON.stringify(teacherClasses)) {
+                    console.log('Using cached student count');
+                    totalStudents = parseInt(cachedCount);
+                } else {
+                    console.log('Fetching fresh student data using optimized cache...');
+                    const students = await window.loadStudentsWithCache();
 
-                    // Check if student's year matches any of teacher's assigned years
-                    if (teacherClasses.includes(yearCode)) {
-                        totalStudents++;
+                    if (students) {
+                        Object.values(students).forEach(student => {
+                            const studentYear = (student.year || '').toString().toUpperCase();
+                            let yearCode = '';
+                            if (['FIRST', 'FIRST YEAR', '1', 'FY'].includes(studentYear)) yearCode = 'FY';
+                            else if (['SECOND', 'SECOND YEAR', '2', 'SY'].includes(studentYear)) yearCode = 'SY';
+                            else if (['THIRD', 'THIRD YEAR', '3', 'TY'].includes(studentYear)) yearCode = 'TY';
+                            else if (['FOURTH', 'FOURTH YEAR', '4', 'BE'].includes(studentYear)) yearCode = 'BE';
+                            else yearCode = studentYear;
+
+                            if (teacherClasses.includes(yearCode)) {
+                                totalStudents++;
+                            }
+                        });
+
+                        // Cache the result
+                        sessionStorage.setItem('dashboard_student_count', totalStudents);
+                        sessionStorage.setItem('dashboard_teacher_classes', JSON.stringify(teacherClasses));
                     }
-                });
+                }
 
                 // Update UI elements if they exist
                 if (totalStudentsElement) {
@@ -7204,9 +6955,11 @@
                 console.log('🔍 Filters:', { department, year, division, startDate, endDate, teacherKey });
 
                 // Load attendance data from Firebase
-                // Load attendance data from Firebase
-                console.log('Fetching all attendance data (Reverted optimization)...');
-                const attendanceSnapshot = await window.db.ref('attendance').once('value');
+                // Load attendance data from Firebase - Optimized to fetch only this teacher's records
+                const attendanceSnapshot = await window.db.ref('attendance')
+                    .orderByChild('teacherId')
+                    .equalTo(teacherKey)
+                    .once('value');
                 const attendanceData = attendanceSnapshot.val() || {};
 
                 console.log('📦 Raw attendance data loaded:', Object.keys(attendanceData).length, 'records');
