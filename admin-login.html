@@ -32,17 +32,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BVIT Attendance System - Admin Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4F46E5;
             --primary-dark: #4338CA;
             --primary-light: rgba(79, 70, 229, 0.1);
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --danger: #EF4444;
             --text-dark: #1F2937;
             --text-light: #6B7280;
-            --bg-light: #F3F4F6;
             --white: #FFFFFF;
             --border: #E5E7EB;
         }
@@ -51,7 +48,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
@@ -59,50 +56,61 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80') center/cover no-repeat;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url('login-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             background-attachment: fixed;
+            background-color: #002147;
             padding: 20px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .login-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 360px;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-header {
-            padding: 30px;
+            padding: 30px 25px 15px;
             text-align: center;
-            background: white;
         }
 
         .login-header img {
-            width: 180px;
-            height: auto;
-            margin-bottom: 30px;
-            object-fit: contain;
+            width: 130px;
+            margin-bottom: 15px;
         }
 
         .login-header h1 {
-            font-size: 26px;
-            color: #1F2937;
-            margin-bottom: 8px;
+            font-size: 20px;
+            color: var(--text-dark);
             font-weight: 700;
-            letter-spacing: 1px;
         }
 
         .login-header p {
-            color: #6B7280;
-            font-size: 14px;
-            font-weight: 400;
+            color: var(--text-light);
+            font-size: 13px;
         }
 
         .login-form {
-            padding: 0 30px 30px;
+            padding: 15px 25px 30px;
         }
 
         .form-group {
@@ -113,7 +121,7 @@
             display: block;
             margin-bottom: 8px;
             color: var(--text-dark);
-            font-weight: 500;
+            font-weight: 600;
             font-size: 14px;
         }
 
@@ -123,35 +131,28 @@
 
         .input-group input {
             width: 100%;
-            padding: 12px 12px 12px 40px;
+            padding: 12px 14px 12px 42px;
             border: 2px solid var(--border);
             border-radius: 12px;
             font-size: 15px;
             transition: all 0.3s ease;
-            background: var(--bg-light);
+            background: white;
             color: var(--text-dark);
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--primary);
-            background: var(--white);
             box-shadow: 0 0 0 4px var(--primary-light);
         }
 
         .input-group i {
             position: absolute;
-            left: 14px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
             font-size: 16px;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus+i {
-            color: var(--primary);
         }
 
         .password-toggle {
@@ -163,30 +164,23 @@
             border: none;
             color: var(--text-light);
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary);
-            background: var(--primary-light);
+            padding: 5px;
         }
 
         .btn-login {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: var(--primary);
-            color: var(--white);
+            color: white;
             border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.3s ease;
         }
 
@@ -195,166 +189,19 @@
             transform: translateY(-2px);
         }
 
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .btn-login i {
-            font-size: 18px;
-        }
-
         .error-message {
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 12px;
             border-radius: 8px;
             background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+            color: #EF4444;
             font-size: 14px;
             display: none;
-        }
-
-        .login-links {
-            margin-top: 20px;
             text-align: center;
-            font-size: 14px;
-            color: var(--text-light);
         }
 
-        .login-links a {
-            color: var(--primary);
-            text-decoration: none;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
-
-        .login-links a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
-        /* Password Toggle Button */
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-light);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary);
-        }
-
-        .password-toggle i {
-            font-size: 16px;
-        }
-
-        /* Adjust input padding for password field */
-        .input-group input[type="password"] {
-            padding-right: 40px;
-        }
-
-        /* Mobile Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-
-            .login-container {
-                max-width: 100%;
-                border-radius: 16px;
-            }
-
-            .login-header {
-                padding: 25px 20px 20px;
-            }
-
-            .login-header img {
-                width: 140px;
-            }
-
-            .login-header h1 {
-                font-size: 22px;
-            }
-
-            .login-header p {
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            .login-container {
-                border-radius: 12px;
-            }
-
-            .login-header {
-                padding: 20px 15px 15px;
-            }
-
-            .login-header img {
-                width: 120px;
-                margin-bottom: 15px;
-            }
-
-            .login-header h1 {
-                font-size: 20px;
-                letter-spacing: 0.5px;
-            }
-
-            .login-header p {
-                font-size: 12px;
-            }
-
-            .login-form {
-                padding: 0 15px 20px;
-            }
-
-            .form-group {
-                margin-bottom: 15px;
-            }
-
-            .form-group label {
-                font-size: 13px;
-                margin-bottom: 6px;
-            }
-
-            .input-group input {
-                padding: 12px 12px 12px 40px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-
-            .input-group i {
-                left: 14px;
-                font-size: 14px;
-            }
-
-            .btn-login {
-                padding: 14px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-
-            .btn-login i {
-                font-size: 16px;
-            }
-
-            /* Mobile styles for password toggle */
-            .password-toggle {
-                padding: 8px;
-            }
+        .error-message.show {
+            display: block;
         }
     </style>
 
@@ -362,8 +209,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-    <!-- Firebase Configuration & Init -->
     <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
 </head>
@@ -396,119 +241,59 @@
                 </div>
             </div>
             <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Login as Admin
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
             </button>
             <div id="adminError" class="error-message"></div>
         </form>
-
-
     </div>
 
     <script>
-        // Handle admin login
         async function handleAdminLogin(event) {
             event.preventDefault();
-
-            // Show loading state
-            const loginButton = document.querySelector('button[type="submit"]');
-            const originalButtonText = loginButton.innerHTML;
+            const loginButton = event.target.querySelector('button[type="submit"]');
+            const originalContent = loginButton.innerHTML;
             loginButton.disabled = true;
             loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
-            // Clear previous error messages
             const errorDiv = document.getElementById('adminError');
-            errorDiv.textContent = '';
-            errorDiv.style.display = 'none';
+            errorDiv.classList.remove('show');
 
             try {
-                // Wait for Firebase to be ready
-                if (typeof firebase === 'undefined' || !window.auth) {
-                    throw new Error('Firebase not initialized properly');
-                }
-
                 const email = document.getElementById('adminEmail').value;
                 const password = document.getElementById('adminPassword').value;
 
-                // Check internet connection
-                if (!navigator.onLine) {
-                    throw new Error('Please check your internet connection and try again.');
-                }
-
-                // Sign in with Firebase
                 const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Check if user is admin
                 const adminSnapshot = await window.db.ref('admins/' + user.uid).once('value');
                 if (adminSnapshot.exists()) {
-                    // Store admin data in session
                     sessionStorage.setItem('isAdminLoggedIn', 'true');
                     sessionStorage.setItem('adminData', JSON.stringify(adminSnapshot.val()));
-
-                    // Start auto logout timer
-                    if (typeof startAutoLogoutTimer === 'function') {
-                        startAutoLogoutTimer('admin');
-                    }
-
-                    // Redirect to admin dashboard
                     window.location.href = 'admin-dashboard.html';
                 } else {
                     throw new Error('You do not have admin privileges.');
                 }
-
             } catch (error) {
-                console.error('Login error:', error);
-
-                // Handle specific error cases
-                let errorMessage = '';
-                switch (error.code) {
-                    case 'auth/network-request-failed':
-                        errorMessage = 'Network error. Please check your internet connection and try again.';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = 'Invalid email address.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Invalid password.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Too many login attempts. Please try again later.';
-                        break;
-                    default:
-                        errorMessage = error.message || 'An error occurred during login. Please try again.';
-                }
-
-                // Show error message
-                errorDiv.textContent = errorMessage;
-                errorDiv.style.display = 'block';
-
-            } finally {
-                // Reset button state
+                errorDiv.textContent = error.message;
+                errorDiv.classList.add('show');
                 loginButton.disabled = false;
-                loginButton.innerHTML = originalButtonText;
+                loginButton.innerHTML = originalContent;
             }
         }
 
-        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('adminPassword');
             const toggleIcon = document.querySelector('.password-toggle i');
-
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
+                toggleIcon.className = 'fas fa-eye-slash';
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+                toggleIcon.className = 'fas fa-eye';
             }
         }
 
-        // Add event listeners
         document.getElementById('adminForm').addEventListener('submit', handleAdminLogin);
-        document.querySelector('.password-toggle').addEventListener('click', togglePassword);
     </script>
 </body>
 

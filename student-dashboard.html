@@ -1,5 +1,6 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +19,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             background: #f5f5f5;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -57,7 +58,7 @@
             background: var(--darker);
             min-height: 100vh;
             padding: 1.5rem;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             left: 0;
             top: 0;
@@ -170,7 +171,7 @@
         .header {
             background: white;
             padding: 1.5rem 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
         }
 
@@ -217,7 +218,7 @@
             border-radius: 12px;
             color: var(--text-dark);
             border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .detail-row {
@@ -245,7 +246,7 @@
             padding: 1.5rem;
             text-align: center;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .stat-card h3 {
@@ -283,10 +284,11 @@
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .attendance-table th, .attendance-table td {
+        .attendance-table th,
+        .attendance-table td {
             padding: 0.75rem 1rem;
             text-align: left;
             border-bottom: 1px solid var(--border);
@@ -323,7 +325,7 @@
                 display: flex;
                 min-height: 100vh;
             }
-            
+
             .sidebar {
                 width: 280px;
                 min-height: 100vh;
@@ -331,20 +333,20 @@
                 left: 0;
                 top: 0;
             }
-            
+
             .main-content {
                 margin-left: 280px;
                 flex: 1;
                 padding: 2rem;
             }
-            
+
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 1.5rem;
                 margin-bottom: 2rem;
             }
-            
+
             .profile-section {
                 display: grid;
                 grid-template-columns: 1fr;
@@ -365,7 +367,7 @@
             border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .chart-card h3 {
@@ -423,33 +425,33 @@
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .feedback-card {
             background: white;
             border-radius: 8px;
             padding: 30px;
             border: 1px solid var(--border);
         }
-        
+
         .feedback-header {
             text-align: center;
             margin-bottom: 40px;
         }
-        
+
         .feedback-header i {
             font-size: 2em;
             color: var(--primary);
             margin-bottom: 10px;
             display: block;
         }
-        
+
         .feedback-header h3 {
             color: var(--text-dark);
             font-size: 1.5em;
             margin-bottom: 10px;
             font-weight: 600;
         }
-        
+
         .feedback-header p {
             color: var(--text-light);
             font-size: 1em;
@@ -503,25 +505,25 @@
             font-weight: 600;
             font-size: 1.1em;
         }
-        
+
         .rating-group label i {
             color: #667eea;
             margin-right: 8px;
         }
-        
+
         .star-rating {
             display: flex;
             gap: 8px;
             justify-content: center;
         }
-        
+
         .star {
             font-size: 2em;
             color: #e2e8f0;
             cursor: pointer;
             user-select: none;
         }
-        
+
         .star.active {
             color: #ffd700;
         }
@@ -557,11 +559,11 @@
             transition: all 0.3s ease;
         }
 
-        .radio-label input[type="radio"]:checked + span {
+        .radio-label input[type="radio"]:checked+span {
             background: #3498db;
             color: white;
         }
-        
+
         /* Vertical radio options styles */
         .radio-options-vertical {
             display: flex;
@@ -569,7 +571,7 @@
             gap: 12px;
             margin-top: 15px;
         }
-        
+
         .radio-label-vertical {
             display: flex;
             align-items: center;
@@ -581,23 +583,23 @@
             transition: all 0.3s ease;
             font-size: 16px;
         }
-        
+
         .radio-label-vertical:hover {
             background: rgba(102, 126, 234, 0.1);
             border-color: #667eea;
             transform: translateX(5px);
         }
-        
+
         .radio-label-vertical input[type="radio"] {
             margin-right: 12px;
             transform: scale(1.2);
         }
-        
-        .radio-label-vertical input[type="radio"]:checked + span {
+
+        .radio-label-vertical input[type="radio"]:checked+span {
             color: #667eea;
             font-weight: 600;
         }
-        
+
         .radio-label-vertical:has(input[type="radio"]:checked) {
             background: rgba(102, 126, 234, 0.15);
             border-color: #667eea;
@@ -619,7 +621,7 @@
             padding: 12px 16px;
             border: 1.5px solid #d1d5db;
             border-radius: 10px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.8);
             font-size: 1em;
             font-family: 'Inter', sans-serif;
             margin-top: 6px;
@@ -643,7 +645,7 @@
             min-height: 70px;
             max-height: 200px;
         }
-        
+
         .submit-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -668,11 +670,11 @@
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
             background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
         }
-        
+
         .submit-btn:active {
             transform: translateY(-1px);
         }
-        
+
         .submit-btn i {
             font-size: 1.2em;
         }
@@ -776,7 +778,7 @@
             padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .rating-group label:first-child {
@@ -816,7 +818,7 @@
             accent-color: var(--primary);
         }
 
-        .radio-label-vertical input[type="radio"]:checked + span {
+        .radio-label-vertical input[type="radio"]:checked+span {
             color: var(--primary);
             font-weight: 600;
         }
@@ -909,9 +911,19 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -30px) rotate(120deg); }
-            66% { transform: translate(-20px, 20px) rotate(240deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
         }
 
         .profile-card:hover {
@@ -945,7 +957,7 @@
             display: flex;
             min-height: 100vh;
         }
-        
+
         .sidebar {
             width: 280px;
             min-height: 100vh;
@@ -953,13 +965,13 @@
             left: 0;
             top: 0;
         }
-        
+
         .main-content {
             margin-left: 280px;
             flex: 1;
             padding: 2rem;
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -972,7 +984,7 @@
             .container {
                 flex-direction: column;
             }
-            
+
             .sidebar {
                 width: 100%;
                 position: relative;
@@ -1045,13 +1057,13 @@
                 grid-template-columns: 1fr;
             }
         }
-        
+
         /* Enhanced Mobile Responsive Styles */
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
             }
-            
+
             .sidebar {
                 width: 100%;
                 min-height: auto;
@@ -1059,160 +1071,160 @@
                 position: relative;
                 margin-bottom: 1rem;
             }
-            
+
             .sidebar-header {
                 flex-direction: row;
                 text-align: left;
                 margin-bottom: 1rem;
             }
-            
+
             .nav-menu {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5rem;
             }
-            
+
             .nav-item {
                 flex: 1;
                 min-width: calc(50% - 0.25rem);
             }
-            
+
             .nav-link {
                 padding: 0.75rem 0.5rem;
                 font-size: 0.875rem;
                 text-align: center;
             }
-            
+
             .nav-link i {
                 display: block;
                 margin-bottom: 0.25rem;
             }
-            
+
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr !important;
                 gap: 1rem;
             }
-            
+
             .stat-card {
                 padding: 1rem;
             }
-            
+
             .charts-container {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .chart-card {
                 padding: 1rem;
             }
-            
+
             .table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
-            
+
             .attendance-table {
                 min-width: 600px;
             }
-            
+
             .attendance-table th,
             .attendance-table td {
                 padding: 12px 8px;
                 font-size: 0.875rem;
             }
-            
+
             .form-container {
                 padding: 1rem;
             }
-            
+
             .form-card {
                 padding: 1.5rem;
             }
-            
+
             .form-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .form-group label {
                 font-size: 0.875rem;
             }
-            
+
             .form-group input,
             .form-group select,
             .form-group textarea {
                 padding: 10px 12px;
                 font-size: 0.875rem;
             }
-            
+
             .btn {
                 width: 100%;
                 padding: 12px;
                 font-size: 0.875rem;
             }
-            
+
             .feedback-card {
                 padding: 1.5rem;
             }
-            
+
             .radio-group {
                 gap: 0.5rem;
             }
-            
+
             .radio-label-vertical {
                 padding: 10px 12px;
                 font-size: 0.875rem;
             }
         }
-        
+
         @media (max-width: 480px) {
             .container {
                 padding: 0.5rem;
             }
-            
+
             .sidebar {
                 padding: 0.75rem;
             }
-            
+
             .nav-item {
                 min-width: 100%;
             }
-            
+
             .nav-link {
                 padding: 0.5rem;
             }
-            
+
             .main-content {
                 padding: 0.5rem;
             }
-            
+
             .stat-card {
                 padding: 0.75rem;
             }
-            
+
             .chart-card {
                 padding: 0.75rem;
             }
-            
+
             .form-card {
                 padding: 1rem;
             }
-            
+
             .feedback-card {
                 padding: 1rem;
             }
-            
+
             .attendance-table th,
             .attendance-table td {
                 padding: 8px 6px;
                 font-size: 0.75rem;
             }
-            
+
             .status-badge {
                 padding: 4px 8px;
                 font-size: 0.75rem;
@@ -1224,7 +1236,7 @@
             body {
                 flex-direction: column;
             }
-            
+
             .sidebar {
                 width: 100%;
                 min-height: auto;
@@ -1232,24 +1244,24 @@
                 padding: 1rem;
                 margin-bottom: 1rem;
             }
-            
+
             .sidebar-header {
                 flex-direction: row;
                 text-align: left;
                 margin-bottom: 1rem;
             }
-            
+
             .nav-menu {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5rem;
             }
-            
+
             .nav-item {
                 flex: 1;
                 min-width: calc(50% - 0.25rem);
             }
-            
+
             .nav-link {
                 padding: 0.75rem;
                 font-size: 0.875rem;
@@ -1257,98 +1269,98 @@
                 flex-direction: column;
                 gap: 0.5rem;
             }
-            
+
             .nav-link i {
                 font-size: 1.25rem;
                 margin: 0;
             }
-            
+
             .nav-section {
                 width: 100%;
                 margin: 1rem 0 0.5rem;
                 text-align: center;
             }
-            
+
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
             }
-            
+
             .header {
                 padding: 1rem;
                 margin-bottom: 1rem;
             }
-            
+
             .page-title {
                 font-size: 1.5rem;
             }
-            
+
             .stats-container {
                 grid-template-columns: 1fr !important;
                 gap: 1rem;
             }
-            
+
             .stat-card {
                 padding: 1rem;
             }
-            
+
             .charts-container {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .chart-card {
                 padding: 1rem;
             }
-            
+
             .attendance-table {
                 display: block;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
-            
+
             .attendance-table th,
             .attendance-table td {
                 white-space: nowrap;
                 padding: 0.75rem;
             }
-            
+
             .feedback-container {
                 padding: 0.5rem;
             }
-            
+
             .feedback-card {
                 padding: 1rem;
             }
-            
+
             .feedback-fields {
                 gap: 1rem;
             }
-            
+
             .rating-group {
                 padding: 1rem;
             }
-            
+
             .radio-options-vertical {
                 gap: 0.5rem;
             }
-            
+
             .radio-label-vertical {
                 padding: 0.75rem;
                 font-size: 0.875rem;
             }
-            
+
             .form-actions {
                 flex-direction: column;
                 gap: 0.5rem;
             }
-            
+
             .submit-btn {
                 width: 100%;
                 padding: 0.875rem;
                 font-size: 1rem;
             }
-            
+
             .logout-btn {
                 position: static;
                 margin: 1rem 0;
@@ -1360,84 +1372,84 @@
             .sidebar {
                 padding: 0.75rem;
             }
-            
+
             .nav-item {
                 min-width: 100%;
             }
-            
+
             .nav-link {
                 padding: 0.5rem;
                 font-size: 0.75rem;
             }
-            
+
             .nav-link i {
                 font-size: 1rem;
             }
-            
+
             .main-content {
                 padding: 0.75rem;
             }
-            
+
             .header {
                 padding: 0.75rem;
             }
-            
+
             .page-title {
                 font-size: 1.25rem;
             }
-            
+
             .stat-card {
                 padding: 0.75rem;
             }
-            
+
             .stat-card h3 {
                 font-size: 1.5rem;
             }
-            
+
             .stat-card p {
                 font-size: 0.875rem;
             }
-            
+
             .chart-card {
                 padding: 0.75rem;
             }
-            
+
             .chart-card h3 {
                 font-size: 1rem;
             }
-            
+
             .attendance-table th,
             .attendance-table td {
                 padding: 0.5rem;
                 font-size: 0.75rem;
             }
-            
+
             .status-badge {
                 padding: 0.25rem 0.5rem;
                 font-size: 0.75rem;
             }
-            
+
             .feedback-card {
                 padding: 0.75rem;
             }
-            
+
             .feedback-header h3 {
                 font-size: 1.25rem;
             }
-            
+
             .feedback-header p {
                 font-size: 0.875rem;
             }
-            
+
             .rating-group {
                 padding: 0.75rem;
             }
-            
+
             .radio-label-vertical {
                 padding: 0.5rem;
                 font-size: 0.75rem;
             }
-            
+
             .submit-btn {
                 padding: 0.75rem;
                 font-size: 0.875rem;
@@ -1458,14 +1470,14 @@
             border-radius: 0.5rem;
             cursor: pointer;
             font-size: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 768px) {
             .mobile-menu-toggle {
                 display: block;
             }
-            
+
             .sidebar {
                 display: none;
                 position: fixed;
@@ -1477,26 +1489,27 @@
                 overflow-y: auto;
                 padding-top: 4rem;
             }
-            
+
             .sidebar.active {
                 display: block;
             }
-            
+
             .main-content {
                 margin-top: 4rem;
             }
         }
     </style>
 </head>
+
 <body>
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-  const studentData = sessionStorage.getItem('studentData');
-  if (!studentData) {
-    window.location.href = 'student-login.html';
-  }
-});
-</script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            const studentData = sessionStorage.getItem('studentData');
+            if (!studentData) {
+                window.location.href = 'welcome.html';
+            }
+        });
+    </script>
     <!-- Mobile Menu Toggle Button -->
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
@@ -1508,7 +1521,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 <i class="fas fa-graduation-cap logo-icon"></i>
                 <div class="logo-text">Student Portal</div>
             </div>
-            
+
             <ul class="nav-menu">
                 <li class="nav-section">Main Menu</li>
                 <li class="nav-item">
@@ -1526,7 +1539,7 @@ window.addEventListener('DOMContentLoaded', function() {
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </li>
-                
+
                 <li class="nav-section">Services</li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" onclick="handleFeedbackNavigation()" id="feedbackNavLink">
@@ -1539,16 +1552,16 @@ window.addEventListener('DOMContentLoaded', function() {
                     </a>
                 </li>
             </ul>
-            
+
             <button class="logout-btn" onclick="handleStudentLogout()">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
         <script>
-        function handleStudentLogout() {
-            sessionStorage.clear();
-            window.location.href = 'student-login.html';
-        }
+            function handleStudentLogout() {
+                sessionStorage.clear();
+                window.location.href = 'welcome.html';
+            }
         </script>
         <div class="main-content">
             <div class="header">
@@ -1631,7 +1644,8 @@ window.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody id="attendanceTableBody">
                             <tr>
-                                <td colspan="4" style="text-align: center; padding: 2rem;">Loading attendance records...</td>
+                                <td colspan="4" style="text-align: center; padding: 2rem;">Loading attendance records...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -1645,7 +1659,7 @@ window.addEventListener('DOMContentLoaded', function() {
         function toggleMobileMenu() {
             const sidebar = document.querySelector('.sidebar');
             const menuButton = document.querySelector('.mobile-menu-toggle i');
-            
+
             if (sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
                 menuButton.classList.remove('fa-times');
@@ -1658,12 +1672,12 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const sidebar = document.querySelector('.sidebar');
             const menuButton = document.querySelector('.mobile-menu-toggle');
-            
-            if (sidebar.classList.contains('active') && 
-                !sidebar.contains(event.target) && 
+
+            if (sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
                 !menuButton.contains(event.target)) {
                 sidebar.classList.remove('active');
                 const menuIcon = menuButton.querySelector('i');
@@ -1685,7 +1699,7 @@ window.addEventListener('DOMContentLoaded', function() {
             // Update profile elements
             const profileElements = {
                 'studentNameDisplay': studentData.name || 'N/A',
-                'studentEmail': studentData.email || 'N/A', 
+                'studentEmail': studentData.email || 'N/A',
                 'studentRoll': studentData.email?.split('@')[0] || 'N/A',
                 'studentBranch': studentData.branch || 'N/A',
                 'studentDivision': studentData.division || 'N/A'
@@ -1724,7 +1738,7 @@ window.addEventListener('DOMContentLoaded', function() {
             try {
                 // Wait for Firebase to be initialized
                 await waitForFirebase();
-                
+
                 const studentData = JSON.parse(sessionStorage.getItem('studentData'));
                 if (!studentData) {
                     console.error('No student data found');
@@ -1735,19 +1749,19 @@ window.addEventListener('DOMContentLoaded', function() {
                 const attendanceRef = firebase.database().ref('attendance');
                 const snapshot = await attendanceRef.once('value');
                 const attendanceData = snapshot.val();
-                
+
                 // Debug: Show raw Firebase data structure
                 console.log('🔥 Raw Firebase attendance data keys:', Object.keys(attendanceData || {}));
                 console.log('🔥 First 3 attendance records:', Object.entries(attendanceData || {}).slice(0, 3));
-                
+
                 // Critical Debug: Check if student UID exists ANYWHERE in attendance data
                 const currentUser = firebase.auth().currentUser;
                 const firebaseUID = currentUser ? currentUser.uid : null;
                 console.log('🔍 Searching for student UID across ALL attendance records:', firebaseUID);
-                
+
                 let foundInAnyRecord = false;
                 let foundRecords = [];
-                
+
                 Object.entries(attendanceData || {}).forEach(([recordId, record]) => {
                     if (record && record.students && record.students[firebaseUID]) {
                         foundInAnyRecord = true;
@@ -1759,7 +1773,7 @@ window.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                 });
-                
+
                 if (foundInAnyRecord) {
                     console.log('✅ Student UID found in these records:', foundRecords);
                 } else {
@@ -1797,11 +1811,11 @@ window.addEventListener('DOMContentLoaded', function() {
                         const studentId = studentData.email.split('@')[0];
                         const rollMatch = studentId.match(/\d{4}/);
                         const rollNo = rollMatch ? rollMatch[0] : '';
-                        const yearCode = rollNo.charAt(0) === '3' ? 'TY' : 
-                                        rollNo.charAt(0) === '2' ? 'SY' : 
-                                        rollNo.charAt(0) === '1' ? 'FY' : '';
+                        const yearCode = rollNo.charAt(0) === '3' ? 'TY' :
+                            rollNo.charAt(0) === '2' ? 'SY' :
+                                rollNo.charAt(0) === '1' ? 'FY' : '';
                         const deptCode = (studentData.branch || '').split(' ').map(word => word.charAt(0)).join('');
-                        
+
                         // Create variations of class code for matching
                         const classCodeVariations = [
                             `${yearCode}${deptCode}`,
@@ -1829,9 +1843,9 @@ window.addEventListener('DOMContentLoaded', function() {
                         // Get Firebase UID from session storage (most reliable identifier)
                         const currentUser = firebase.auth().currentUser;
                         const firebaseUID = currentUser ? currentUser.uid : null;
-                        
+
                         // Use existing studentId and rollNo variables from above
-                        
+
                         const studentIdsToCheck = [
                             firebaseUID,  // Primary identifier - Firebase UID
                             studentId,
@@ -1850,51 +1864,51 @@ window.addEventListener('DOMContentLoaded', function() {
                         console.log('🆔 Firebase UID:', firebaseUID);
                         console.log('📋 Students in record:', Object.keys(students));
                         console.log('📊 Students data:', students);
-                        
+
                         // Debug: Show what keys actually look like in attendance
                         console.log('🔍 Sample attendance keys for analysis:');
                         Object.keys(students).slice(0, 10).forEach(key => {
                             console.log(`  Key: "${key}" -> Value: ${students[key]}`);
                         });
-                        
+
                         // Debug: Check if student UID exists in any form in the record
                         const studentUIDFound = Object.keys(students).includes(firebaseUID);
                         console.log(`🔍 Student UID ${firebaseUID} found in record:`, studentUIDFound);
-                        
+
                         // Additional debug: Check if student might be in a different batch/section
                         if (!studentUIDFound) {
                             console.log('🔍 Checking for student in different batches/sections...');
                             console.log('📝 Record class:', record.class);
                             console.log('👤 Student branch:', studentData.branch);
                             console.log('👤 Student division:', studentData.division);
-                            
+
                             // Check if any student ID contains parts of our identifiers
                             const possibleMatches = Object.keys(students).filter(key => {
-                                return studentIdsToCheck.some(id => 
+                                return studentIdsToCheck.some(id =>
                                     id && (key.includes(id) || id.includes(key))
                                 );
                             });
-                            
+
                             if (possibleMatches.length > 0) {
                                 console.log('🔍 Possible partial matches found:', possibleMatches);
                                 possibleMatches.forEach(match => {
                                     console.log(`  - ${match}: ${students[match]}`);
                                 });
                             }
-                            
+
                             // Enhanced search for email/roll patterns
                             console.log('🔍 Searching for email/roll patterns...');
                             const emailBase = 'patilsarth2703mec';
                             const rollNumber = '2703';
                             const nameVariations = ['PATIL', 'SARTHAK', 'SUNIL'];
-                            
+
                             const enhancedMatches = Object.keys(students).filter(key => {
                                 const keyLower = key.toLowerCase();
                                 return keyLower.includes(emailBase.toLowerCase()) ||
-                                       keyLower.includes(rollNumber) ||
-                                       nameVariations.some(name => keyLower.includes(name.toLowerCase()));
+                                    keyLower.includes(rollNumber) ||
+                                    nameVariations.some(name => keyLower.includes(name.toLowerCase()));
                             });
-                            
+
                             if (enhancedMatches.length > 0) {
                                 console.log('✅ Enhanced pattern matches found:', enhancedMatches);
                                 enhancedMatches.forEach(match => {
@@ -1914,10 +1928,10 @@ window.addEventListener('DOMContentLoaded', function() {
                                 foundStudent = true;
                                 const studentStatus = students[id];
                                 console.log(`✅ Found student ${id} with status:`, studentStatus, typeof studentStatus);
-                                
+
                                 // More flexible status checking - if student exists in record, they were present
-                                if (studentStatus === true || 
-                                    studentStatus === 'present' || 
+                                if (studentStatus === true ||
+                                    studentStatus === 'present' ||
                                     studentStatus === 'Present' ||
                                     studentStatus === 'PRESENT' ||
                                     (typeof studentStatus === 'object' && studentStatus.status === 'present') ||
@@ -1932,7 +1946,7 @@ window.addEventListener('DOMContentLoaded', function() {
                                 }
                             }
                         }
-                        
+
                         if (!foundStudent) {
                             console.log('⚠️ Student not found with exact ID match');
                         }
@@ -1941,16 +1955,16 @@ window.addEventListener('DOMContentLoaded', function() {
                         if (status === 'absent' && !foundStudent) {
                             const studentKeys = Object.keys(students);
                             console.log('🔍 Attempting partial matching...');
-                            
+
                             for (const key of studentKeys) {
                                 let isMatch = false;
-                                
+
                                 // Check roll number match
                                 if (rollNo && (key.includes(rollNo) || rollNo.includes(key))) {
                                     isMatch = true;
                                     console.log(`📍 Roll match: ${key} ↔ ${rollNo}`);
                                 }
-                                
+
                                 // Check name match
                                 if (studentData.name) {
                                     const nameParts = studentData.name.toLowerCase().split(' ');
@@ -1960,21 +1974,21 @@ window.addEventListener('DOMContentLoaded', function() {
                                         console.log(`📍 Name match: ${key} ↔ ${studentData.name}`);
                                     }
                                 }
-                                
+
                                 // Check email/ID partial match
-                                if (studentId && (key.toLowerCase().includes(studentId.toLowerCase()) || 
-                                                 studentId.toLowerCase().includes(key.toLowerCase()))) {
+                                if (studentId && (key.toLowerCase().includes(studentId.toLowerCase()) ||
+                                    studentId.toLowerCase().includes(key.toLowerCase()))) {
                                     isMatch = true;
                                     console.log(`📍 ID match: ${key} ↔ ${studentId}`);
                                 }
-                                
+
                                 if (isMatch) {
                                     const studentStatus = students[key];
                                     console.log(`🔍 Partial match: ${key} = ${studentStatus} (${typeof studentStatus})`);
-                                    
+
                                     // If student found in any form, mark as present unless explicitly absent
-                                    if (studentStatus === true || 
-                                        studentStatus === 'present' || 
+                                    if (studentStatus === true ||
+                                        studentStatus === 'present' ||
                                         studentStatus === 'Present' ||
                                         studentStatus === 'PRESENT' ||
                                         (typeof studentStatus === 'object' && studentStatus.status === 'present') ||
@@ -1990,7 +2004,7 @@ window.addEventListener('DOMContentLoaded', function() {
                                 }
                             }
                         }
-                        
+
                         // Final check: if no match found, student was likely absent
                         if (status === 'absent' && !foundStudent) {
                             console.log('❌ Student not found in attendance record - marking as ABSENT');
@@ -2017,7 +2031,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 console.log('Processed student records:', studentRecords);
 
                 // Update statistics and table
-                updateDashboardStats(studentRecords.length, 
+                updateDashboardStats(studentRecords.length,
                     studentRecords.filter(r => r.status === 'present').length,
                     studentRecords.filter(r => r.status === 'absent').length,
                     studentRecords.length);
@@ -2065,7 +2079,7 @@ window.addEventListener('DOMContentLoaded', function() {
             if (totalClassesEl) totalClassesEl.textContent = totalClasses;
             if (presentClassesEl) presentClassesEl.textContent = presentCount;
             if (absentClassesEl) absentClassesEl.textContent = absentCount;
-            
+
             // Calculate percentage
             const percentage = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
             if (attendancePercentageEl) attendancePercentageEl.textContent = percentage + '%';
@@ -2088,12 +2102,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
             const mainContent = document.querySelector('.main-content');
             const pageTitle = document.querySelector('.page-title');
-            
+
             if (!mainContent) {
                 console.error('Main content element not found');
                 return;
             }
-            
+
             // Update page title based on section
             const titles = {
                 'dashboardSection': 'Student Dashboard',
@@ -2102,17 +2116,17 @@ window.addEventListener('DOMContentLoaded', function() {
                 'feedbackSection': 'Teacher Feedback',
                 'bonafideSection': 'Bonafide Application'
             };
-            
+
             if (pageTitle && titles[sectionId]) {
                 pageTitle.textContent = titles[sectionId];
             }
-            
+
             switch (sectionId) {
                 case 'dashboardSection':
                     // Dashboard is already in the HTML, just show it
                     loadAttendanceData();
                     break;
-                    
+
                 case 'attendanceSection':
                     mainContent.innerHTML = `
                         <div class="header">
@@ -2203,7 +2217,7 @@ window.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
+
                     // Load attendance data for this section
                     loadAttendanceData();
                     break;
@@ -2291,7 +2305,7 @@ window.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
+
                     // Load profile data
                     loadProfileData();
                     break;
@@ -2327,7 +2341,7 @@ window.addEventListener('DOMContentLoaded', function() {
                             `;
                             return;
                         }
-                        
+
                         // If enabled, show normal feedback form
                         mainContent.innerHTML = `
                             <div id="feedbackSection" class="content-section">
@@ -2675,12 +2689,12 @@ window.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
+
                     // Load student data into form
                     loadBonafideFormData();
-                    
+
                     // Add event listener for purpose dropdown
-                    document.getElementById('purpose').addEventListener('change', function() {
+                    document.getElementById('purpose').addEventListener('change', function () {
                         const otherGroup = document.getElementById('otherPurposeGroup');
                         const otherInput = document.getElementById('otherPurpose');
                         if (this.value === 'Other') {
@@ -2702,7 +2716,7 @@ window.addEventListener('DOMContentLoaded', function() {
             try {
                 console.log('Loading profile data...');
                 const studentData = JSON.parse(sessionStorage.getItem('studentData'));
-                
+
                 if (!studentData) {
                     console.error('No student data found in session');
                     // Set default values
@@ -2714,9 +2728,9 @@ window.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('profileStudentEmail').textContent = 'Not Available';
                     return;
                 }
-                
+
                 console.log('Student data found:', studentData);
-                
+
                 // Update profile elements
                 const profileElements = {
                     'profileStudentName': studentData.name || 'Not Available',
@@ -2726,7 +2740,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     'profileStudentDivision': studentData.division || 'Not Available',
                     'profileStudentEmail': studentData.email || 'Not Available'
                 };
-                
+
                 // Update each element
                 Object.entries(profileElements).forEach(([id, value]) => {
                     const element = document.getElementById(id);
@@ -2737,9 +2751,9 @@ window.addEventListener('DOMContentLoaded', function() {
                         console.warn(`Element not found: ${id}`);
                     }
                 });
-                
+
                 console.log('Profile data loaded successfully');
-                
+
             } catch (error) {
                 console.error('Error loading profile data:', error);
                 // Set error message
@@ -2748,40 +2762,40 @@ window.addEventListener('DOMContentLoaded', function() {
                 });
             }
         }
-        
+
         // Initialize star rating functionality
         function initializeStarRating() {
             console.log('Initializing star rating system...');
-            
+
             // Get all star rating containers
             const starRatings = document.querySelectorAll('.star-rating');
-            
+
             starRatings.forEach(rating => {
                 const stars = rating.querySelectorAll('.star');
                 const hiddenInput = rating.querySelector('input[type="hidden"]');
                 const ratingName = rating.getAttribute('data-rating');
-                
+
                 stars.forEach((star, index) => {
                     // Add click event
                     star.addEventListener('click', () => {
                         const value = parseInt(star.getAttribute('data-value'));
-                        
+
                         // Update hidden input
                         hiddenInput.value = value;
-                        
+
                         // Update star display
                         updateStarDisplay(rating, value);
-                        
+
                         console.log(`Rating set for ${ratingName}: ${value} stars`);
                     });
-                    
+
                     // Add hover effect
                     star.addEventListener('mouseenter', () => {
                         const value = parseInt(star.getAttribute('data-value'));
                         updateStarDisplay(rating, value, true);
                     });
                 });
-                
+
                 // Reset on mouse leave
                 rating.addEventListener('mouseleave', () => {
                     const currentValue = parseInt(hiddenInput.value) || 0;
@@ -2789,14 +2803,14 @@ window.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
-        
+
         // Update star display
         function updateStarDisplay(ratingContainer, value, isHover = false) {
             const stars = ratingContainer.querySelectorAll('.star');
-            
+
             stars.forEach((star, index) => {
                 const starValue = parseInt(star.getAttribute('data-value'));
-                
+
                 if (starValue <= value) {
                     star.classList.add('active');
                     if (isHover) {
@@ -2809,7 +2823,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-            
+
             // Reset transform on non-hover
             if (!isHover) {
                 stars.forEach(star => {
@@ -2823,36 +2837,36 @@ window.addEventListener('DOMContentLoaded', function() {
         async function loadTeachersForClass() {
             try {
                 await waitForFirebase();
-                
+
                 const teacherSelect = document.getElementById('teacher');
                 if (!teacherSelect) return;
-                
+
                 teacherSelect.innerHTML = '<option value="">Loading teachers...</option>';
-                
+
                 // Get student data to find their class/department
                 const studentData = JSON.parse(sessionStorage.getItem('studentData'));
                 if (!studentData) {
                     teacherSelect.innerHTML = '<option value="">Please login again</option>';
                     return;
                 }
-                
+
                 const studentDepartment = studentData.branch || studentData.department;
                 const studentYear = studentData.year;
-                
+
                 console.log('Student Department:', studentDepartment, 'Year:', studentYear);
-                
+
                 // Load all teachers
                 const teachersSnapshot = await firebase.database().ref('teachers').once('value');
                 const teachers = teachersSnapshot.val();
-                
+
                 if (!teachers) {
                     teacherSelect.innerHTML = '<option value="">No teachers found</option>';
                     return;
                 }
-                
+
                 let options = '<option value="">Select Teacher</option>';
                 let teacherCount = 0;
-                
+
                 // Helper function to get department code from name
                 function getStudentDepartmentCode(deptName) {
                     const deptMap = {
@@ -2865,34 +2879,34 @@ window.addEventListener('DOMContentLoaded', function() {
                     };
                     return deptMap[deptName] || deptName;
                 }
-                
+
                 // Filter teachers based on student's department/class
                 Object.values(teachers).forEach(teacher => {
                     if (teacher && (teacher.firstName || teacher.name)) {
                         // Get teacher name
-                        const teacherName = teacher.firstName && teacher.lastName 
+                        const teacherName = teacher.firstName && teacher.lastName
                             ? `${teacher.firstName} ${teacher.lastName}`.trim()
                             : teacher.name || 'Unknown Teacher';
-                        
+
                         // Check if teacher teaches this student's department/year
                         const teacherDepartments = teacher.departments || [];
                         const teacherSubjects = teacher.subjects || [];
-                        
+
                         // Convert student department to code for matching
                         const studentDeptCode = getStudentDepartmentCode(studentDepartment);
-                        
+
                         console.log('Checking teacher:', teacherName, 'departments:', teacherDepartments, 'student dept code:', studentDeptCode);
-                        
+
                         // Include teacher if:
                         // 1. Teacher department matches student department, OR
                         // 2. No specific departments (teaches all departments)
-                        const shouldInclude = 
+                        const shouldInclude =
                             teacherDepartments.some(dept => {
                                 const deptCode = typeof dept === 'string' ? dept : dept.code;
                                 return deptCode === studentDeptCode || deptCode === studentDepartment;
                             }) || // Department matches exactly
                             (!teacherDepartments || teacherDepartments.length === 0); // No specific department (teaches all)
-                        
+
                         if (shouldInclude) {
                             options += `<option value="${teacher.teacherId || teacher.code || teacher.email || teacherName}">${teacherName}</option>`;
                             teacherCount++;
@@ -2900,14 +2914,14 @@ window.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 });
-                
+
                 if (teacherCount === 0) {
                     options += '<option value="">No teachers found for your class</option>';
                 }
-                
+
                 teacherSelect.innerHTML = options;
                 console.log(`Loaded ${teacherCount} teachers for ${studentDepartment} department`);
-                
+
             } catch (error) {
                 const teacherSelect = document.getElementById('teacher');
                 if (teacherSelect) teacherSelect.innerHTML = '<option value="">Error loading teachers</option>';
@@ -2917,18 +2931,18 @@ window.addEventListener('DOMContentLoaded', function() {
 
         async function submitFeedback(event) {
             event.preventDefault();
-            
+
             // First check if feedback system is enabled
             const isEnabled = await checkFeedbackSystemStatus();
             if (!isEnabled) {
                 alert('Feedback system is currently disabled by the administrator. Please try again later.');
                 return;
             }
-            
+
             try {
                 const form = event.target;
                 const studentData = JSON.parse(sessionStorage.getItem('studentData'));
-                
+
                 if (!studentData) {
                     alert('Please login again');
                     return;
@@ -2939,24 +2953,24 @@ window.addEventListener('DOMContentLoaded', function() {
                     alert('Please enter a subject name');
                     return;
                 }
-                
+
                 if (!form.lectureType || !form.lectureType.value) {
                     alert('Please select lecture type');
                     return;
                 }
-                
+
                 if (!form.teacher || !form.teacher.value) {
                     alert('Please select a teacher');
                     return;
                 }
-                
+
                 // Function to get radio button value
                 function getRadioValue(name) {
                     const radios = form.querySelectorAll(`input[name="${name}"]:checked`);
                     if (radios.length === 0) return null;
                     const value = radios[0].value;
                     // Convert text values to numbers
-                    switch(value) {
+                    switch (value) {
                         case 'Excellent': return 5;
                         case 'Good': return 4;
                         case 'Satisfactory': return 3;
@@ -2964,7 +2978,7 @@ window.addEventListener('DOMContentLoaded', function() {
                         default: return parseInt(value) || 0;
                     }
                 }
-                
+
                 // Check if all rating fields have values
                 const ratingFields = ['knowledge', 'clarity', 'punctuality', 'doubts', 'interaction', 'control', 'aids', 'motivation', 'quality'];
                 for (const field of ratingFields) {
@@ -3049,10 +3063,10 @@ window.addEventListener('DOMContentLoaded', function() {
                 tableBody.innerHTML = records.map(record => `
                     <tr>
                         <td>${new Date(record.date).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                        })}</td>
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                })}</td>
                         <td>${record.subject}</td>
                         <td>${record.type}</td>
                         <td>
@@ -3075,355 +3089,356 @@ window.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-    // Bonafide form: auto-fill student data
-function loadBonafideFormData() {
-    try {
-        const studentData = JSON.parse(sessionStorage.getItem('studentData')) || {};
-        document.getElementById('studentName').value = studentData.name || '';
-        document.getElementById('rollNumber').value = studentData.rollNo || '';
-        document.getElementById('department').value = studentData.department || studentData.branch || '';
-        document.getElementById('class').value = studentData.year || '';
-        document.getElementById('email').value = studentData.email || '';
-        document.getElementById('contactNumber').value = studentData.phone || '';
-    } catch (e) {
-        // fallback: clear fields
-        ['studentName','rollNumber','department','class','email','contactNumber'].forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).value = '';
-        });
-    }
-}
-
-// Make showSection global for sidebar navigation
-window.showSection = showSection;
-
-// Generate smart, short application ID
-function generateSmartApplicationId(department, rollNumber) {
-    // Get department code
-    const deptCode = getDepartmentCode(department);
-    
-    // Get current year (last 2 digits)
-    const year = new Date().getFullYear().toString().slice(-2);
-    
-    // Get current month
-    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    
-    // Generate random 3-digit number
-    const random = Math.floor(Math.random() * 900) + 100;
-    
-    // Format: BF-DEPT-ROLL-YYMM-XXX
-    // Example: BF-CS-101-2501-123
-    return `BF-${deptCode}-${rollNumber}-${year}${month}-${random}`;
-}
-
-// Get department code
-function getDepartmentCode(department) {
-    const deptCodes = {
-        'Computer Science': 'CS',
-        'Computer Engineering': 'CE', 
-        'Information Technology': 'IT',
-        'Electronics': 'EC',
-        'Electronics and Communication': 'EC',
-        'Mechanical': 'ME',
-        'Mechanical Engineering': 'ME',
-        'Civil': 'CV',
-        'Civil Engineering': 'CV',
-        'Electrical': 'EE',
-        'Electrical Engineering': 'EE',
-        'Automobile': 'AU',
-        'Automobile Engineering': 'AU'
-    };
-    
-    return deptCodes[department] || 'GN'; // GN = General
-}
-
-// Bonafide form: submit handler
-async function submitBonafideApplication(event) {
-    event.preventDefault();
-    const form = document.getElementById('bonafideForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
-    try {
-        // Get student data from session
-        const studentData = JSON.parse(sessionStorage.getItem('studentData'));
-        if (!studentData) {
-            alert('Student data not found. Please login again.');
-            return;
-        }
-        
-        // Prepare application data
-        const applicationData = {
-            // Student Information
-            studentName: form.studentName.value,
-            rollNumber: form.rollNumber.value,
-            department: form.department.value,
-            class: form.class.value,
-            academicYear: form.academicYear.value,
-            email: form.email.value,
-            contactNumber: form.contactNumber.value,
-            address: form.address.value,
-            
-            // Application Details
-            purpose: form.purpose.value === 'Other' ? form.otherPurpose.value : form.purpose.value,
-            certificateType: 'Bonafide Certificate',
-            
-            // System Information - Generate smart, short application ID
-            applicationId: generateSmartApplicationId(form.department.value, form.rollNumber.value),
-            submissionDate: new Date().toISOString(),
-            submissionTime: new Date().toLocaleString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            }),
-            status: 'pending',
-            priority: 'medium',
-            
-            // Student ID for tracking
-            studentId: studentData.email,
-            studentUID: studentData.uid || studentData.email
-        };
-        
-        // Save to Firebase using custom application ID as key
-        await window.db.ref('bonafideApplications').child(applicationData.applicationId).set(applicationData);
-        
-        // Also save to general applications collection for clerk dashboard
-        await window.db.ref('applications').child(applicationData.applicationId).set({
-            ...applicationData,
-            type: 'bonafide',
-            firebaseKey: applicationData.applicationId
-        });
-        
-        // Success message
-        alert('Bonafide application submitted successfully!\n\nApplication ID: ' + applicationData.applicationId + '\n\nYour application has been sent to the clerk for processing.');
-        
-        // Reset form
-        form.reset();
-        loadBonafideFormData();
-        
-        console.log('Bonafide application submitted:', applicationData);
-        
-    } catch (error) {
-        console.error('Error submitting bonafide application:', error);
-        alert('Error submitting application. Please try again.\n\nError: ' + error.message);
-    }
-}
-
-// Update Feedback Navigation Status
-async function updateFeedbackNavigationStatus() {
-    try {
-        const isEnabled = await checkFeedbackSystemStatus();
-        const feedbackNavLink = document.getElementById('feedbackNavLink');
-        
-        if (feedbackNavLink) {
-            if (!isEnabled) {
-                feedbackNavLink.style.opacity = '0.5';
-                feedbackNavLink.style.cursor = 'not-allowed';
-                feedbackNavLink.title = 'Feedback system is currently disabled';
-                feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback <span style="color: #EF4444; font-size: 0.7rem;">(Disabled)</span>';
-            } else {
-                feedbackNavLink.style.opacity = '1';
-                feedbackNavLink.style.cursor = 'pointer';
-                feedbackNavLink.title = '';
-                feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
+        // Bonafide form: auto-fill student data
+        function loadBonafideFormData() {
+            try {
+                const studentData = JSON.parse(sessionStorage.getItem('studentData')) || {};
+                document.getElementById('studentName').value = studentData.name || '';
+                document.getElementById('rollNumber').value = studentData.rollNo || '';
+                document.getElementById('department').value = studentData.department || studentData.branch || '';
+                document.getElementById('class').value = studentData.year || '';
+                document.getElementById('email').value = studentData.email || '';
+                document.getElementById('contactNumber').value = studentData.phone || '';
+            } catch (e) {
+                // fallback: clear fields
+                ['studentName', 'rollNumber', 'department', 'class', 'email', 'contactNumber'].forEach(id => {
+                    if (document.getElementById(id)) document.getElementById(id).value = '';
+                });
             }
         }
-    } catch (error) {
-        console.error('Error updating feedback navigation status:', error);
-    }
-}
 
-// Handle Feedback Navigation
-async function handleFeedbackNavigation() {
-    const isEnabled = await checkFeedbackSystemStatus();
-    if (!isEnabled) {
-        alert('Feedback system is currently disabled by the administrator. Please contact admin for more information.');
-        return;
-    }
-    showSection('feedbackSection');
-}
+        // Make showSection global for sidebar navigation
+        window.showSection = showSection;
 
-// Submit Feedback Function
-async function submitFeedback(event) {
-    event.preventDefault();
-    
-    // First check if feedback system is enabled
-    const isEnabled = await checkFeedbackSystemStatus();
-    if (!isEnabled) {
-        alert('Feedback system is currently disabled by the administrator. Please try again later.');
-        return;
-    }
-    
-    const form = document.getElementById('feedbackForm');
-    
-    // Validate form fields
-    if (!form.subject || !form.subject.value.trim()) {
-        alert('Please enter a subject name');
-        return;
-    }
-    
-    if (!form.lectureType || !form.lectureType.value) {
-        alert('Please select lecture type');
-        return;
-    }
-    
-    if (!form.teacher || !form.teacher.value) {
-        alert('Please select a teacher');
-        return;
-    }
-    
-    // Get radio button values
-    function getRadioValue(name) {
-        const radios = form.querySelectorAll(`input[name="${name}"]:checked`);
-        if (radios.length === 0) return null;
-        const value = radios[0].value;
-        // Convert text to numbers
-        switch(value) {
-            case 'Excellent': return 5;
-            case 'Good': return 4;
-            case 'Satisfactory': return 3;
-            case 'Not Satisfactory': return 2;
-            default: return parseInt(value) || 0;
+        // Generate smart, short application ID
+        function generateSmartApplicationId(department, rollNumber) {
+            // Get department code
+            const deptCode = getDepartmentCode(department);
+
+            // Get current year (last 2 digits)
+            const year = new Date().getFullYear().toString().slice(-2);
+
+            // Get current month
+            const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+
+            // Generate random 3-digit number
+            const random = Math.floor(Math.random() * 900) + 100;
+
+            // Format: BF-DEPT-ROLL-YYMM-XXX
+            // Example: BF-CS-101-2501-123
+            return `BF-${deptCode}-${rollNumber}-${year}${month}-${random}`;
         }
-    }
-    
-    // Validate all rating fields
-    const ratingFields = ['knowledge', 'clarity', 'punctuality', 'doubts', 'interaction', 'control', 'aids', 'motivation', 'quality'];
-    const ratings = {};
-    
-    for (const field of ratingFields) {
-        const value = getRadioValue(field);
-        if (value === null) {
-            alert(`Please provide rating for ${field}`);
-            return;
-        }
-        ratings[field] = value;
-    }
-    
-    try {
-        // Get student data
-        const studentData = JSON.parse(sessionStorage.getItem('studentData'));
-        if (!studentData) {
-            alert('Student data not found. Please login again.');
-            return;
-        }
-        
-        // Prepare feedback data
-        const feedbackData = {
-            subject: form.subject.value.trim(),
-            lectureType: form.lectureType.value,
-            teacher: form.teacher.value,
-            studentId: studentData.email,
-            studentName: studentData.name || 'Unknown',
-            timestamp: Date.now(),
-            ratings: ratings
-        };
-        
-        // Save to Firebase
-        await waitForFirebase();
-        await window.db.ref('feedback').push(feedbackData);
-        
-        alert('Feedback submitted successfully! Thank you for your valuable feedback.');
-        
-        // Reset form
-        form.reset();
-        
-        console.log('Feedback submitted:', feedbackData);
-        
-    } catch (error) {
-        console.error('Error submitting feedback:', error);
-        alert('Error submitting feedback. Please try again.');
-    }
-}
 
-// Check Feedback System Status
-async function checkFeedbackSystemStatus() {
-    try {
-        await waitForFirebase();
-        
-        const statusSnapshot = await window.db.ref('settings/feedbackEnabled').once('value');
-        if (statusSnapshot.exists()) {
-            return statusSnapshot.val();
-        } else {
-            // Default to enabled if setting doesn't exist
-            return true;
+        // Get department code
+        function getDepartmentCode(department) {
+            const deptCodes = {
+                'Computer Science': 'CS',
+                'Computer Engineering': 'CE',
+                'Information Technology': 'IT',
+                'Electronics': 'EC',
+                'Electronics and Communication': 'EC',
+                'Mechanical': 'ME',
+                'Mechanical Engineering': 'ME',
+                'Civil': 'CV',
+                'Civil Engineering': 'CV',
+                'Electrical': 'EE',
+                'Electrical Engineering': 'EE',
+                'Automobile': 'AU',
+                'Automobile Engineering': 'AU'
+            };
+
+            return deptCodes[department] || 'GN'; // GN = General
         }
-        
-    } catch (error) {
-        console.error('Error checking feedback system status:', error);
-        // Default to enabled on error
-        return true;
-    }
-}
 
-// Handle Feedback Navigation
-async function handleFeedbackNavigation() {
-    const isEnabled = await checkFeedbackSystemStatus();
-    if (!isEnabled) {
-        alert('Feedback system is currently disabled by the administrator. Please contact admin for more information.');
-        return;
-    }
-    showSection('feedbackSection');
-}
+        // Bonafide form: submit handler
+        async function submitBonafideApplication(event) {
+            event.preventDefault();
+            const form = document.getElementById('bonafideForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-// Update Feedback Navigation Status
-async function updateFeedbackNavigationStatus() {
-    try {
-        const isEnabled = await checkFeedbackSystemStatus();
-        const feedbackNavLink = document.getElementById('feedbackNavLink');
-        
-        if (feedbackNavLink) {
-            if (!isEnabled) {
-                feedbackNavLink.style.opacity = '0.5';
-                feedbackNavLink.style.cursor = 'not-allowed';
-                feedbackNavLink.title = 'Feedback system is currently disabled';
-                feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback <span style="color: #EF4444; font-size: 0.7rem;">(Disabled)</span>';
-            } else {
-                feedbackNavLink.style.opacity = '1';
-                feedbackNavLink.style.cursor = 'pointer';
-                feedbackNavLink.title = '';
-                feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
+            try {
+                // Get student data from session
+                const studentData = JSON.parse(sessionStorage.getItem('studentData'));
+                if (!studentData) {
+                    alert('Student data not found. Please login again.');
+                    return;
+                }
+
+                // Prepare application data
+                const applicationData = {
+                    // Student Information
+                    studentName: form.studentName.value,
+                    rollNumber: form.rollNumber.value,
+                    department: form.department.value,
+                    class: form.class.value,
+                    academicYear: form.academicYear.value,
+                    email: form.email.value,
+                    contactNumber: form.contactNumber.value,
+                    address: form.address.value,
+
+                    // Application Details
+                    purpose: form.purpose.value === 'Other' ? form.otherPurpose.value : form.purpose.value,
+                    certificateType: 'Bonafide Certificate',
+
+                    // System Information - Generate smart, short application ID
+                    applicationId: generateSmartApplicationId(form.department.value, form.rollNumber.value),
+                    submissionDate: new Date().toISOString(),
+                    submissionTime: new Date().toLocaleString('en-IN', {
+                        timeZone: 'Asia/Kolkata',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }),
+                    status: 'pending',
+                    priority: 'medium',
+
+                    // Student ID for tracking
+                    studentId: studentData.email,
+                    studentUID: studentData.uid || studentData.email
+                };
+
+                // Save to Firebase using custom application ID as key
+                await window.db.ref('bonafideApplications').child(applicationData.applicationId).set(applicationData);
+
+                // Also save to general applications collection for clerk dashboard
+                await window.db.ref('applications').child(applicationData.applicationId).set({
+                    ...applicationData,
+                    type: 'bonafide',
+                    firebaseKey: applicationData.applicationId
+                });
+
+                // Success message
+                alert('Bonafide application submitted successfully!\n\nApplication ID: ' + applicationData.applicationId + '\n\nYour application has been sent to the clerk for processing.');
+
+                // Reset form
+                form.reset();
+                loadBonafideFormData();
+
+                console.log('Bonafide application submitted:', applicationData);
+
+            } catch (error) {
+                console.error('Error submitting bonafide application:', error);
+                alert('Error submitting application. Please try again.\n\nError: ' + error.message);
             }
         }
-    } catch (error) {
-        console.error('Error updating feedback navigation status:', error);
-    }
-}
 
-// Initialize page
-window.addEventListener('DOMContentLoaded', async function() {
-    console.log('Student dashboard loading...');
+        // Update Feedback Navigation Status
+        async function updateFeedbackNavigationStatus() {
+            try {
+                const isEnabled = await checkFeedbackSystemStatus();
+                const feedbackNavLink = document.getElementById('feedbackNavLink');
 
-    // Check authentication
-    const studentData = sessionStorage.getItem('studentData');
-    if (!studentData) {
-        window.location.href = 'welcome.html';
-        return;
-    }
+                if (feedbackNavLink) {
+                    if (!isEnabled) {
+                        feedbackNavLink.style.opacity = '0.5';
+                        feedbackNavLink.style.cursor = 'not-allowed';
+                        feedbackNavLink.title = 'Feedback system is currently disabled';
+                        feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback <span style="color: #EF4444; font-size: 0.7rem;">(Disabled)</span>';
+                    } else {
+                        feedbackNavLink.style.opacity = '1';
+                        feedbackNavLink.style.cursor = 'pointer';
+                        feedbackNavLink.title = '';
+                        feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating feedback navigation status:', error);
+            }
+        }
 
-    try {
-        // Wait for Firebase to be ready
-        await waitForFirebase();
-        console.log('Firebase ready, initializing dashboard...');
-        
-        // Load student data and attendance
-        loadStudentData();
-        loadAttendanceData();
-        
-        // Update feedback navigation status
-        await updateFeedbackNavigationStatus();
-    } catch (error) {
-        console.error('Error initializing dashboard:', error);
-        // Still show dashboard even if Firebase fails
-        showSection('dashboardSection');
-    }
-});
+        // Handle Feedback Navigation
+        async function handleFeedbackNavigation() {
+            const isEnabled = await checkFeedbackSystemStatus();
+            if (!isEnabled) {
+                alert('Feedback system is currently disabled by the administrator. Please contact admin for more information.');
+                return;
+            }
+            showSection('feedbackSection');
+        }
 
-</script>
+        // Submit Feedback Function
+        async function submitFeedback(event) {
+            event.preventDefault();
+
+            // First check if feedback system is enabled
+            const isEnabled = await checkFeedbackSystemStatus();
+            if (!isEnabled) {
+                alert('Feedback system is currently disabled by the administrator. Please try again later.');
+                return;
+            }
+
+            const form = document.getElementById('feedbackForm');
+
+            // Validate form fields
+            if (!form.subject || !form.subject.value.trim()) {
+                alert('Please enter a subject name');
+                return;
+            }
+
+            if (!form.lectureType || !form.lectureType.value) {
+                alert('Please select lecture type');
+                return;
+            }
+
+            if (!form.teacher || !form.teacher.value) {
+                alert('Please select a teacher');
+                return;
+            }
+
+            // Get radio button values
+            function getRadioValue(name) {
+                const radios = form.querySelectorAll(`input[name="${name}"]:checked`);
+                if (radios.length === 0) return null;
+                const value = radios[0].value;
+                // Convert text to numbers
+                switch (value) {
+                    case 'Excellent': return 5;
+                    case 'Good': return 4;
+                    case 'Satisfactory': return 3;
+                    case 'Not Satisfactory': return 2;
+                    default: return parseInt(value) || 0;
+                }
+            }
+
+            // Validate all rating fields
+            const ratingFields = ['knowledge', 'clarity', 'punctuality', 'doubts', 'interaction', 'control', 'aids', 'motivation', 'quality'];
+            const ratings = {};
+
+            for (const field of ratingFields) {
+                const value = getRadioValue(field);
+                if (value === null) {
+                    alert(`Please provide rating for ${field}`);
+                    return;
+                }
+                ratings[field] = value;
+            }
+
+            try {
+                // Get student data
+                const studentData = JSON.parse(sessionStorage.getItem('studentData'));
+                if (!studentData) {
+                    alert('Student data not found. Please login again.');
+                    return;
+                }
+
+                // Prepare feedback data
+                const feedbackData = {
+                    subject: form.subject.value.trim(),
+                    lectureType: form.lectureType.value,
+                    teacher: form.teacher.value,
+                    studentId: studentData.email,
+                    studentName: studentData.name || 'Unknown',
+                    timestamp: Date.now(),
+                    ratings: ratings
+                };
+
+                // Save to Firebase
+                await waitForFirebase();
+                await window.db.ref('feedback').push(feedbackData);
+
+                alert('Feedback submitted successfully! Thank you for your valuable feedback.');
+
+                // Reset form
+                form.reset();
+
+                console.log('Feedback submitted:', feedbackData);
+
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('Error submitting feedback. Please try again.');
+            }
+        }
+
+        // Check Feedback System Status
+        async function checkFeedbackSystemStatus() {
+            try {
+                await waitForFirebase();
+
+                const statusSnapshot = await window.db.ref('settings/feedbackEnabled').once('value');
+                if (statusSnapshot.exists()) {
+                    return statusSnapshot.val();
+                } else {
+                    // Default to enabled if setting doesn't exist
+                    return true;
+                }
+
+            } catch (error) {
+                console.error('Error checking feedback system status:', error);
+                // Default to enabled on error
+                return true;
+            }
+        }
+
+        // Handle Feedback Navigation
+        async function handleFeedbackNavigation() {
+            const isEnabled = await checkFeedbackSystemStatus();
+            if (!isEnabled) {
+                alert('Feedback system is currently disabled by the administrator. Please contact admin for more information.');
+                return;
+            }
+            showSection('feedbackSection');
+        }
+
+        // Update Feedback Navigation Status
+        async function updateFeedbackNavigationStatus() {
+            try {
+                const isEnabled = await checkFeedbackSystemStatus();
+                const feedbackNavLink = document.getElementById('feedbackNavLink');
+
+                if (feedbackNavLink) {
+                    if (!isEnabled) {
+                        feedbackNavLink.style.opacity = '0.5';
+                        feedbackNavLink.style.cursor = 'not-allowed';
+                        feedbackNavLink.title = 'Feedback system is currently disabled';
+                        feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback <span style="color: #EF4444; font-size: 0.7rem;">(Disabled)</span>';
+                    } else {
+                        feedbackNavLink.style.opacity = '1';
+                        feedbackNavLink.style.cursor = 'pointer';
+                        feedbackNavLink.title = '';
+                        feedbackNavLink.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating feedback navigation status:', error);
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async function () {
+            console.log('Student dashboard loading...');
+
+            // Check authentication
+            const studentData = sessionStorage.getItem('studentData');
+            if (!studentData) {
+                window.location.href = 'welcome.html';
+                return;
+            }
+
+            try {
+                // Wait for Firebase to be ready
+                await waitForFirebase();
+                console.log('Firebase ready, initializing dashboard...');
+
+                // Load student data and attendance
+                loadStudentData();
+                loadAttendanceData();
+
+                // Update feedback navigation status
+                await updateFeedbackNavigationStatus();
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                // Still show dashboard even if Firebase fails
+                showSection('dashboardSection');
+            }
+        });
+
+    </script>
 </body>
-</html> 
+
+</html>
