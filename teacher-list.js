@@ -378,174 +378,132 @@ class TeacherList {
     filterTeachers() {
         if (!this.allTeachers) return;
 
-        const searchTerm = this.searchInput ? this.searchInput.value.toLowerCase() : '';
+        const searchTerm = this.searchInput ? this.searchInput.value.trim().toLowerCase() : '';
         const selectedDepartment = document.getElementById('departmentFilter')?.value;
 
-        // If no department is selected, don't show anyone (unless searching specifically)
-        if (!selectedDepartment) {
-            this.tableBody.innerHTML = '';
-            this.showEmptyState('कृपया शिक्षक पाहण्यासाठी प्रथम विभाग निवडा (Please select a department to view teachers)');
-            this.updateResultCounter(0, Object.keys(this.allTeachers).length);
-            return;
-        }
-
         // Clear existing rows
-        this.tableBody.innerHTML = '';
+        if (this.tableBody) this.tableBody.innerHTML = '';
+
+        // If no department selected AND no search term, you can either show ALL or show empty
+        // Let's show ALL by default because it's better UX, but keep the department grouping
+        const isFiltering = !!selectedDepartment || !!searchTerm;
 
         // Group teachers by department
         const teachersByDept = {};
 
-        // Initialize all departments (except CM, as it will be merged with CT)
-        Object.keys(departmentFullNames)
-            .filter(code => code !== 'CM')
-            .forEach(deptCode => {
-                teachersByDept[deptCode] = [];
-            });
+        // Helper to add teacher to a department group
+        const addToDeptGroup = (deptCode, teacher, id) => {
+            const normalized = normalizeDepartmentCode(deptCode) || 'none';
+            if (!teachersByDept[normalized]) {
+                teachersByDept[normalized] = [];
+            }
+            // Avoid duplicates in the same department display group
+            if (!teachersByDept[normalized].some(t => t.id === id)) {
+                teachersByDept[normalized].push({ ...teacher, id });
+            }
+        };
 
         // Filter and group teachers
         Object.entries(this.allTeachers).forEach(([id, teacher]) => {
-            const firstName = teacher.firstName || '';
+            if (!teacher) return;
+
+            const firstName = teacher.firstName || teacher.name || '';
             const lastName = teacher.lastName || '';
             const email = teacher.email || '';
             const phone = String(teacher.phone || '');
             const teacherFullName = `${firstName} ${lastName}`.trim();
             const teacherId = teacher.teacherId || '';
 
-            // Check if teacher matches search term
+            // Check match search
             const matchesSearch = !searchTerm ||
-                firstName.toLowerCase().includes(searchTerm) ||
-                lastName.toLowerCase().includes(searchTerm) ||
                 teacherFullName.toLowerCase().includes(searchTerm) ||
                 email.toLowerCase().includes(searchTerm) ||
                 teacherId.toLowerCase().includes(searchTerm) ||
                 phone.includes(searchTerm);
 
-            // Get assigned departments for this teacher
-            const assignedDepartments = teacherDepartments[teacherFullName] || [];
+            if (!matchesSearch) return;
 
-            // Check if teacher matches selected department
-            const matchesDepartment = !selectedDepartment ||
-                (teacher.departments && teacher.departments.some(dept =>
-                    normalizeDepartmentCode(dept.code) === selectedDepartment
-                )) ||
-                assignedDepartments.includes(selectedDepartment);
+            // Get assigned departments
+            const teacherDepts = teacher.departments || [];
+            const labDepts = teacherDepartments[teacherFullName] || [];
 
-            if (matchesSearch && matchesDepartment) {
-                // If teacher is a lab faculty, add them to all departments
+            // Check department match
+            let matchesDepartment = !selectedDepartment;
+            if (selectedDepartment) {
+                const hasDept = teacherDepts.some(d => normalizeDepartmentCode(d.code || d) === selectedDepartment);
+                const hasLabDept = labDepts.includes(selectedDepartment);
+                matchesDepartment = hasDept || hasLabDept;
+            }
+
+            if (matchesDepartment) {
+                // Determine which department groups to add this teacher to
                 if (isLabFaculty(teacherFullName)) {
-                    // Add to all departments
-                    Object.keys(departmentFullNames)
-                        .filter(code => code !== 'CM')
-                        .forEach(deptCode => {
-                            if (!selectedDepartment || selectedDepartment === deptCode) {
-                                if (!teachersByDept[deptCode]) {
-                                    teachersByDept[deptCode] = [];
-                                }
-                                if (!teachersByDept[deptCode].some(t => t.id === id)) {
-                                    // Add assigned departments to teacher data
-                                    const teacherWithDepts = {
-                                        id,
-                                        ...teacher,
-                                        departments: assignedDepartments.map(code => ({
-                                            code,
-                                            name: getDepartmentFullName(code)
-                                        })),
-                                        isLabFaculty: true
-                                    };
-                                    teachersByDept[deptCode].push(teacherWithDepts);
-                                }
-                            }
-                        });
+                    // Lab faculty show up in their assigned departments
+                    const deptsToShow = selectedDepartment ? [selectedDepartment] : labDepts;
+                    deptsToShow.forEach(d => addToDeptGroup(d, teacher, id));
+                } else if (teacherDepts.length > 0) {
+                    // Regular teachers show up in their assigned departments
+                    teacherDepts.forEach(d => {
+                        const code = d.code || d;
+                        if (!selectedDepartment || normalizeDepartmentCode(code) === selectedDepartment) {
+                            addToDeptGroup(code, teacher, id);
+                        }
+                    });
                 } else {
-                    // Regular department-wise grouping for other teachers
-                    if (selectedDepartment) {
-                        if (!teachersByDept[selectedDepartment]) {
-                            teachersByDept[selectedDepartment] = [];
-                        }
-                        if (!teachersByDept[selectedDepartment].some(t => t.id === id)) {
-                            teachersByDept[selectedDepartment].push({ id, ...teacher });
-                        }
-                    } else {
-                        if (teacher.departments && teacher.departments.length > 0) {
-                            teacher.departments.forEach(dept => {
-                                const deptCode = normalizeDepartmentCode(dept.code);
-                                if (!teachersByDept[deptCode]) {
-                                    teachersByDept[deptCode] = [];
-                                }
-                                if (!teachersByDept[deptCode].some(t => t.id === id)) {
-                                    teachersByDept[deptCode].push({ id, ...teacher });
-                                }
-                            });
-                        } else {
-                            if (!teachersByDept['none']) {
-                                teachersByDept['none'] = [];
-                            }
-                            teachersByDept['none'].push({ id, ...teacher });
-                        }
+                    // No department assigned
+                    if (!selectedDepartment || selectedDepartment === 'none') {
+                        addToDeptGroup('none', teacher, id);
                     }
                 }
             }
         });
 
-        // Remove empty departments
-        Object.keys(teachersByDept).forEach(deptCode => {
-            if (teachersByDept[deptCode].length === 0) {
-                delete teachersByDept[deptCode];
-            }
-        });
-
-        // Sort departments
-        const sortedDepts = Object.keys(teachersByDept).sort((a, b) => {
-            if (a === 'none') return 1;
-            if (b === 'none') return -1;
-            return getDepartmentFullName(a).localeCompare(getDepartmentFullName(b));
-        });
-
-        // Display filtered teachers
-        if (Object.keys(teachersByDept).length === 0) {
-            this.showEmptyState('No teachers found matching the criteria');
+        // Display results
+        const deptKeys = Object.keys(teachersByDept);
+        if (deptKeys.length === 0) {
+            this.showEmptyState(searchTerm ? 'शोधलेल्या नावाचा कोणताही शिक्षक सापडला नाही' : 'निवडलेल्या विभागात कोणतेही शिक्षक नाहीत');
+            this.updateResultCounter(0, Object.keys(this.allTeachers).length);
             return;
         }
 
-        // Add teachers to table by department
-        sortedDepts.forEach(deptCode => {
-            // Get department colors
+        // Sort and Render
+        deptKeys.sort((a, b) => {
+            if (a === 'none') return 1;
+            if (b === 'none') return -1;
+            return getDepartmentFullName(a).localeCompare(getDepartmentFullName(b));
+        }).forEach(deptCode => {
             const colors = departmentColors[deptCode] || defaultColors;
-
-            // Add department header
             const deptName = deptCode === 'none' ? 'Unassigned' : getDepartmentFullName(deptCode);
+
             const headerRow = document.createElement('tr');
             headerRow.className = 'department-header';
             headerRow.innerHTML = `
-                <td colspan="6">
-                    <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text};">
+                <td colspan="7">
+                    <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text}; padding: 12px 20px; border-radius: 8px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
                         <div>
                             <i class="${deptCode === 'none' ? 'fas fa-question-circle' : 'fas fa-graduation-cap'}"></i>
                             ${deptName}
                         </div>
-                        <span class="badge" style="background: ${colors.text}; color: white;">
-                            ${teachersByDept[deptCode].length} Assignments
+                        <span class="badge" style="background: ${colors.text}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+                            ${teachersByDept[deptCode].length} Entries
                         </span>
                     </div>
                 </td>
             `;
             this.tableBody.appendChild(headerRow);
 
-            // Sort teachers - lab faculty first, then others alphabetically
-            const sortedTeachers = teachersByDept[deptCode].sort((a, b) => {
-                if (a.isLabFaculty && !b.isLabFaculty) return -1;
-                if (!a.isLabFaculty && b.isLabFaculty) return 1;
-                return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-            });
-
-            // Add teachers for this department
-            sortedTeachers.forEach(teacher => {
-                this.addTeacherRow(teacher.id, teacher, teacher.isLabFaculty);
+            // Sort and add teachers
+            teachersByDept[deptCode].sort((a, b) => {
+                const nameA = `${a.firstName || a.name || ''} ${a.lastName || ''}`.trim();
+                const nameB = `${b.firstName || b.name || ''} ${b.lastName || ''}`.trim();
+                return nameA.localeCompare(nameB);
+            }).forEach(teacher => {
+                this.addTeacherRow(teacher.id, teacher, isLabFaculty(`${teacher.firstName || teacher.name || ''} ${teacher.lastName || ''}`.trim()));
             });
         });
 
-        // Update result counter
-        this.updateResultCounter(Object.values(teachersByDept).flat().length, Object.keys(this.allTeachers || {}).length);
+        // Update stats
+        this.updateResultCounter(Object.values(teachersByDept).flat().length, Object.keys(this.allTeachers).length);
     }
 
     updateResultCounter(filteredEntries, uniqueCount) {
@@ -783,19 +741,23 @@ class TeacherList {
     }
 
     addTeacherRow(id, teacher, isLabFaculty = false) {
+        if (!this.tableBody) return;
+
         const row = document.createElement('tr');
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         row.style.transition = 'all 0.4s ease-out';
 
-        const initials = `${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}`.toUpperCase();
+        const firstName = teacher.firstName || teacher.name || 'Unknown';
+        const lastName = teacher.lastName || '';
+        const initials = `${firstName[0]}${lastName[0] || ''}`.toUpperCase();
         const role = teacher.role || (isLabFaculty ? 'Lab Assistant' : 'Lecturer');
         const roleClass = role === 'HOD' ? 'badge-rose' : (role === 'Lab Assistant' ? 'badge-amber' : 'badge-indigo');
         const isHOD = role === 'HOD';
 
         // Dynamic avatar color based on name
         const colors = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-        const avatarColor = isHOD ? '#F59E0B' : colors[teacher.firstName.length % colors.length];
+        const avatarColor = isHOD ? '#F59E0B' : colors[firstName.length % colors.length];
 
         row.innerHTML = `
             <td style="${isHOD ? 'border-left: 4px solid #F59E0B;' : ''}">
@@ -805,14 +767,14 @@ class TeacherList {
                     </div>
                     <div class="teacher-info-stack">
                         <div class="teacher-name-text">
-                            ${teacher.firstName} ${teacher.lastName}
+                            ${firstName} ${lastName}
                             ${isHOD ? '<i class="fas fa-crown" style="color: #F59E0B; margin-left: 4px; font-size: 0.8rem;" title="Department Head"></i>' : ''}
                         </div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                             <span class="badge ${roleClass}" style="padding: 1px 6px; font-size: 0.65rem;">
                                 ${role.toUpperCase()}
                             </span>
-                            <span style="font-size: 0.75rem; color: var(--text-muted)">${teacher.email}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all;">${teacher.email || 'No Email'}</span>
                         </div>
                     </div>
                 </div>
@@ -825,7 +787,7 @@ class TeacherList {
             <td>
                 <div style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main); font-weight: 500;">
                     <i class="fas fa-phone-alt" style="color: var(--secondary); font-size: 0.8rem;"></i>
-                    ${teacher.phone}
+                    ${teacher.phone || 'N/A'}
                 </div>
             </td>
             <td>
@@ -839,20 +801,20 @@ class TeacherList {
                 </div>
             </td>
             <td>
-                <div class="pass-cell" style="border: 1px dashed var(--border-color); background: transparent;">
+                <div class="pass-cell" style="border: 1px dashed var(--border-color); background: transparent; min-width: 100px; display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-radius: 6px;">
                     <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em;">${teacher.initialPassword || '••••••••'}</span>
                     ${teacher.initialPassword ? `
-                        <i class="fas fa-copy copy-pill" onclick="copyPassword('${teacher.initialPassword}', this)" title="Copy Password"></i>
+                        <i class="fas fa-copy copy-pill" style="cursor:pointer; color: var(--primary); font-size: 0.8rem;" onclick="copyPassword('${teacher.initialPassword}', this)" title="Copy Password"></i>
                     ` : ''}
                 </div>
             </td>
             <td>
-                <div class="action-cell">
-                    <button class="icon-btn" onclick="updateTeacherDetails('${id}')" title="Edit Profile" style="background: #f8fafc;">
-                        <i class="fas fa-pen-nib"></i>
+                <div class="action-cell" style="display: flex; gap: 0.50rem; justify-content: flex-end;">
+                    <button class="icon-btn edit" onclick="updateTeacherDetails('${id}')" title="Edit Teacher">
+                        <i class="fas fa-edit"></i>
                     </button>
-                    <button class="icon-btn delete" onclick="deleteTeacher('${id}')" title="Delete Account" style="background: #fff1f2;">
-                        <i class="fas fa-user-minus"></i>
+                    <button class="icon-btn delete" onclick="deleteTeacher('${id}')" title="Delete Teacher">
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </td>
@@ -864,7 +826,6 @@ class TeacherList {
             row.style.opacity = '1';
             row.style.transform = 'translateY(0)';
         }, 50);
-        this.tableBody.appendChild(row);
     }
 
     async initialize() {
@@ -939,7 +900,7 @@ class TeacherList {
                     departmentCounts[deptCode]++;
 
                     const teacherId = deptCode + String(departmentCounts[deptCode]).padStart(3, '0');
-                    updates[`teachers/${teacherKey}/teacherId`] = teacherId;
+                    updates[`teachers / ${teacherKey}/teacherId`] = teacherId;
 
                     console.log(`Generated teacherId ${teacherId} for teacher ${teacher.email}`);
                 }
