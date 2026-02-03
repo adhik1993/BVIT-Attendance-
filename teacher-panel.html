@@ -4688,6 +4688,10 @@
                     const matchesDivision = !division || division === '' ||
                         (student.division && student.division.toUpperCase() === division.toUpperCase());
 
+                    // 🛠️ FIX: Exclude IT student (Roll 2662) from CE/CT SY lists
+                    const studentRoll = parseInt((student.rollNo || student.roll_no || '').replace(/\D/g, '')) || 0;
+                    if ((department === 'CE' || department === 'CT') && normalizedYear === 'SY' && studentRoll === 2662) return;
+
 
                     if (matchesDepartment && matchesYear && matchesDivision) {
                         allStudents.push({
@@ -5750,9 +5754,9 @@
                         if (studentDivision !== division) return;
                     }
 
-                    // 🛠️ FIX: Exclude IT student (Roll 2662) from CE SY list
+                    // 🛠️ FIX: Exclude IT student (Roll 2662) from CE & CT SY lists
                     const studentRoll = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
-                    if (department === 'CE' && normalizedYear === 'SY' && studentRoll === 2662) return;
+                    if ((department === 'CE' || department === 'CT') && normalizedYear === 'SY' && studentRoll === 2662) return;
 
                     // Student passed!
                     students.push({
