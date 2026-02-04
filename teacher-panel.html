@@ -3397,9 +3397,9 @@
                 // Clear existing options
                 batchSelect.innerHTML = '<option value="">Select Batch</option>';
 
-                // Special handling for CE TY - only Batch A
+                // Special handling for CE TY - only Batch A (Roll 3001-3027)
                 if (departmentValue === 'CE' && yearValue === 'TY') {
-                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3026)</option>';
+                    batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3027)</option>';
                 } else {
                     // Default batches for other departments/years
                     batchSelect.innerHTML += '<option value="A">Batch A</option>';
@@ -3477,6 +3477,9 @@
             } else if (selectedDepartment === 'CE' && selectedYear === 'SY') {
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (2001-2022, 2027)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (2023-2026, 2028 onwards)</option>';
+            } else if (selectedDepartment === 'CE' && selectedYear === 'TY') {
+                // CE TY: Only Batch A (Roll 3001-3027)
+                batchSelect.innerHTML += '<option value="A">Batch A (Roll 3001-3027)</option>';
             } else if (selectedDepartment === 'CE' && selectedYear === 'FY') {
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (1101-1120)</option>';
                 batchSelect.innerHTML += '<option value="BatchB">Batch B (1121-1140)</option>';
@@ -4708,12 +4711,45 @@
 
                 // Sort students by roll number
                 allStudents.sort((a, b) => {
-                    const rollA = parseInt(a.rollNo) || 0;
-                    const rollB = parseInt(b.rollNo) || 0;
+                    const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
+                    const rollB = parseInt((b.rollNo || '').replace(/\D/g, '')) || 0;
                     return rollA - rollB;
                 });
 
-                // 🎯 Custom batch ranges for Computer Technology Second & Third Year
+                // 🎯 PRIORITY FIX: CE TY Special handling (Roll 3001-3027)
+                if (department === 'CE' && year === 'TY') {
+                    if (batch.replace('Batch', '') === 'A') {
+                        let batchStudents = allStudents.filter(s => {
+                            const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
+                            return roll >= 3001 && roll <= 3027;
+                        });
+
+                        if (tableBody) {
+                            if (batchStudents.length === 0) {
+                                tableBody.innerHTML = `<tr><td colspan="3" class="text-center">No students found (3001-3027)</td></tr>`;
+                            } else {
+                                let studentsHTML = '';
+                                batchStudents.forEach(student => {
+                                    studentsHTML += `
+                                        <tr data-student-id="${student.id}">
+                                            <td>${student.rollNo}</td>
+                                            <td>${student.name}</td>
+                                            <td>
+                                                <div class="attendance-buttons">
+                                                    <button class="btn-attendance present" onclick="markAttendance('${student.id}', true)"><i class="fas fa-check"></i> Present</button>
+                                                    <button class="btn-attendance absent" onclick="markAttendance('${student.id}', false)"><i class="fas fa-times"></i> Absent</button>
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                                });
+                                tableBody.innerHTML = studentsHTML;
+                            }
+                        }
+                        return; // Done for CE TY
+                    }
+                }
+
+                // 🎯 Custom batch ranges for other departments...
                 const batchLetter = batch.replace('Batch', '');
                 let startIndex, endIndex;
 
@@ -5568,12 +5604,12 @@
                         batchStudents = [];
                     }
                 } else if (department === 'CE' && year === 'TY') {
-                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3026
+                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3027
                     if (batchLetter === 'A') {
-                        // Filter students with roll numbers 3001-3026
+                        // Filter students with roll numbers 3001-3027
                         batchStudents = allStudents.filter(s => {
                             const roll = parseInt((s.rollNo || '').replace(/\D/g, ''));
-                            return roll >= 3001 && roll <= 3026;
+                            return roll >= 3001 && roll <= 3027;
                         });
                         // Sort by roll number
                         batchStudents.sort((a, b) => {
