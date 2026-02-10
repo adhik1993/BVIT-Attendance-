@@ -3539,6 +3539,23 @@
                     batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
                     batchSelect.innerHTML += '<option value="BatchC">Batch C (20 students)</option>';
                 }
+            } else if (selectedDepartment === 'CT' && selectedYear === 'TY') {
+                const divisionSelect = document.getElementById('division');
+                const selectedDivision = divisionSelect ? divisionSelect.value : '';
+
+                if (selectedDivision === 'A') {
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (3101-3120)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (3121-3140)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (3141-3163)</option>';
+                } else if (selectedDivision === 'C') {
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (Roll 1-20)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (Roll 21-40)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (Roll 41-63)</option>';
+                } else {
+                    batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchB">Batch B (20 students)</option>';
+                    batchSelect.innerHTML += '<option value="BatchC">Batch C (15 students)</option>';
+                }
             } else {
                 // Show all batches for other departments/years
                 batchSelect.innerHTML += '<option value="BatchA">Batch A (20 students)</option>';
@@ -5026,11 +5043,11 @@
                     // 🎯 Computer Technology Third Year custom batch ranges
 
                     if (division === 'A') {
-                        // Division A: Only Batch C specified (41-61)
+                        // Division A: Batch A (1-20), Batch B (21-40), Batch C (41-63)
                         switch (batchLetter) {
                             case 'A': startIndex = 0; endIndex = 20; break;   // Default for Batch A
                             case 'B': startIndex = 20; endIndex = 40; break;  // Default for Batch B
-                            case 'C': startIndex = 40; endIndex = 61; break;  // Students 41-61
+                            case 'C': startIndex = 40; endIndex = 63; break;  // Students 41-63 (Roll 3141-3163)
                             default: startIndex = 0; endIndex = 20; break;
                         }
                     } else if (division === 'B') {
@@ -5042,11 +5059,11 @@
                             default: startIndex = 0; endIndex = 20; break;
                         }
                     } else if (division === 'C') {
-                        // Division C: Only Batch C specified (41-61)
+                        // Division C: Batch A (1-20), Batch B (21-40), Batch C (41-63)
                         switch (batchLetter) {
                             case 'A': startIndex = 0; endIndex = 20; break;   // Default for Batch A
                             case 'B': startIndex = 20; endIndex = 40; break;  // Default for Batch B
-                            case 'C': startIndex = 40; endIndex = 61; break;  // Students 41-61
+                            case 'C': startIndex = 40; endIndex = 63; break;  // Students 41-63
                             default: startIndex = 0; endIndex = 20; break;
                         }
                     } else {
@@ -5599,6 +5616,27 @@
                         batchStudents = allStudents.filter(s => {
                             const r = toNum(s);
                             return r >= 1141;
+                        });
+                    } else {
+                        batchStudents = [];
+                    }
+                } else if (department === 'CT' && year === 'TY' && division === 'A') {
+                    // 🎯 CT TY Division A roll-based slicing
+                    const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
+                    if (batchLetter === 'A') {
+                        batchStudents = allStudents.filter(s => {
+                            const r = toNum(s);
+                            return r >= 3101 && r <= 3120;
+                        });
+                    } else if (batchLetter === 'B') {
+                        batchStudents = allStudents.filter(s => {
+                            const r = toNum(s);
+                            return r >= 3121 && r <= 3140;
+                        });
+                    } else if (batchLetter === 'C') {
+                        batchStudents = allStudents.filter(s => {
+                            const r = toNum(s);
+                            return r >= 3141 && r <= 3163;
                         });
                     } else {
                         batchStudents = [];
