@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <script>
     // Global Firebase Offline Fallback (must be first)
     (function () {
@@ -1849,7 +1849,7 @@
             color: #9CA3AF;
         }
 
-        /* 📊 Reports Section Enhanced Styling */
+        /* ðŸ“Š Reports Section Enhanced Styling */
         .report-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2032,7 +2032,7 @@
         }
 
         .lecture-type.theory::before {
-            content: '📚';
+            content: 'ðŸ“š';
             font-size: 10px;
         }
 
@@ -2043,7 +2043,7 @@
         }
 
         .lecture-type.practical::before {
-            content: '🔬';
+            content: 'ðŸ”¬';
             font-size: 10px;
         }
 
@@ -2108,7 +2108,7 @@
         }
 
         .percentage.high::before {
-            content: '✅';
+            content: 'âœ…';
             font-size: 11px;
         }
 
@@ -2119,7 +2119,7 @@
         }
 
         .percentage.medium::before {
-            content: '⚠️';
+            content: 'âš ï¸';
             font-size: 11px;
         }
 
@@ -2130,7 +2130,7 @@
         }
 
         .percentage.low::before {
-            content: '❌';
+            content: 'âŒ';
             font-size: 11px;
         }
 
@@ -2395,6 +2395,18 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="#add-system" class="nav-link" data-page="add-system">
+                    <i class="fas fa-desktop"></i>
+                    <span class="nav-text">Add System</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#my-systems" class="nav-link" data-page="my-systems">
+                    <i class="fas fa-list-alt"></i>
+                    <span class="nav-text">My Systems</span>
+                </a>
+            </li>
         </ul>
         <button class="logout-button" onclick="handleLogout()">
             <i class="fas fa-sign-out-alt"></i>
@@ -2465,29 +2477,43 @@
         // Global teacher data
         let teacherData = null;
 
+        // --- FIREBASE READY CHECK ---
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                const check = () => {
+                    if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0 && window.db) {
+                        resolve(true);
+                    } else {
+                        setTimeout(check, 100);
+                    }
+                };
+                check();
+            });
+        }
+
         console.log('Firebase services ready');
 
-        // 📧 EmailJS Configuration
-        // 🔧 REPLACE THESE VALUES WITH YOUR ACTUAL EmailJS CREDENTIALS:
+        // ðŸ“§ EmailJS Configuration
+        // ðŸ”§ REPLACE THESE VALUES WITH YOUR ACTUAL EmailJS CREDENTIALS:
         const EMAILJS_CONFIG = {
-            publicKey: 'D3hARPpt5fnuBw1kN',     // ✅ Your Public Key
-            serviceId: 'service_1qq5e1e',       // ✅ Your Gmail Service ID  
-            templateId: 'template_dyjlgvx'      // ✅ Your Template ID
+            publicKey: 'D3hARPpt5fnuBw1kN',     // âœ… Your Public Key
+            serviceId: 'service_1qq5e1e',       // âœ… Your Gmail Service ID  
+            templateId: 'template_dyjlgvx'      // âœ… Your Template ID
         };
 
-        // ✅ TEMPLATE CREATED SUCCESSFULLY!
-        // 📋 Next Steps:
+        // âœ… TEMPLATE CREATED SUCCESSFULLY!
+        // ðŸ“‹ Next Steps:
         // 1. Copy your Template ID from EmailJS dashboard
         // 2. Copy your Service ID (Gmail service)
         // 3. Copy your Public Key from Account settings
         // 4. Replace the values above
         // 5. Test the email functionality
 
-        // 📋 SETUP INSTRUCTIONS:
+        // ðŸ“‹ SETUP INSTRUCTIONS:
         // 1. Go to https://dashboard.emailjs.com/
-        // 2. Create Gmail service → Copy Service ID
-        // 3. Create email template → Copy Template ID  
-        // 4. Go to Account → Copy Public Key
+        // 2. Create Gmail service â†’ Copy Service ID
+        // 3. Create email template â†’ Copy Template ID  
+        // 4. Go to Account â†’ Copy Public Key
         // 5. Replace the values above with your actual IDs
 
         // Initialize EmailJS
@@ -2495,60 +2521,35 @@
             try {
                 if (typeof emailjs !== 'undefined') {
                     emailjs.init(EMAILJS_CONFIG.publicKey);
-                    console.log('📧 EmailJS initialized successfully');
+                    console.log('ðŸ“§ EmailJS initialized successfully');
                 } else {
-                    console.warn('⚠️ EmailJS library not loaded');
+                    console.warn('âš ï¸ EmailJS library not loaded');
                 }
             } catch (error) {
-                console.error('❌ EmailJS initialization failed:', error);
+                console.error('âŒ EmailJS initialization failed:', error);
             }
         }
 
-        // 📧 Send Attendance Email Notification with Smart Limits
+        // ðŸ“§ Send Attendance Email Notification with Smart Limits
         async function sendAttendanceEmail(attendanceData) {
             try {
-                console.log('📧 Preparing to send attendance email:', attendanceData);
+                console.log('--- Preparing to send attendance email ---', attendanceData);
 
                 // Check if EmailJS is available
                 if (typeof emailjs === 'undefined') {
-                    console.warn('⚠️ EmailJS not available, skipping email notification');
+                    console.warn('EmailJS not available, skipping email notification');
                     return { success: false, message: 'EmailJS not available' };
                 }
 
-                // 📊 Check daily email limit (EmailJS Free: 50/day)
+                // Check daily email limit (EmailJS Free: 50/day)
                 const today = new Date().toDateString();
                 const dailyCount = parseInt(localStorage.getItem(`emailCount_${today}`)) || 0;
-                const DAILY_LIMIT = 45; // Safety margin (EmailJS limit is 50)
+                const DAILY_LIMIT = 45; // Safety margin
 
                 if (dailyCount >= DAILY_LIMIT) {
-                    console.warn(`⚠️ Daily email limit reached (${dailyCount}/${DAILY_LIMIT})`);
-                    return { success: false, message: 'Daily email limit reached' };
+                    console.warn(`Daily email limit reached (${dailyCount}/${DAILY_LIMIT})`);
+                    return { success: false, message: 'Daily limit reached' };
                 }
-
-                // 🎯 Smart Email Sending Logic
-                const attendancePercentage = Math.round((attendanceData.presentCount / attendanceData.totalStudents) * 100);
-                const currentHour = new Date().getHours();
-                const isFirstClass = currentHour < 12; // Morning classes
-                const isPractical = attendanceData.lectureType?.toLowerCase() === 'practical';
-                const isLowAttendance = attendancePercentage < 75;
-
-                // Send email for all attendance submissions
-                const shouldSendEmail = true; // Always send email
-
-                console.log('📧 Email will be sent for all attendance submissions:', {
-                    percentage: attendancePercentage,
-                    isFirstClass,
-                    isPractical,
-                    isLowAttendance
-                });
-
-                console.log('📧 Email approved for sending:', {
-                    percentage: attendancePercentage,
-                    isFirstClass,
-                    isPractical,
-                    isLowAttendance,
-                    dailyCount: dailyCount + 1
-                });
 
                 // Prepare email template parameters
                 const templateParams = {
@@ -2570,27 +2571,27 @@
                     batch: attendanceData.batch || 'N/A'
                 };
 
-                console.log('📧 Email template parameters:', templateParams);
-
-                // Send email using EmailJS
                 const response = await emailjs.send(
                     EMAILJS_CONFIG.serviceId,
                     EMAILJS_CONFIG.templateId,
                     templateParams
                 );
 
-                console.log('✅ Email sent successfully:', response);
+                console.log('Email sent successfully:', response);
 
-                // 📊 Update daily email count
                 const newCount = dailyCount + 1;
                 localStorage.setItem(`emailCount_${today}`, newCount.toString());
-                console.log(`📊 Daily email count updated: ${newCount}/${DAILY_LIMIT}`);
-
-                return { success: true, response: response, dailyCount: newCount };
+                return { success: true, response: response };
 
             } catch (error) {
-                console.error('❌ Failed to send email:', error);
-                return { success: false, error: error.message };
+                const errorMsg = error.text || error.message || 'Unknown error';
+                console.error('Failed to send email:', error);
+
+                if (errorMsg.includes('quota')) {
+                    console.warn('EmailJS quota reached - email not sent but attendance is saved.');
+                }
+
+                return { success: false, error: errorMsg };
             }
         }
 
@@ -2611,7 +2612,7 @@
 
                     // Timeout after 5 seconds
                     setTimeout(() => {
-                        console.log('⏰ Auth state timeout, proceeding...');
+                        console.log('â° Auth state timeout, proceeding...');
                         resolve(null);
                     }, 5000);
                 });
@@ -2635,7 +2636,7 @@
 
                 // If teacher data missing, fetch from Firebase
                 if (!teacherData) {
-                    console.log('🔄 Teacher data missing, fetching from Firebase...');
+                    console.log('ðŸ”„ Teacher data missing, fetching from Firebase...');
                     try {
                         const teacherRef = firebase.database().ref('teachers').child(teacherKey);
                         const snapshot = await teacherRef.once('value');
@@ -2643,14 +2644,14 @@
 
                         if (fetchedTeacherData) {
                             sessionStorage.setItem('teacherData', JSON.stringify(fetchedTeacherData));
-                            console.log('✅ Teacher data fetched and stored');
+                            console.log('âœ… Teacher data fetched and stored');
                         } else {
-                            console.log('❌ Teacher data not found in Firebase');
+                            console.log('âŒ Teacher data not found in Firebase');
                             window.location.href = 'welcome.html';
                             return;
                         }
                     } catch (error) {
-                        console.error('❌ Error fetching teacher data:', error);
+                        console.error('âŒ Error fetching teacher data:', error);
                         window.location.href = 'welcome.html';
                         return;
                     }
@@ -2665,7 +2666,7 @@
                 initializeEmailJS();
 
                 // Load dashboard content
-                console.log('🏠 Loading dashboard...');
+                console.log('ðŸ  Loading dashboard...');
                 loadDashboardContent();
             } catch (error) {
                 console.error('Error during authentication check:', error);
@@ -2743,8 +2744,333 @@
                 case 'settings':
                     loadSettingsContent();
                     break;
+                case 'add-system':
+                    loadAddSystemContent();
+                    break;
+                case 'my-systems':
+                    loadMySystemsContent();
+                    break;
                 default:
                     loadDashboardContent();
+            }
+        }
+
+        // Cache teachers list - fetch only once per session
+        window._teachersCache = null;
+
+        // Content loading functions
+        async function loadAddSystemContent() {
+            const mainContent = document.querySelector('.main-content');
+            if (!mainContent) return;
+
+            // Wait for Firebase to be ready
+            if (!window.firebase || !firebase.apps.length) {
+                setTimeout(loadAddSystemContent, 500);
+                return;
+            }
+
+            // All 7 departments - hardcoded, NO Firebase read needed
+            const deptMap = {
+                'CT': 'Computer Technology',
+                'IT': 'Information Technology',
+                'ME': 'Mechanical Engineering',
+                'CE': 'Civil Engineering',
+                'EE': 'Electrical Engineering',
+                'ET': 'Electronics & Telecommunication',
+                'AI': 'Artificial Intelligence'
+            };
+            const deptOptions = Object.entries(deptMap)
+                .map(([code, name]) => `<option value="${code}">${name}</option>`).join('');
+
+            // Build user options: Only current teacher and STUDENT
+            const teacherName = window.teacherData ? `${window.teacherData.firstName} ${window.teacherData.lastName}` : 'Teacher';
+            let userOptions = `
+                <option value="">Select User...</option>
+                <option value="${teacherName}">${teacherName}</option>
+                <option value="STUDENT">STUDENT</option>
+            `;
+
+            mainContent.innerHTML = `
+                <div class="header">
+                    <h1 class="page-title">Add System / Dead Stock</h1>
+                </div>
+                <div class="settings-container" style="max-width: 800px; margin: 0 auto; margin-top: 2rem;">
+                    <div class="settings-section">
+                        <form id="addSystemForm" class="password-form" onsubmit="handleAddSystemSubmit(event)" style="max-width: 100%;">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-building"></i> Department Name</label>
+                                <select id="sysDepartment" class="form-control" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem;">
+                                    <option value="">Select Department...</option>
+                                    ${deptOptions}
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-door-open"></i> Room No / Lab No</label>
+                                <input type="text" id="sysRoom" class="form-control" placeholder="e.g. Lab 1" required oninput="this.value = this.value.toUpperCase()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; text-transform: uppercase;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-barcode"></i> Dead Stock No</label>
+                                <input type="text" id="sysDeadStock" class="form-control" placeholder="e.g. BVIT/IF/963/2025-2026" required oninput="this.value = this.value.toUpperCase()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; text-transform: uppercase;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-desktop"></i> System Name</label>
+                                <input type="text" id="sysName" class="form-control" placeholder="e.g. IOTNM-DES-254" required oninput="this.value = this.value.toUpperCase()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; text-transform: uppercase;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-network-wired"></i> System IP Address</label>
+                                <input type="text" id="sysIP" class="form-control" placeholder="e.g. 192.168.1.100" required oninput="this.value = this.value.toUpperCase()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; text-transform: uppercase;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label><i class="fas fa-user-tie"></i> System User Name</label>
+                                <select id="sysUser" class="form-control" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem;">
+                                    ${userOptions}
+                                </select>
+                            </div>
+                            <button type="submit" class="submit-btn" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 1rem; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-save"></i> Save System Info
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+
+
+        async function handleAddSystemSubmit(event) {
+            event.preventDefault();
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                submitBtn.disabled = true;
+
+                const sysData = {
+                    department: document.getElementById('sysDepartment').value,
+                    roomNo: document.getElementById('sysRoom').value.trim(),
+                    deadStockNo: document.getElementById('sysDeadStock').value.trim(),
+                    systemName: document.getElementById('sysName').value.trim(),
+                    ipAddress: document.getElementById('sysIP').value.trim(),
+                    userName: document.getElementById('sysUser').value,
+                    addedBy: window.teacherData ? `${window.teacherData.firstName} ${window.teacherData.lastName}` : 'Unknown',
+                    addedAt: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                // 1 Firebase write only
+                await firebase.database().ref('systems').push(sysData);
+
+                alert('System details saved successfully!');
+                event.target.reset();
+                // loadMySystemsContent(); // Auto-redirect disabled as requested
+            } catch (error) {
+                console.error('Error saving system:', error);
+                alert('Failed to save. Please try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // --- MANAGE SYSTEMS (ADDED BY TEACHER) ---
+        async function loadMySystemsContent() {
+            const mainContent = document.querySelector('.main-content');
+            if (!mainContent) return;
+
+            mainContent.innerHTML = `
+                <div class="header">
+                    <h1 class="page-title">My Added Systems / Dead Stock</h1>
+                    <button onclick="loadAddSystemContent()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New System
+                    </button>
+                </div>
+                <div class="attendance-container" style="margin-top: 2rem;">
+                    <div class="attendance-list" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                        <div class="list-header" style="margin-bottom: 2rem;">
+                            <h2 style="font-size: 1.25rem; font-weight: 600; color: #111827;">My Records</h2>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="attendance-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #F9FAFB; border-bottom: 2px solid #F3F4F6;">
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563; width: 180px;">Dept</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563; width: 80px;">Room</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563; white-space: nowrap;">System Name</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563; white-space: nowrap;">IP Address</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563;">User</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563; white-space: nowrap;">Dead Stock No</th>
+                                        <th style="padding: 1rem; text-align: left; font-weight: 600; font-size: 0.875rem; color: #4B5563;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mySystemsBody">
+                                    <tr><td colspan="7" class="text-center" style="padding: 2rem; color: #6B7280;">Loading your records...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                await waitForFirebase();
+                const userName = window.teacherData ? `${window.teacherData.firstName} ${window.teacherData.lastName}` : '';
+                const snap = await firebase.database().ref('systems').once('value');
+                const myRecords = [];
+
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const s = child.val();
+                        if (s.addedBy === userName) {
+                            myRecords.push({ id: child.key, ...s });
+                        }
+                    });
+                }
+
+                renderMySystemsTable(myRecords);
+            } catch (err) {
+                console.error(err);
+                const body = document.getElementById('mySystemsBody');
+                if (body) body.innerHTML = `<tr><td colspan="7" class="text-center" style="padding: 2rem; color: #EF4444;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderMySystemsTable(data) {
+            const body = document.getElementById('mySystemsBody');
+            if (!body) return;
+
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 3rem; color: #6B7280;">No records found. You haven\'t added any systems yet.</td></tr>';
+                return;
+            }
+
+            const deptMap = {
+                'CT': 'Computer Technology', 'IT': 'Information Technology', 'ME': 'Mechanical Engineering',
+                'CE': 'Civil Engineering', 'EE': 'Electrical Engineering', 'ET': 'Electronics & Telecommunication',
+                'AI': 'Artificial Intelligence'
+            };
+
+            // Sort by latest added
+            data.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+
+            body.innerHTML = data.map(s => `
+                <tr style="border-bottom: 1px solid #F3F4F6;">
+                    <td style="padding:1rem; font-size: 0.9rem;">${deptMap[s.department] || s.department || '-'}</td>
+                    <td style="padding:1rem;">${s.roomNo || '-'}</td>
+                    <td style="padding:1rem; white-space: nowrap;"><strong>${s.systemName || '-'}</strong></td>
+                    <td style="padding:1rem; white-space: nowrap;"><code>${s.ipAddress || '-'}</code></td>
+                    <td style="padding:1rem;">${s.userName || '-'}</td>
+                    <td style="padding:1rem; white-space: nowrap;">${s.deadStockNo || '-'}</td>
+                    <td style="padding:1rem;">
+                        <div style="display:flex; gap: 8px;">
+                            <button onclick="editSystemRecord('${s.id}')" title="Edit" style="background:#f59e0b; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; transition:all 0.2s;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteSystemRecord('${s.id}')" title="Delete" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; transition:all 0.2s;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteSystemRecord(id) {
+            if (!confirm('Are you sure you want to delete this system record?')) return;
+            try {
+                await firebase.database().ref(`systems/${id}`).remove();
+                alert('Record deleted successfully!');
+                loadMySystemsContent();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        async function editSystemRecord(id) {
+            const mainContent = document.querySelector('.main-content');
+            try {
+                const snap = await firebase.database().ref(`systems/${id}`).once('value');
+                if (!snap.exists()) return;
+                const s = snap.val();
+
+                const teacherName = window.teacherData ? `${window.teacherData.firstName} ${window.teacherData.lastName}` : 'Teacher';
+                const deptMap = { 'CT': 'Computer Technology', 'IT': 'Information Technology', 'ME': 'Mechanical Engineering', 'CE': 'Civil Engineering', 'EE': 'Electrical Engineering', 'ET': 'Electronics & Telecommunication', 'AI': 'Artificial Intelligence' };
+                const deptOptions = Object.entries(deptMap).map(([code, name]) =>
+                    `<option value="${code}" ${s.department === code ? 'selected' : ''}>${name}</option>`
+                ).join('');
+
+                mainContent.innerHTML = `
+                    <div class="header">
+                        <h1 class="page-title">Edit System Record</h1>
+                        <button onclick="loadMySystemsContent()" class="btn" style="background:#6B7280; color:white;">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </button>
+                    </div>
+                    <div class="settings-container" style="max-width: 800px; margin: 0 auto; margin-top: 2rem;">
+                        <div class="settings-section" style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                            <form onsubmit="handleEditSystemSubmit(event, '${id}')" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Department</label>
+                                    <select id="editSysDept" class="form-control" required style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB;">${deptOptions}</select>
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Room / Lab No</label>
+                                    <input type="text" id="editSysRoom" class="form-control" value="${s.roomNo || ''}" required oninput="this.value = this.value.toUpperCase()" style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB; text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Dead Stock No</label>
+                                    <input type="text" id="editSysDS" class="form-control" value="${s.deadStockNo || ''}" required oninput="this.value = this.value.toUpperCase()" style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB; text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">System Name</label>
+                                    <input type="text" id="editSysName" class="form-control" value="${s.systemName || ''}" required oninput="this.value = this.value.toUpperCase()" style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB; text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">IP Address</label>
+                                    <input type="text" id="editSysIP" class="form-control" value="${s.ipAddress || ''}" required oninput="this.value = this.value.toUpperCase()" style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB; text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">System User Name</label>
+                                    <select id="editSysUser" class="form-control" required style="width:100%; padding:0.75rem; border-radius:10px; border:1px solid #D1D5DB;">
+                                        <option value="${teacherName}" ${s.userName === teacherName ? 'selected' : ''}>${teacherName}</option>
+                                        <option value="STUDENT" ${s.userName === 'STUDENT' ? 'selected' : ''}>STUDENT</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width:100%; padding:1rem; border-radius:12px; font-weight:600; margin-top: 1rem;">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                alert('Error loading record: ' + err.message);
+            }
+        }
+
+        async function handleEditSystemSubmit(event, id) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button[type="submit"]');
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                const updates = {
+                    department: document.getElementById('editSysDept').value,
+                    roomNo: document.getElementById('editSysRoom').value.trim(),
+                    deadStockNo: document.getElementById('editSysDS').value.trim(),
+                    systemName: document.getElementById('editSysName').value.trim(),
+                    ipAddress: document.getElementById('editSysIP').value.trim(),
+                    userName: document.getElementById('editSysUser').value.trim(),
+                    updatedAt: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                await firebase.database().ref(`systems/${id}`).update(updates);
+                alert('Record updated successfully!');
+                loadMySystemsContent();
+            } catch (err) {
+                alert('Update failed: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
             }
         }
 
@@ -2809,7 +3135,7 @@
             loadTotalStudentsCount();
         }
 
-        // 💾 FIREBASE OPTIMIZATION - Caching to reduce reads/writes
+        // ðŸ’¾ FIREBASE OPTIMIZATION - Caching to reduce reads/writes
         let studentsCache = null;
         let studentsCacheTime = 0;
         let attendanceCache = null;
@@ -2817,21 +3143,21 @@
         const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
         window.loadStudentsWithCache = async function () {
-            console.log('📚 Loading students with cache optimization...');
+            console.log('ðŸ“š Loading students with cache optimization...');
 
             // Check if cache is valid
             const now = Date.now();
             if (studentsCache && (now - studentsCacheTime) < CACHE_DURATION) {
-                console.log('✅ Using cached students data (saves Firebase read)');
+                console.log('âœ… Using cached students data (saves Firebase read)');
                 return studentsCache;
             }
 
             try {
-                console.log('🔄 Fetching fresh students data from Firebase');
+                console.log('ðŸ”„ Fetching fresh students data from Firebase');
                 const snapshot = await firebase.database().ref('students').once('value');
                 studentsCache = snapshot.val() || {};
                 studentsCacheTime = now;
-                console.log(`💾 Students cached for ${CACHE_DURATION / 60000} minutes`);
+                console.log(`ðŸ’¾ Students cached for ${CACHE_DURATION / 60000} minutes`);
                 return studentsCache;
             } catch (error) {
                 console.error('Error loading students:', error);
@@ -2840,29 +3166,29 @@
         };
 
         window.loadAttendanceOptimized = async function (teacherId = null) {
-            console.log('📊 Loading attendance with optimization...');
+            console.log('ðŸ“Š Loading attendance with optimization...');
 
             // Check if cache is valid
             const now = Date.now();
             if (attendanceCache && (now - attendanceCacheTime) < CACHE_DURATION) {
-                console.log('✅ Using cached attendance data (saves Firebase read)');
+                console.log('âœ… Using cached attendance data (saves Firebase read)');
                 return attendanceCache;
             }
 
             try {
-                console.log('🔄 Fetching fresh attendance data from Firebase');
+                console.log('ðŸ”„ Fetching fresh attendance data from Firebase');
                 let query = firebase.database().ref('attendance');
 
                 // Optimize: Only load teacher-specific data if teacherId provided
                 if (teacherId) {
                     query = query.orderByChild('teacherId').equalTo(teacherId);
-                    console.log('🎯 Loading only teacher-specific attendance (reduces data transfer)');
+                    console.log('ðŸŽ¯ Loading only teacher-specific attendance (reduces data transfer)');
                 }
 
                 const snapshot = await query.once('value');
                 attendanceCache = snapshot.val() || {};
                 attendanceCacheTime = now;
-                console.log(`💾 Attendance cached for ${CACHE_DURATION / 60000} minutes`);
+                console.log(`ðŸ’¾ Attendance cached for ${CACHE_DURATION / 60000} minutes`);
                 return attendanceCache;
             } catch (error) {
                 console.error('Error loading attendance:', error);
@@ -2870,19 +3196,19 @@
             }
         };
 
-        // 🚀 OPTIMIZED FIREBASE WRITES - Batch operations to reduce costs
+        // ðŸš€ OPTIMIZED FIREBASE WRITES - Batch operations to reduce costs
         window.saveAttendanceWithOfflineSupport = async function (data) {
-            console.log('💾 Saving attendance with optimization...');
+            console.log('ðŸ’¾ Saving attendance with optimization...');
             try {
                 // Clear cache after write to ensure fresh data on next read
                 attendanceCache = null;
                 attendanceCacheTime = 0;
 
                 // Use set() with specific key instead of push() for better control
-                const attendanceKey = `${data.date}_${data.teacherId}_${Date.now()}`;
-                await firebase.database().ref(`attendance/${attendanceKey}`).set(data);
+                const attendanceKey = `${data.date}_${data.teacherId}_${Date.now()} `;
+                await firebase.database().ref(`attendance / ${attendanceKey} `).set(data);
 
-                console.log('✅ Attendance saved with optimized write operation');
+                console.log('âœ… Attendance saved with optimized write operation');
                 return { success: true };
             } catch (error) {
                 console.error('Error saving attendance:', error);
@@ -2890,9 +3216,9 @@
             }
         };
 
-        // 📦 BATCH OPERATIONS - Reduce multiple Firebase calls
+        // ðŸ“¦ BATCH OPERATIONS - Reduce multiple Firebase calls
         window.batchUpdateAttendance = async function (updates) {
-            console.log('📦 Performing batch attendance updates...');
+            console.log('ðŸ“¦ Performing batch attendance updates...');
             try {
                 // Clear cache before batch operation
                 attendanceCache = null;
@@ -2900,7 +3226,7 @@
 
                 // Use Firebase batch update for multiple operations
                 await firebase.database().ref().update(updates);
-                console.log('✅ Batch update completed - saves multiple Firebase writes');
+                console.log('âœ… Batch update completed - saves multiple Firebase writes');
                 return { success: true };
             } catch (error) {
                 console.error('Error in batch update:', error);
@@ -2908,43 +3234,43 @@
             }
         };
 
-        // 📱 OFFLINE SUPPORT - Reduce Firebase dependency
+        // ðŸ“± OFFLINE SUPPORT - Reduce Firebase dependency
         let offlineQueue = [];
         let isOnline = navigator.onLine;
 
         // Monitor online/offline status
         window.addEventListener('online', () => {
             isOnline = true;
-            console.log('🌐 Back online - processing offline queue');
+            console.log('ðŸŒ Back online - processing offline queue');
             processOfflineQueue();
         });
 
         window.addEventListener('offline', () => {
             isOnline = false;
-            console.log('📱 Gone offline - queuing operations');
+            console.log('ðŸ“± Gone offline - queuing operations');
         });
 
         // Process queued operations when back online
         async function processOfflineQueue() {
             if (offlineQueue.length === 0) return;
 
-            console.log(`🔄 Processing ${offlineQueue.length} offline operations`);
+            console.log(`ðŸ”„ Processing ${offlineQueue.length} offline operations`);
             const batch = {};
 
             offlineQueue.forEach((operation, index) => {
-                batch[`attendance/${operation.key}`] = operation.data;
+                batch[`attendance / ${operation.key} `] = operation.data;
             });
 
             try {
                 await firebase.database().ref().update(batch);
-                console.log('✅ Offline queue processed successfully');
+                console.log('âœ… Offline queue processed successfully');
                 offlineQueue = []; // Clear queue
             } catch (error) {
-                console.error('❌ Error processing offline queue:', error);
+                console.error('âŒ Error processing offline queue:', error);
             }
         }
 
-        // 🗜️ DATA COMPRESSION - Reduce payload size
+        // ðŸ—œï¸ DATA COMPRESSION - Reduce payload size
         function compressAttendanceData(data) {
             // Remove unnecessary fields and compress data
             const compressed = {
@@ -2960,7 +3286,7 @@
                 ac: data.absentCount
             };
 
-            console.log('🗜️ Data compressed - reduced payload size');
+            console.log('ðŸ—œï¸ Data compressed - reduced payload size');
             return compressed;
         }
 
@@ -2970,15 +3296,15 @@
             if (!totalStudentsElement || !window.teacherData) return;
 
             try {
-                console.log('📊 Loading total students with cache optimization...');
-                // 💰 COST OPTIMIZATION: Use cached data to reduce Firebase reads
+                console.log('ðŸ“Š Loading total students with cache optimization...');
+                // ðŸ’° COST OPTIMIZATION: Use cached data to reduce Firebase reads
                 const students = await window.loadStudentsWithCache();
                 let totalStudents = 0;
 
                 // Only count if we have valid cached data
                 if (!students || Object.keys(students).length === 0) {
                     totalStudentsElement.textContent = '0';
-                    console.log('⚠️ No students data available (cache miss)');
+                    console.log('âš ï¸ No students data available (cache miss)');
                     return;
                 }
 
@@ -3064,7 +3390,7 @@
                     return;
                 }
 
-                // 🚀 OPTIMIZED: Use cached attendance data with teacher filtering
+                // ðŸš€ OPTIMIZED: Use cached attendance data with teacher filtering
                 const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
                 let totalPresent = 0;
                 let totalStudents = 0;
@@ -3102,7 +3428,7 @@
                     return;
                 }
 
-                console.log('📈 Loading average attendance with optimization...');
+                console.log('ðŸ“ˆ Loading average attendance with optimization...');
                 // Use cached attendance data to reduce Firebase reads
                 const attendanceData = await window.loadAttendanceOptimized(currentUser.uid);
                 let totalPresent = 0;
@@ -3131,13 +3457,13 @@
 
         // Function to load attendance content
         function loadAttendanceContent() {
-            console.log('📝 Loading attendance content...');
+            console.log('ðŸ“ Loading attendance content...');
             const mainContent = document.querySelector('.main-content');
             if (!mainContent) return;
 
             mainContent.innerHTML = `
-                <div class="header">
-                    <h1 class="page-title">Take Attendance</h1>
+            <div class="header">
+                <h1 class="page-title">Take Attendance</h1>
                 </div>
                 <div class="attendance-form">
                     <div class="form-row">
@@ -3218,7 +3544,7 @@
                         <button type="button" onclick="submitAttendance()" class="btn btn-primary">Save Attendance</button>
                     </div>
                 </div>
-            `;
+        `;
 
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
@@ -3227,7 +3553,7 @@
             // Populate dropdowns with teacher's assigned data
             populateDepartmentDropdown();
 
-            console.log('✅ Attendance content loaded successfully');
+            console.log('âœ… Attendance content loaded successfully');
         }
 
         // Removed duplicate submitAttendance function - using the complete one at line 5876
@@ -3246,7 +3572,7 @@
                     return;
                 }
 
-                console.log('📅 Loading today\'s attendance with optimization...');
+                console.log('ðŸ“… Loading today\'s attendance with optimization...');
                 // Use optimized attendance loading with teacher filter
                 const attendanceData = await window.loadAttendanceOptimized(teacherKey);
                 let totalPresent = 0;
@@ -3272,9 +3598,9 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = 'success-message';
             messageDiv.innerHTML = `
-                <i class="fas fa-check-circle"></i>
+            <i class="fas fa-check-circle"></i>
                 <span>${message}</span>
-            `;
+        `;
             document.body.appendChild(messageDiv);
 
             setTimeout(() => {
@@ -3287,9 +3613,9 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = 'error-message';
             messageDiv.innerHTML = `
-                <i class="fas fa-exclamation-circle"></i>
+            <i class="fas fa-exclamation-circle"></i>
                 <span>${message}</span>
-            `;
+        `;
             document.body.appendChild(messageDiv);
 
             setTimeout(() => {
@@ -3303,10 +3629,6 @@
             if (!yearSelect) return;
 
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
-            if (!teacherData || !teacherData.classes) {
-                yearSelect.innerHTML = '<option value="">No classes assigned</option>';
-                return;
-            }
 
             yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
             const yearMap = {
@@ -3316,9 +3638,23 @@
                 'BE': 'Final Year (BE)'
             };
 
-            teacherData.classes.forEach(year => {
-                yearSelect.innerHTML += `<option value="${year}">${yearMap[year] || year}</option>`;
-            });
+            if (teacherData && teacherData.classes && teacherData.classes.length > 0) {
+                // Use teacher's assigned classes
+                teacherData.classes.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = yearMap[year] || year;
+                    yearSelect.appendChild(option);
+                });
+            } else {
+                // Fallback: show all 4 years
+                Object.entries(yearMap).forEach(([code, name]) => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = name;
+                    yearSelect.appendChild(option);
+                });
+            }
 
             // Update batch dropdown when year changes
             setTimeout(() => handleLectureTypeChange(), 100);
@@ -3330,15 +3666,35 @@
             if (!departmentSelect) return;
 
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
-            if (!teacherData || !teacherData.departments) {
-                departmentSelect.innerHTML = '<option value="">No departments assigned</option>';
-                return;
-            }
 
             departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
-            teacherData.departments.forEach(dept => {
-                departmentSelect.innerHTML += `<option value="${dept.code}">${dept.name}</option>`;
-            });
+
+            if (teacherData && teacherData.departments && teacherData.departments.length > 0) {
+                // Use teacher's assigned departments
+                teacherData.departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.code;
+                    option.textContent = dept.name;
+                    departmentSelect.appendChild(option);
+                });
+            } else {
+                // Fallback: show all 7 departments
+                const deptMap = {
+                    'CT': 'Computer Technology',
+                    'IT': 'Information Technology',
+                    'ME': 'Mechanical Engineering',
+                    'CE': 'Civil Engineering',
+                    'EE': 'Electrical Engineering',
+                    'ET': 'Electronics & Telecommunication',
+                    'AI': 'Artificial Intelligence'
+                };
+                Object.entries(deptMap).forEach(([code, name]) => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = name;
+                    departmentSelect.appendChild(option);
+                });
+            }
         }
 
         // Function to populate division dropdown with assigned divisions
@@ -3359,7 +3715,7 @@
                 assignedDivisions.forEach(division => {
                     const option = document.createElement('option');
                     option.value = division;
-                    option.textContent = `Division ${division}`;
+                    option.textContent = `Division ${division} `;
                     divisionSelect.appendChild(option);
                 });
             } else {
@@ -3368,7 +3724,7 @@
                 allDivisions.forEach(division => {
                     const option = document.createElement('option');
                     option.value = division;
-                    option.textContent = `Division ${division}`;
+                    option.textContent = `Division ${division} `;
                     divisionSelect.appendChild(option);
                 });
             }
@@ -3581,143 +3937,143 @@
             if (!teacherData || !teacherData.departments || teacherData.departments.length === 0) {
                 console.log('No departments assigned to teacher');
                 mainContent.innerHTML = `
-                    <div class="header">
-                        <h1 class="page-title">Fill Attendance</h1>
+            <div class="header">
+                <h1 class="page-title">Fill Attendance</h1>
                     </div>
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>No departments assigned</p>
-                        <div class="subtitle">You don't have any departments assigned to you yet</div>
-                    </div>
-                `;
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>No departments assigned</p>
+                <div class="subtitle">You don't have any departments assigned to you yet</div>
+            </div>
+        `;
                 return;
             }
 
             console.log('Rendering attendance form');
             mainContent.innerHTML = `
-                <div class="header">
-                    <h1 class="page-title">Fill Attendance</h1>
+            <div class="header">
+                <h1 class="page-title">Fill Attendance</h1>
                 </div>
 
-                <div class="attendance-container">
-                    <div class="filter-section">
-                        <div class="form-group">
-                            <label for="department">
-                                <i class="fas fa-building"></i>
-                                Select Department
-                            </label>
-                            <select id="department" onchange="updateClassOptions(); updateDivisionVisibility(); updateBatchDropdown();">
-                                <option value="">-- Select Department --</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="year">
-                                <i class="fas fa-graduation-cap"></i>
-                                Select Year
-                            </label>
-                            <select id="year" onchange="updateClassOptions(); updateBatchDropdown();">
-                                <option value="">-- Select Year --</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group division-group" style="display: none;">
-                            <label for="division">
-                                <i class="fas fa-users"></i>
-                                Select Division
-                            </label>
-                            <select id="division" onchange="updateBatchDropdown();">
-                                <option value="">All Divisions</option>
-                                <option value="A">Division A</option>
-                                <option value="B">Division B</option>
-                                <option value="C">Division C</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group batch-group" id="batchGroup" style="display: none;">
-                            <label for="batch">
-                                <i class="fas fa-layer-group"></i>
-                                Select Batch
-                            </label>
-                            <select id="batch" onchange="loadStudents()">
-                                <option value="">-- Select Batch --</option>
-                                <option value="BatchA">Batch A (20 students)</option>
-                                <option value="BatchB">Batch B (20 students)</option>
-                                <option value="BatchC">Batch C (20 students)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="subject">
-                                <i class="fas fa-book"></i>
-                                Subject
-                            </label>
-                            <input type="text" id="subject" placeholder="Enter subject name (max 4 chars)" required oninput="limitSubjectWords(this)" onkeydown="preventExtraWords(event, this)" maxlength="4">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="lectureType">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                Lecture Type
-                            </label>
-                            <select id="lectureType" onchange="toggleBatchVisibility(); loadStudents()">
-                                <option value="">-- Select Type --</option>
-                                <option value="theory">Theory</option>
-                                <option value="practical">Practical</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="date">
-                                <i class="fas fa-calendar-alt"></i>
-                                Date
-                            </label>
-                            <input type="date" id="date" onchange="loadStudents()" value="${new Date().toISOString().split('T')[0]}">
-                        </div>
+            <div class="attendance-container">
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="department">
+                            <i class="fas fa-building"></i>
+                            Select Department
+                        </label>
+                        <select id="department" onchange="updateClassOptions(); updateDivisionVisibility(); updateBatchDropdown();">
+                            <option value="">-- Select Department --</option>
+                        </select>
                     </div>
 
-                    <div class="attendance-list">
-                        <div class="list-header">
-                            <h2>Students List</h2>
-                            <div class="quick-actions">
-                                <button onclick="markAllPresent()" class="action-btn present-all">
-                                    <i class="fas fa-check-circle"></i> Mark All Present
-                                </button>
-                                <button onclick="markAllAbsent()" class="action-btn absent-all">
-                                    <i class="fas fa-times-circle"></i> Mark All Absent
-                                </button>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="year">
+                            <i class="fas fa-graduation-cap"></i>
+                            Select Year
+                        </label>
+                        <select id="year" onchange="updateClassOptions(); updateBatchDropdown();">
+                            <option value="">-- Select Year --</option>
+                        </select>
+                    </div>
 
-                        <table class="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th>Roll No</th>
-                                    <th>Student Name</th>
-                                    <th>Attendance</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-body">
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-info-circle"></i>
-                                            <p>Please fill all required fields</p>
-                                            <div class="subtitle">Department, Year, Subject, Date and Lecture Type are required</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="form-group division-group" style="display: none;">
+                        <label for="division">
+                            <i class="fas fa-users"></i>
+                            Select Division
+                        </label>
+                        <select id="division" onchange="updateBatchDropdown();">
+                            <option value="">All Divisions</option>
+                            <option value="A">Division A</option>
+                            <option value="B">Division B</option>
+                            <option value="C">Division C</option>
+                        </select>
+                    </div>
 
-                        <div class="submit-section">
-                            <button id="submitAttendanceBtn" onclick="submitAttendance()" class="submit-btn">
-                                <i class="fas fa-save"></i> Submit Attendance
+                    <div class="form-group batch-group" id="batchGroup" style="display: none;">
+                        <label for="batch">
+                            <i class="fas fa-layer-group"></i>
+                            Select Batch
+                        </label>
+                        <select id="batch" onchange="loadStudents()">
+                            <option value="">-- Select Batch --</option>
+                            <option value="BatchA">Batch A (20 students)</option>
+                            <option value="BatchB">Batch B (20 students)</option>
+                            <option value="BatchC">Batch C (20 students)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">
+                            <i class="fas fa-book"></i>
+                            Subject
+                        </label>
+                        <input type="text" id="subject" placeholder="Enter subject name (max 4 chars)" required oninput="limitSubjectWords(this)" onkeydown="preventExtraWords(event, this)" maxlength="4">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lectureType">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Lecture Type
+                        </label>
+                        <select id="lectureType" onchange="toggleBatchVisibility(); loadStudents()">
+                            <option value="">-- Select Type --</option>
+                            <option value="theory">Theory</option>
+                            <option value="practical">Practical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">
+                            <i class="fas fa-calendar-alt"></i>
+                            Date
+                        </label>
+                        <input type="date" id="date" onchange="loadStudents()" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                </div>
+
+                <div class="attendance-list">
+                    <div class="list-header">
+                        <h2>Students List</h2>
+                        <div class="quick-actions">
+                            <button onclick="markAllPresent()" class="action-btn present-all">
+                                <i class="fas fa-check-circle"></i> Mark All Present
+                            </button>
+                            <button onclick="markAllAbsent()" class="action-btn absent-all">
+                                <i class="fas fa-times-circle"></i> Mark All Absent
                             </button>
                         </div>
                     </div>
+
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student Name</th>
+                                <th>Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body">
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <div class="empty-state">
+                                        <i class="fas fa-info-circle"></i>
+                                        <p>Please fill all required fields</p>
+                                        <div class="subtitle">Department, Year, Subject, Date and Lecture Type are required</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="submit-section">
+                        <button id="submitAttendanceBtn" onclick="submitAttendance()" class="submit-btn">
+                            <i class="fas fa-save"></i> Submit Attendance
+                        </button>
+                    </div>
                 </div>
-            `;
+            </div>
+        `;
 
             // Populate dropdowns with assigned departments and years
             populateDepartmentDropdown();
@@ -3732,66 +4088,66 @@
         // Add styles for submit button and success message
         const style = document.createElement('style');
         style.textContent = `
-            .submit-section {
-                margin-top: 20px;
-                padding: 20px;
-                display: flex;
-                justify-content: center;
-            }
+            .submit - section {
+            margin - top: 20px;
+            padding: 20px;
+            display: flex;
+            justify - content: center;
+        }
 
-            .submit-btn {
-                padding: 12px 24px;
-                background: #10B981;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 16px;
-                font-weight: 500;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.2s;
-            }
+            .submit - btn {
+            padding: 12px 24px;
+            background: #10B981;
+            color: white;
+            border: none;
+            border - radius: 6px;
+            font - size: 16px;
+            font - weight: 500;
+            cursor: pointer;
+            display: flex;
+            align - items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
 
-            .submit-btn:hover {
-                background: #059669;
-            }
+            .submit - btn:hover {
+            background: #059669;
+        }
 
-            .submit-btn:disabled {
-                background: #9CA3AF;
-                cursor: not-allowed;
-            }
+            .submit - btn:disabled {
+            background: #9CA3AF;
+            cursor: not - allowed;
+        }
 
-            .success-message {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #059669;
-                color: white;
-                padding: 16px 24px;
-                border-radius: 6px;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                animation: slideIn 0.3s ease-out;
-            }
+            .success - message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            padding: 16px 24px;
+            border - radius: 6px;
+            display: flex;
+            align - items: center;
+            gap: 12px;
+            box - shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease - out;
+        }
 
-            .success-message i {
-                font-size: 20px;
-            }
+            .success - message i {
+            font - size: 20px;
+        }
 
-            @keyframes slideIn {
+        @keyframes slideIn {
                 from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
+                transform: translateX(100 %);
+                opacity: 0;
             }
+                to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         `;
         document.head.appendChild(style);
 
@@ -3801,7 +4157,7 @@
 
             // Wait for Firebase to be ready
             if (!window.firebase || !firebase.apps.length) {
-                console.log('⏳ Waiting for Firebase initialization...');
+                console.log('â³ Waiting for Firebase initialization...');
                 setTimeout(loadReportsContent, 500);
                 return;
             }
@@ -3810,68 +4166,68 @@
 
             if (!teacherData || !teacherId) {
                 mainContent.innerHTML = `
-                    <div class="header">
-                        <h1 class="page-title">View Reports</h1>
+            <div class="header">
+                <h1 class="page-title">View Reports</h1>
                     </div>
-                    <div class="reports-container">
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Please login again</p>
-                            <div class="subtitle">Your session has expired</div>
-                        </div>
-                    </div>
-                `;
+            <div class="reports-container">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Please login again</p>
+                    <div class="subtitle">Your session has expired</div>
+                </div>
+            </div>
+        `;
                 return;
             }
 
             mainContent.innerHTML = `
-                <div class="header">
-                    <h1 class="page-title">Attendance Reports</h1>
+            <div class="header">
+                <h1 class="page-title">Attendance Reports</h1>
                 </div>
-                <div class="reports-container">
-                    <div class="filter-section">
-                        <div class="form-group">
-                            <label for="reportDepartment">Department:</label>
-                            <select id="reportDepartment" onchange="updateReportDivisionVisibility()">
-                                <option value="">All Departments</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="reportYear">Year:</label>
-                            <select id="reportYear" onchange="loadAttendanceReport()">
-                                <option value="">All Years</option>
-                                <option value="FY">First Year</option>
-                                <option value="SY">Second Year</option>
-                                <option value="TY">Third Year</option>
-                                <option value="BE">Final Year</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="reportDivisionGroup" style="display: none;">
-                            <label for="reportDivision">Division:</label>
-                            <select id="reportDivision" onchange="loadAttendanceReport()">
-                                <option value="">All Divisions</option>
-                                <option value="A">Division A</option>
-                                <option value="B">Division B</option>
-                                <option value="C">Division C</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="startDate">Start Date:</label>
-                            <input type="date" id="startDate" onchange="loadAttendanceReport()">
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">End Date:</label>
-                            <input type="date" id="endDate" onchange="loadAttendanceReport()">
-                        </div>
+            <div class="reports-container">
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="reportDepartment">Department:</label>
+                        <select id="reportDepartment" onchange="updateReportDivisionVisibility()">
+                            <option value="">All Departments</option>
+                        </select>
                     </div>
-                    <div id="reportContent">
-                        <div class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading reports...</p>
-                        </div>
+                    <div class="form-group">
+                        <label for="reportYear">Year:</label>
+                        <select id="reportYear" onchange="loadAttendanceReport()">
+                            <option value="">All Years</option>
+                            <option value="FY">First Year</option>
+                            <option value="SY">Second Year</option>
+                            <option value="TY">Third Year</option>
+                            <option value="BE">Final Year</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="reportDivisionGroup" style="display: none;">
+                        <label for="reportDivision">Division:</label>
+                        <select id="reportDivision" onchange="loadAttendanceReport()">
+                            <option value="">All Divisions</option>
+                            <option value="A">Division A</option>
+                            <option value="B">Division B</option>
+                            <option value="C">Division C</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" onchange="loadAttendanceReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" onchange="loadAttendanceReport()">
                     </div>
                 </div>
-            `;
+                <div id="reportContent">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading reports...</p>
+                    </div>
+                </div>
+            </div>
+        `;
 
             // Populate department dropdown with teacher's assigned departments
             const departmentSelect = document.getElementById('reportDepartment');
@@ -3915,7 +4271,7 @@
             }
 
             reportContent.innerHTML = `
-                <div class="loading-state">
+            <div class="loading-state">
                     <i class="fas fa-spinner fa-spin"></i>
                     <p>Loading attendance records...</p>
                 </div>
@@ -3930,7 +4286,7 @@
                     throw new Error('Teacher not logged in properly');
                 }
 
-                console.log('🔍 Loading reports for teacher:', teacherKey);
+                console.log('ðŸ” Loading reports for teacher:', teacherKey);
                 console.log('Teacher Data:', teacherData);
 
                 // Helper function to normalize year format
@@ -3965,7 +4321,7 @@
                     return dept;
                 }
 
-                // 🚀 OPTIMIZED: Query attendance specifically for this teacher
+                // ðŸš€ OPTIMIZED: Query attendance specifically for this teacher
                 // This significantly reduces data transfer by not downloading other teachers' records
                 const snapshot = await firebase.database()
                     .ref('attendance')
@@ -3982,7 +4338,7 @@
                     // Date filtering (Client-side because Firebase only supports 1 filter reliably)
                     if (data.date < startDate || data.date > endDate) return;
 
-                    console.log('✅ Processing record for current teacher:', data);
+                    console.log('âœ… Processing record for current teacher:', data);
 
                     // Check if this record is for teacher's class
                     const recordClass = data.class || '';
@@ -4081,18 +4437,18 @@
 
                 if (records.length === 0) {
                     reportContent.innerHTML = `
-                        <div class="empty-state">
+            <div class="empty-state">
                             <i class="fas fa-clipboard-list"></i>
                             <p>No attendance records found</p>
                             <div class="subtitle">Try changing the filters or date range</div>
                         </div>
-                    `;
+            `;
                     return;
                 }
 
                 // Generate report HTML
                 let html = `
-                    <table class="report-table">
+            <table class="report-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -4158,19 +4514,19 @@
                 html += `
                         </tbody>
                     </table>
-                `;
+            `;
 
                 reportContent.innerHTML = html;
 
             } catch (error) {
                 console.error('Error loading attendance report:', error);
                 reportContent.innerHTML = `
-                    <div class="empty-state">
+            <div class="empty-state">
                         <i class="fas fa-exclamation-circle"></i>
                         <p>Error loading report</p>
                         <div class="subtitle">${error.message}</div>
                     </div>
-                `;
+            `;
             }
         }
 
@@ -4189,7 +4545,7 @@
             const modal = document.createElement('div');
             modal.className = 'success-modal-overlay';
             modal.innerHTML = `
-                <div class="success-modal">
+            <div class="success-modal">
                     <div class="success-header">
                         <div class="success-icon">
                             <i class="fas fa-check-circle"></i>
@@ -4210,85 +4566,85 @@
                 const styles = document.createElement('style');
                 styles.id = 'success-modal-styles';
                 styles.textContent = `
-                    .success-modal-overlay {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0, 0, 0, 0.5);
-                        backdrop-filter: blur(5px);
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        z-index: 10000;
-                        animation: fadeIn 0.3s ease-out;
-                    }
+                .success - modal - overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100 %;
+            height: 100 %;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop - filter: blur(5px);
+            display: flex;
+            justify - content: center;
+            align - items: center;
+            z - index: 10000;
+            animation: fadeIn 0.3s ease - out;
+        }
                     
-                    .success-modal {
-                        background: white;
-                        border-radius: 12px;
-                        padding: 0;
-                        max-width: 400px;
-                        width: 90%;
-                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-                        animation: slideIn 0.3s ease-out;
-                        overflow: hidden;
-                    }
+                    .success - modal {
+            background: white;
+            border - radius: 12px;
+            padding: 0;
+            max - width: 400px;
+            width: 90 %;
+            box - shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease - out;
+            overflow: hidden;
+        }
                     
-                    .success-header {
-                        background: linear-gradient(135deg, #10B981, #059669);
-                        color: white;
-                        padding: 20px;
-                        text-align: center;
-                    }
+                    .success - header {
+            background: linear - gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 20px;
+            text - align: center;
+        }
                     
-                    .success-icon {
-                        font-size: 48px;
-                        margin-bottom: 10px;
-                        animation: pulse 1s ease-in-out infinite;
-                    }
+                    .success - icon {
+            font - size: 48px;
+            margin - bottom: 10px;
+            animation: pulse 1s ease -in -out infinite;
+        }
                     
-                    .success-header h3 {
-                        margin: 0;
-                        font-size: 24px;
-                        font-weight: 600;
-                    }
+                    .success - header h3 {
+            margin: 0;
+            font - size: 24px;
+            font - weight: 600;
+        }
                     
-                    .success-message {
-                        padding: 20px;
-                        text-align: center;
-                        line-height: 1.6;
-                        color: #374151;
-                        white-space: pre-line;
-                    }
+                    .success - message {
+            padding: 20px;
+            text - align: center;
+            line - height: 1.6;
+            color: #374151;
+            white - space: pre - line;
+        }
                     
-                    .success-footer {
-                        padding: 20px;
-                        text-align: center;
-                        border-top: 1px solid #E5E7EB;
-                    }
-                    
-                    @keyframes fadeIn {
+                    .success - footer {
+            padding: 20px;
+            text - align: center;
+            border - top: 1px solid #E5E7EB;
+        }
+
+        @keyframes fadeIn {
                         from { opacity: 0; }
                         to { opacity: 1; }
-                    }
-                    
-                    @keyframes slideIn {
+        }
+
+        @keyframes slideIn {
                         from { transform: translateY(-50px) scale(0.9); opacity: 0; }
                         to { transform: translateY(0) scale(1); opacity: 1; }
-                    }
-                    
-                    @keyframes pulse {
-                        0%, 100% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                    }
-                    
-                    @keyframes fadeOut {
+        }
+
+        @keyframes pulse {
+            0 %, 100 % { transform: scale(1); }
+            50 % { transform: scale(1.1); }
+        }
+
+        @keyframes fadeOut {
                         from { opacity: 1; }
                         to { opacity: 0; }
-                    }
-                `;
+        }
+        `;
                 document.head.appendChild(styles);
             }
 
@@ -4312,24 +4668,24 @@
         async function deleteAttendanceRecord(recordKey, date, subject, className) {
             // Get teacher information for confirmation
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData') || '{}');
-            const teacherName = `${teacherData.firstName || ''} ${teacherData.lastName || ''}`.trim() || 'Teacher';
+            const teacherName = `${teacherData.firstName || ''} ${teacherData.lastName || ''} `.trim() || 'Teacher';
 
             // Show detailed confirmation dialog
-            const confirmMessage = `🗑️ Delete Attendance Record?\n\n` +
-                `📅 Date: ${new Date(date).toLocaleDateString('en-IN')}\n` +
-                `📚 Subject: ${subject}\n` +
-                `🏫 Class: ${className}\n` +
-                `👨‍🏫 Teacher: ${teacherName}\n\n` +
-                `⚠️ This action cannot be undone!\n\n` +
-                `Are you sure you want to delete this attendance record?`;
+            const confirmMessage = `ðŸ—‘ï¸ Delete Attendance Record ?\n\n` +
+                `ðŸ“… Date: ${new Date(date).toLocaleDateString('en-IN')} \n` +
+                `ðŸ“š Subject: ${subject} \n` +
+                `ðŸ« Class: ${className} \n` +
+                `ðŸ‘¨â€ðŸ« Teacher: ${teacherName} \n\n` +
+                `âš ï¸ This action cannot be undone!\n\n` +
+                `Are you sure you want to delete this attendance record ? `;
 
             if (!confirm(confirmMessage)) {
-                console.log('❌ User cancelled attendance record deletion');
+                console.log('âŒ User cancelled attendance record deletion');
                 return;
             }
 
             try {
-                console.log('🗑️ Starting attendance record deletion:', {
+                console.log('ðŸ—‘ï¸ Starting attendance record deletion:', {
                     recordKey,
                     date,
                     subject,
@@ -4348,13 +4704,13 @@
                 // Delete from Firebase
                 await firebase.database().ref('attendance').child(recordKey).remove();
 
-                console.log('✅ Attendance record deleted successfully from Firebase');
+                console.log('âœ… Attendance record deleted successfully from Firebase');
 
                 // Show success message
-                showSuccessMessage(`✅ Attendance Record Deleted Successfully!\n\n` +
-                    `Date: ${new Date(date).toLocaleDateString('en-IN')}\n` +
-                    `Subject: ${subject}\n` +
-                    `Class: ${className}`);
+                showSuccessMessage(`âœ… Attendance Record Deleted Successfully!\n\n` +
+                    `Date: ${new Date(date).toLocaleDateString('en-IN')} \n` +
+                    `Subject: ${subject} \n` +
+                    `Class: ${className} `);
 
                 // Reload the attendance report to reflect changes
                 setTimeout(() => {
@@ -4362,12 +4718,12 @@
                 }, 1000);
 
             } catch (error) {
-                console.error('❌ Error deleting attendance record:', error);
+                console.error('âŒ Error deleting attendance record:', error);
 
                 // Show error message
-                alert(`❌ Error Deleting Record\n\n` +
+                alert(`âŒ Error Deleting Record\n\n` +
                     `Failed to delete attendance record.\n` +
-                    `Error: ${error.message}\n\n` +
+                    `Error: ${error.message} \n\n` +
                     `Please try again or contact support.`);
 
                 // Re-enable delete button
@@ -4382,47 +4738,47 @@
         function loadScheduleContent() {
             const mainContent = document.querySelector('.main-content');
             mainContent.innerHTML = `                <div class="header">
-                    <h1 class="page-title">Schedule</h1>
+            <h1 class="page-title">Schedule</h1>
                 </div>
-                <div class="schedule-container">
-                    <div class="timetable">
-                        <div class="weekday">
-                            <h3>Monday</h3>
-                            <div class="classes">
-                                <!-- Classes will be loaded here -->
-                            </div>
+            <div class="schedule-container">
+                <div class="timetable">
+                    <div class="weekday">
+                        <h3>Monday</h3>
+                        <div class="classes">
+                            <!-- Classes will be loaded here -->
                         </div>
-                        <div class="weekday">
-                            <h3>Tuesday</h3>
-                            <div class="classes">
-                                <!-- Classes will be loaded here -->
-                            </div>
-                        </div>
-                        <!-- Add other weekdays similarly -->
                     </div>
+                    <div class="weekday">
+                        <h3>Tuesday</h3>
+                        <div class="classes">
+                            <!-- Classes will be loaded here -->
+                        </div>
+                    </div>
+                    <!-- Add other weekdays similarly -->
                 </div>
-            `;
+            </div>
+        `;
         }
 
         function loadNotificationsContent() {
             const mainContent = document.querySelector('.main-content');
             mainContent.innerHTML = `                <div class="header">
-                    <h1 class="page-title">Notifications</h1>
+            <h1 class="page-title">Notifications</h1>
                         </div>
-                <div class="notifications-container">
-                    <div class="notification-filters">
-                        <button class="btn btn-primary active">All</button>
-                        <button class="btn btn-outline">Unread</button>
-                        <button class="btn btn-outline">Important</button>
-                    </div>
-                    <div class="notifications-list">
-                        <!-- Notifications will be loaded here -->
-                        <div class="no-notifications">
-                            No new notifications
-                        </div>
+            <div class="notifications-container">
+                <div class="notification-filters">
+                    <button class="btn btn-primary active">All</button>
+                    <button class="btn btn-outline">Unread</button>
+                    <button class="btn btn-outline">Important</button>
+                </div>
+                <div class="notifications-list">
+                    <!-- Notifications will be loaded here -->
+                    <div class="no-notifications">
+                        No new notifications
                     </div>
                 </div>
-            `;
+            </div>
+        `;
         }
 
         // Handle logout
@@ -4432,14 +4788,14 @@
                 sessionStorage.clear();
                 if (window.firebaseOfflineMode || typeof firebase === 'undefined' || !firebase.auth) {
                     // Offline or no firebase, just redirect
-                    showErrorMessage('तुम्ही ऑफलाइन आहात किंवा लॉगआउट करण्यात अडचण आहे. पुन्हा लॉगिन करा.');
+                    showErrorMessage('à¤¤à¥à¤®à¥à¤¹à¥€ à¤‘à¤«à¤²à¤¾à¤‡à¤¨ à¤†à¤¹à¤¾à¤¤ à¤•à¤¿à¤‚à¤µà¤¾ à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ à¤•à¤°à¤£à¥à¤¯à¤¾à¤¤ à¤…à¤¡à¤šà¤£ à¤†à¤¹à¥‡. à¤ªà¥à¤¨à¥à¤¹à¤¾ à¤²à¥‰à¤—à¤¿à¤¨ à¤•à¤°à¤¾.');
                     setTimeout(() => { window.location.href = 'welcome.html'; }, 1200);
                     return;
                 }
                 await firebase.auth().signOut();
                 window.location.href = 'welcome.html';
             } catch (e) {
-                showErrorMessage('लॉगआउट करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.');
+                showErrorMessage('à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ à¤•à¤°à¤¤à¤¾à¤¨à¤¾ à¤¤à¥à¤°à¥à¤Ÿà¥€ à¤†à¤²à¥€. à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ªà¥à¤¨à¥à¤¹à¤¾ à¤ªà¥à¤°à¤¯à¤¤à¥à¤¨ à¤•à¤°à¤¾.');
                 setTimeout(() => {
                     firebase.auth().signOut().then(() => {
                         window.location.href = 'welcome.html';
@@ -4541,15 +4897,15 @@
                 const tableBody = document.getElementById('attendance-body');
                 if (tableBody) {
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <div class="loading-state">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <p>Loading students...</p>
-                                </div>
-                            </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading students...</p>
+                </div>
+            </td>
                         </tr>
-                    `;
+            `;
                 }
 
                 // Check required fields - division is optional
@@ -4557,16 +4913,16 @@
 
                     if (tableBody) {
                         tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <div class="empty-state">
-                                        <i class="fas fa-info-circle"></i>
-                                        <p>Please fill all required fields</p>
-                                        <div class="subtitle">Department, Year, Subject, Date and Lecture Type are required</div>
-                                    </div>
-                                </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Please fill all required fields</p>
+                    <div class="subtitle">Department, Year, Subject, Date and Lecture Type are required</div>
+                </div>
+            </td>
                             </tr>
-                        `;
+            `;
                     }
                 } else {
                     // All required fields are filled, load students
@@ -4576,16 +4932,16 @@
                         console.error('Error loading students:', error);
                         if (tableBody) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            <p>Error loading students</p>
-                                            <div class="subtitle">Please try again</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Error loading students</p>
+                    <div class="subtitle">Please try again</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         }
                     }
                 }
@@ -4593,16 +4949,16 @@
                 const tableBody = document.getElementById('attendance-body');
                 if (tableBody) {
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <div class="empty-state">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <p>You are not assigned to this year</p>
-                                    <div class="subtitle">Please select a year that is assigned to you</div>
-                                </div>
-                            </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>You are not assigned to this year</p>
+                    <div class="subtitle">Please select a year that is assigned to you</div>
+                </div>
+            </td>
                         </tr>
-                    `;
+            `;
                 }
             }
         }
@@ -4655,15 +5011,15 @@
             // Show loading state
             if (tableBody) {
                 tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="text-center">
-                            <div class="loading-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading Batch ${batch.replace('Batch', '')} students...</p>
-                            </div>
-                        </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading Batch ${batch.replace('Batch', '')} students...</p>
+                </div>
+            </td>
                     </tr>
-                `;
+            `;
             }
 
             try {
@@ -4674,16 +5030,16 @@
                 if (!snapshot.exists()) {
                     if (tableBody) {
                         tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-slash"></i>
-                                        <p>No students found in database</p>
-                                        <div class="subtitle">Add students from Student Management section</div>
-                                    </div>
-                                </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found in database</p>
+                    <div class="subtitle">Add students from Student Management section</div>
+                </div>
+            </td>
                             </tr>
-                        `;
+            `;
                     }
                     return;
                 }
@@ -4708,7 +5064,7 @@
                     const matchesDivision = !division || division === '' ||
                         (student.division && student.division.toUpperCase() === division.toUpperCase());
 
-                    // 🛠️ FIX: Exclude IT student (Roll 2662) from CE/CT/EE/ME/ET SY lists
+                    // ðŸ› ï¸ FIX: Exclude IT student (Roll 2662) from CE/CT/EE/ME/ET SY lists
                     const studentRoll = parseInt((student.rollNo || student.roll_no || '').replace(/\D/g, '')) || 0;
                     if ((department === 'CE' || department === 'CT' || department === 'EE' || department === 'ME' || department === 'ET') && normalizedYear === 'SY' && studentRoll === 2662) return;
 
@@ -4733,7 +5089,7 @@
                     return rollA - rollB;
                 });
 
-                // 🎯 PRIORITY FIX: CE TY Special handling (Roll 3001-3027)
+                // ðŸŽ¯ PRIORITY FIX: CE TY Special handling (Roll 3001-3027)
                 if (department === 'CE' && year === 'TY') {
                     if (batch.replace('Batch', '') === 'A') {
                         let batchStudents = allStudents.filter(s => {
@@ -4743,12 +5099,12 @@
 
                         if (tableBody) {
                             if (batchStudents.length === 0) {
-                                tableBody.innerHTML = `<tr><td colspan="3" class="text-center">No students found (3001-3027)</td></tr>`;
+                                tableBody.innerHTML = `<tr> <td colspan="3" class="text-center">No students found (3001-3027)</td></tr> `;
                             } else {
                                 let studentsHTML = '';
                                 batchStudents.forEach(student => {
                                     studentsHTML += `
-                                        <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                             <td>${student.rollNo}</td>
                                             <td>${student.name}</td>
                                             <td>
@@ -4757,7 +5113,7 @@
                                                     <button class="btn-attendance absent" onclick="markAttendance('${student.id}', false)"><i class="fas fa-times"></i> Absent</button>
                                                 </div>
                                             </td>
-                                        </tr>`;
+                                        </tr> `;
                                 });
                                 tableBody.innerHTML = studentsHTML;
                             }
@@ -4766,7 +5122,7 @@
                     }
                 }
 
-                // 🎯 Custom batch ranges for other departments...
+                // ðŸŽ¯ Custom batch ranges for other departments...
                 const batchLetter = batch.replace('Batch', '');
                 let startIndex, endIndex;
 
@@ -4811,21 +5167,21 @@
                     if (tableBody) {
                         if (batchStudents.length === 0) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-user-slash"></i>
-                                            <p>No students found for CT FY A Division Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1201-1220' : batchLetter === 'B' ? 'Roll numbers 1221-1240' : 'Roll numbers 1241 onwards'}</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found for CT FY A Division Batch ${batchLetter}</p>
+                    <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1201-1220' : batchLetter === 'B' ? 'Roll numbers 1221-1240' : 'Roll numbers 1241 onwards'}</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         } else {
                             let studentsHTML = '';
                             batchStudents.forEach((student, index) => {
                                 studentsHTML += `
-                                    <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                         <td>${student.rollNo}</td>
                                         <td>${student.name}</td>
                                         <td>
@@ -4843,7 +5199,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                `;
+            `;
                             });
                             tableBody.innerHTML = studentsHTML;
                         }
@@ -4891,21 +5247,21 @@
                     if (tableBody) {
                         if (batchStudents.length === 0) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-user-slash"></i>
-                                            <p>No students found for CT FY B Division Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1301-1320' : batchLetter === 'B' ? 'Roll numbers 1321-1340' : 'Roll numbers 1341 onwards'}</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found for CT FY B Division Batch ${batchLetter}</p>
+                    <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1301-1320' : batchLetter === 'B' ? 'Roll numbers 1321-1340' : 'Roll numbers 1341 onwards'}</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         } else {
                             let studentsHTML = '';
                             batchStudents.forEach((student, index) => {
                                 studentsHTML += `
-                                    <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                         <td>${student.rollNo}</td>
                                         <td>${student.name}</td>
                                         <td>
@@ -4923,7 +5279,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                `;
+            `;
                             });
                             tableBody.innerHTML = studentsHTML;
                         }
@@ -4966,21 +5322,21 @@
                     if (tableBody) {
                         if (batchStudents.length === 0) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-user-slash"></i>
-                                            <p>No students found for CT FY C Division Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'C' ? 'Roll numbers 1441 onwards' : `Students ${batchLetter === 'A' ? '1-20' : '21-40'}`}</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found for CT FY C Division Batch ${batchLetter}</p>
+                    <div class="subtitle">${batchLetter === 'C' ? 'Roll numbers 1441 onwards' : `Students ${batchLetter === 'A' ? '1-20' : '21-40'}`}</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         } else {
                             let studentsHTML = '';
                             batchStudents.forEach((student, index) => {
                                 studentsHTML += `
-                                    <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                         <td>${student.rollNo}</td>
                                         <td>${student.name}</td>
                                         <td>
@@ -4998,7 +5354,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                `;
+            `;
                             });
                             tableBody.innerHTML = studentsHTML;
                         }
@@ -5040,7 +5396,7 @@
                         endIndex = startIndex + 20;
                     }
                 } else if (department === 'CT' && year === 'TY') {
-                    // 🎯 Computer Technology Third Year custom batch ranges
+                    // ðŸŽ¯ Computer Technology Third Year custom batch ranges
 
                     if (division === 'A') {
                         // Division A: Batch A (1-20), Batch B (21-40), Batch C (41-63)
@@ -5074,7 +5430,7 @@
                         endIndex = startIndex + 20;
                     }
                 } else if (department === 'ME' && year === 'SY') {
-                    // 🎯 Mechanical Engineering Second Year custom batch ranges (Only A & B)
+                    // ðŸŽ¯ Mechanical Engineering Second Year custom batch ranges (Only A & B)
 
                     // Create filtered students array for ME SY with roll numbers 2701+
                     const meStudents = allStudents.filter(student => {
@@ -5114,21 +5470,21 @@
                     if (tableBody) {
                         if (batchStudents.length === 0) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-user-slash"></i>
-                                            <p>No students found for ME SY Batch ${batchLetter}</p>
-                                            <div class="subtitle">Roll numbers ${batchLetter === 'A' ? '2701-2725' : '2726+'}</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found for ME SY Batch ${batchLetter}</p>
+                    <div class="subtitle">Roll numbers ${batchLetter === 'A' ? '2701-2725' : '2726+'}</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         } else {
                             let studentsHTML = '';
                             batchStudents.forEach((student, index) => {
                                 studentsHTML += `
-                                    <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                         <td>${student.rollNo}</td>
                                         <td>${student.name}</td>
                                         <td>
@@ -5146,14 +5502,14 @@
                                             </div>
                                         </td>
                                     </tr>
-                                `;
+            `;
                             });
                             tableBody.innerHTML = studentsHTML;
                         }
                     }
                     return; // Exit early since we handled the display
                 } else if (department === 'ME' && year === 'TY') {
-                    // 🎯 Mechanical Engineering Third Year custom batch ranges (Only A & B)
+                    // ðŸŽ¯ Mechanical Engineering Third Year custom batch ranges (Only A & B)
 
                     switch (batchLetter) {
                         case 'A':
@@ -5171,7 +5527,7 @@
                             break;
                     }
                 } else if (department === 'CE' && year === 'SY') {
-                    // 🎯 Civil Engineering Second Year custom batch ranges (Only A & B)
+                    // ðŸŽ¯ Civil Engineering Second Year custom batch ranges (Only A & B)
 
                     switch (batchLetter) {
                         case 'A':
@@ -5189,7 +5545,7 @@
                             break;
                     }
                 } else if (department === 'EE' && year === 'FY') {
-                    // 🎯 Electrical Engineering First Year custom batch ranges - Roll number based filtering
+                    // ðŸŽ¯ Electrical Engineering First Year custom batch ranges - Roll number based filtering
 
                     // Apply batch-specific filtering based on roll number ranges
                     let batchStudents = [];
@@ -5229,21 +5585,21 @@
                     if (tableBody) {
                         if (batchStudents.length === 0) {
                             tableBody.innerHTML = `
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <div class="empty-state">
-                                            <i class="fas fa-user-slash"></i>
-                                            <p>No students found for EE FY Batch ${batchLetter}</p>
-                                            <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1564 + 1504'}</div>
-                                        </div>
-                                    </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found for EE FY Batch ${batchLetter}</p>
+                    <div class="subtitle">${batchLetter === 'A' ? 'Roll numbers 1501-1522 + 1543 skip 1504' : batchLetter === 'B' ? 'Roll numbers 1523-1544 skip 1543' : 'Roll numbers 1545-1564 + 1504'}</div>
+                </div>
+            </td>
                                 </tr>
-                            `;
+            `;
                         } else {
                             let studentsHTML = '';
                             batchStudents.forEach((student, index) => {
                                 studentsHTML += `
-                                    <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                         <td>${student.rollNo}</td>
                                         <td>${student.name}</td>
                                         <td>
@@ -5261,14 +5617,14 @@
                                             </div>
                                         </td>
                                     </tr>
-                                `;
+            `;
                             });
                             tableBody.innerHTML = studentsHTML;
                         }
                     }
                     return; // Exit early since we handled the display
                 } else if (department === 'EE' && year === 'SY') {
-                    // 🎯 Electrical Engineering Second Year custom batch ranges
+                    // ðŸŽ¯ Electrical Engineering Second Year custom batch ranges
 
                     switch (batchLetter) {
                         case 'A':
@@ -5289,7 +5645,7 @@
                             break;
                     }
                 } else if (department === 'EE' && year === 'TY') {
-                    // 🎯 Electrical Engineering Third Year custom batch ranges (Only A & B)
+                    // ðŸŽ¯ Electrical Engineering Third Year custom batch ranges (Only A & B)
 
                     switch (batchLetter) {
                         case 'A':
@@ -5307,7 +5663,7 @@
                             break;
                     }
                 } else if (department === 'IT' && year === 'FY') {
-                    // 🎯 Information Technology First Year custom batch ranges
+                    // ðŸŽ¯ Information Technology First Year custom batch ranges
 
                     switch (batchLetter) {
                         case 'A':
@@ -5328,28 +5684,28 @@
                             break;
                     }
                 } else if (department === 'IT' && year === 'SY') {
-                    // 🎯 Information Technology Second Year custom batch ranges by roll numbers
+                    // ðŸŽ¯ Information Technology Second Year custom batch ranges by roll numbers
 
                     // Declare batchStudents locally for IT SY
                     let batchStudents = [];
 
                     switch (batchLetter) {
                         case 'A':
-                            // 🎯 IT SY Batch A: Roll 2601-2624
+                            // ðŸŽ¯ IT SY Batch A: Roll 2601-2624
                             batchStudents = allStudents.filter(student => {
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2601 && rollNum <= 2624;
                             });
                             break;
                         case 'B':
-                            // 🎯 IT SY Batch B: Roll 2625-2648
+                            // ðŸŽ¯ IT SY Batch B: Roll 2625-2648
                             batchStudents = allStudents.filter(student => {
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2625 && rollNum <= 2648;
                             });
                             break;
                         case 'C':
-                            // 🎯 IT SY Batch C: Roll 2649 onwards
+                            // ðŸŽ¯ IT SY Batch C: Roll 2649 onwards
                             batchStudents = allStudents.filter(student => {
                                 const rollNum = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                                 return rollNum >= 2649;
@@ -5367,21 +5723,21 @@
                     // Display the filtered students
                     if (batchStudents.length === 0) {
                         tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" style="text-align: center; padding: 20px; color: #666;">
-                                    <div class="no-students-message">
-                                        <i class="fas fa-users" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
-                                        <div class="title">No students found for IT SY Batch ${batchLetter}</div>
-                                        <div class="subtitle">Roll numbers ${batchLetter === 'A' ? '2601-2624' : batchLetter === 'B' ? '2625-2648' : '2649+'}</div>
-                                    </div>
-                                </td>
+            <tr>
+            <td colspan="3" style="text-align: center; padding: 20px; color: #666;">
+                <div class="no-students-message">
+                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <div class="title">No students found for IT SY Batch ${batchLetter}</div>
+                    <div class="subtitle">Roll numbers ${batchLetter === 'A' ? '2601-2624' : batchLetter === 'B' ? '2625-2648' : '2649+'}</div>
+                </div>
+            </td>
                             </tr>
-                        `;
+            `;
                     } else {
                         let studentsHTML = '';
                         batchStudents.forEach((student, index) => {
                             studentsHTML += `
-                                <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                                     <td>${student.rollNo}</td>
                                     <td>${student.name}</td>
                                     <td>
@@ -5399,13 +5755,13 @@
                                         </div>
                                     </td>
                                 </tr>
-                            `;
+            `;
                         });
                         tableBody.innerHTML = studentsHTML;
                     }
                     return; // Exit early since we handled the display
                 } else if (department === 'IT' && year === 'TY') {
-                    // 🎯 Information Technology Third Year custom batch ranges (roll 23 only in Batch A)
+                    // ðŸŽ¯ Information Technology Third Year custom batch ranges (roll 23 only in Batch A)
                     // Always sort by rollNo (as integer)
                     allStudents.sort((a, b) => {
                         const rollA = parseInt((a.rollNo || '').replace(/\D/g, '')) || 0;
@@ -5460,7 +5816,7 @@
                 let batchStudents;
 
                 if (department === 'CE' && year === 'SY') {
-                    // 🎯 CE SY roll-based slicing: A = 2001-2022 + 2027, B = 2023-2026 + 2028-2043 (skip 2027), no C
+                    // ðŸŽ¯ CE SY roll-based slicing: A = 2001-2022 + 2027, B = 2023-2026 + 2028-2043 (skip 2027), no C
                     const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.filter(s => {
@@ -5492,7 +5848,7 @@
                             break;
                     }
                 } else if (department === 'ET' && year === 'SY') {
-                    // 🎯 Electronics & Telecommunication Second Year custom batch ranges
+                    // ðŸŽ¯ Electronics & Telecommunication Second Year custom batch ranges
 
                     switch (batchLetter) {
                         case 'A':
@@ -5526,7 +5882,7 @@
                             break;
                     }
                 } else if (department === 'IT' && year === 'TY') {
-                    // 🎯 IT TY Special handling: roll 3623 in Batch A
+                    // ðŸŽ¯ IT TY Special handling: roll 3623 in Batch A
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.slice(0, 23);
                         // Force add roll 3623 to Batch A
@@ -5556,7 +5912,7 @@
                         batchStudents = allStudents.slice(0, 23);
                     }
                 } else if (department === 'AI' && year === 'FY') {
-                    // 🎯 AI FY roll-based slicing: A = 1001-1022, B = 1023-1044, C = 1045 onwards
+                    // ðŸŽ¯ AI FY roll-based slicing: A = 1001-1022, B = 1023-1044, C = 1045 onwards
                     const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.filter(s => {
@@ -5600,7 +5956,7 @@
                         batchStudents = [];
                     }
                 } else if (department === 'CE' && year === 'FY') {
-                    // 🎯 CE FY roll-based slicing: A = 1101-1120, B = 1121-1140, C = 1141 onwards
+                    // ðŸŽ¯ CE FY roll-based slicing: A = 1101-1120, B = 1121-1140, C = 1141 onwards
                     const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.filter(s => {
@@ -5621,7 +5977,7 @@
                         batchStudents = [];
                     }
                 } else if (department === 'CT' && year === 'TY' && division === 'A') {
-                    // 🎯 CT TY Division A roll-based slicing
+                    // ðŸŽ¯ CT TY Division A roll-based slicing
                     const toNum = (s) => parseInt(String((s.rollNo || '')).replace(/\D/g, '')) || 0;
                     if (batchLetter === 'A') {
                         batchStudents = allStudents.filter(s => {
@@ -5642,7 +5998,7 @@
                         batchStudents = [];
                     }
                 } else if (department === 'CE' && year === 'TY') {
-                    // 🎯 CE TY Special handling: Only Batch A with roll 3001-3027
+                    // ðŸŽ¯ CE TY Special handling: Only Batch A with roll 3001-3027
                     if (batchLetter === 'A') {
                         // Filter students with roll numbers 3001-3027
                         batchStudents = allStudents.filter(s => {
@@ -5666,16 +6022,16 @@
                 if (batchStudents.length === 0) {
                     if (tableBody) {
                         tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <div class="empty-state">
-                                        <i class="fas fa-info-circle"></i>
-                                        <p>No students found for Batch ${batchLetter}</p>
-                                        <div class="subtitle">This batch range (${startIndex + 1}-${endIndex}) has no students</div>
-                                    </div>
-                                </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No students found for Batch ${batchLetter}</p>
+                    <div class="subtitle">This batch range (${startIndex + 1}-${endIndex}) has no students</div>
+                </div>
+            </td>
                             </tr>
-                        `;
+            `;
                     }
                     return;
                 }
@@ -5684,7 +6040,7 @@
                 let html = '';
                 batchStudents.forEach((student, index) => {
                     html += `
-                        <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                             <td>${student.rollNo}</td>
                             <td>${student.name}</td>
                             <td>
@@ -5702,7 +6058,7 @@
                                 </div>
                             </td>
                         </tr>
-                    `;
+            `;
                 });
 
                 if (tableBody) {
@@ -5714,16 +6070,16 @@
                 console.error('Error loading batch students:', error);
                 if (tableBody) {
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <div class="empty-state">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <p>Error loading students</p>
-                                    <div class="subtitle">${error.message}</div>
-                                </div>
-                            </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Error loading students</p>
+                    <div class="subtitle">${error.message}</div>
+                </div>
+            </td>
                         </tr>
-                    `;
+            `;
                 }
             }
         }
@@ -5747,16 +6103,16 @@
                 if (tableBody) {
                     const batchMsg = batchRequired ? ', and Batch (for Practical)' : '';
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <div class="empty-state">
-                                    <i class="fas fa-info-circle"></i>
-                                    <p>Please fill all required fields</p>
-                                    <div class="subtitle">Department, Year, Subject, Date, Lecture Type${batchMsg} are required</div>
-                                </div>
-                            </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Please fill all required fields</p>
+                    <div class="subtitle">Department, Year, Subject, Date, Lecture Type${batchMsg} are required</div>
+                </div>
+            </td>
                         </tr>
-                    `;
+            `;
                 }
                 return;
             }
@@ -5764,15 +6120,15 @@
             // Show loading state
             if (tableBody) {
                 tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="text-center">
-                            <div class="loading-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading students...</p>
-                            </div>
-                        </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading students...</p>
+                </div>
+            </td>
                     </tr>
-                `;
+            `;
             }
 
             await waitForFirebase();
@@ -5786,7 +6142,7 @@
             // tableBody is already declared at the top of the function
 
             try {
-                // 🚀 USE CACHED DATA: Avoid redundant Firebase reads
+                // ðŸš€ USE CACHED DATA: Avoid redundant Firebase reads
                 const allStudentsData = await window.loadStudentsWithCache();
                 const students = [];
 
@@ -5800,7 +6156,7 @@
                 Object.keys(allStudentsData).forEach((studentId) => {
                     const student = allStudentsData[studentId];
 
-                    // 🔍 ROBUST FILTERING: Handles multiple department name formats
+                    // ðŸ” ROBUST FILTERING: Handles multiple department name formats
                     const studentDept = (student.department || '').toString().toLowerCase();
                     const studentBranch = (student.branch || '').toString().toLowerCase();
                     const studentDeptCode = (student.dept || '').toString().toLowerCase();
@@ -5828,7 +6184,7 @@
                         if (studentDivision !== division) return;
                     }
 
-                    // 🛠️ FIX: Exclude IT student (Roll 2662) from CE & CT & EE & ME & ET SY lists
+                    // ðŸ› ï¸ FIX: Exclude IT student (Roll 2662) from CE & CT & EE & ME & ET SY lists
                     const studentRoll = parseInt((student.rollNo || '').replace(/\D/g, '')) || 0;
                     if ((department === 'CE' || department === 'CT' || department === 'EE' || department === 'ME' || department === 'ET') && normalizedYear === 'SY' && studentRoll === 2662) return;
 
@@ -5852,25 +6208,25 @@
                 if (students.length === 0) {
                     if (tableBody) {
                         tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-slash"></i>
-                                        <p>No students found</p>
-                                        <div class="subtitle">No Students found in ${department} ${year} ${division || ''}</div>
-                                    </div>
-                                </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students found</p>
+                    <div class="subtitle">No Students found in ${department} ${year} ${division || ''}</div>
+                </div>
+            </td>
                             </tr>
-                        `;
+            `;
                     }
                     return;
                 }
 
                 let html = '';
                 students.forEach(student => {
-                    const studentName = student.name || `${student.firstName} ${student.lastName}`;
+                    const studentName = student.name || `${student.firstName} ${student.lastName} `;
                     html += `
-                        <tr data-student-id="${student.id}">
+            <tr data-student-id="${student.id}">
                             <td>${student.rollNo || '-'}</td>
                             <td>${studentName.trim()}</td>
                             <td>
@@ -5888,7 +6244,7 @@
                                 </div>
                             </td>
                         </tr>
-                    `;
+            `;
                 });
 
                 if (tableBody) tableBody.innerHTML = html;
@@ -5897,16 +6253,16 @@
                 console.error('Error loading students:', error);
                 if (tableBody) {
                     tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <div class="empty-state">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <p>Error loading students</p>
-                                    <div class="subtitle">${error.message}</div>
-                                </div>
-                            </td>
+            <tr>
+            <td colspan="3" class="text-center">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Error loading students</p>
+                    <div class="subtitle">${error.message}</div>
+                </div>
+            </td>
                         </tr>
-                    `;
+            `;
                 }
             }
         }
@@ -5938,32 +6294,32 @@
             const warning = document.createElement('div');
             warning.id = 'subjectWarning';
             warning.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #F59E0B;
-                color: white;
-                padding: 12px 16px;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 500;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                z-index: 1000;
-                animation: slideIn 0.3s ease-out;
-            `;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #F59E0B;
+        color: white;
+        padding: 12px 16px;
+        border - radius: 8px;
+        font - size: 14px;
+        font - weight: 500;
+        box - shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z - index: 1000;
+        animation: slideIn 0.3s ease - out;
+        `;
             warning.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle"></i>
                 Subject limited to 4 words only!
-            `;
+                    `;
 
             // Add CSS animation
             const style = document.createElement('style');
             style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
+        @keyframes slideIn {
+                    from { transform: translateX(100 %); opacity: 0; }
                     to { transform: translateX(0); opacity: 1; }
-                }
-            `;
+        }
+        `;
             document.head.appendChild(style);
 
             document.body.appendChild(warning);
@@ -6003,11 +6359,11 @@
 
         // Function to mark attendance for a student (LOCAL ONLY - NO AUTO SAVE)
         function markAttendance(studentId, isPresent) {
-            console.log('🔄 Marking attendance locally (NO AUTO SAVE):', { studentId, isPresent });
+            console.log('ðŸ”„ Marking attendance locally (NO AUTO SAVE):', { studentId, isPresent });
 
             const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
             if (!row) {
-                console.warn('❌ Student row not found:', studentId);
+                console.warn('âŒ Student row not found:', studentId);
                 return;
             }
 
@@ -6026,8 +6382,8 @@
             // Store attendance locally (NOT in Firebase)
             localAttendanceData[studentId] = isPresent;
 
-            console.log('✅ Local attendance updated:', localAttendanceData);
-            console.log('🚫 NO Firebase save performed - waiting for Submit button');
+            console.log('âœ… Local attendance updated:', localAttendanceData);
+            console.log('ðŸš« NO Firebase save performed - waiting for Submit button');
 
             // Check if all students are marked
             checkAttendanceCompletion();
@@ -6048,7 +6404,7 @@
                 }
             });
 
-            console.log(`📊 Batch Attendance Progress: ${markedVisibleStudents}/${totalVisibleStudents} visible students marked`);
+            console.log(`ðŸ“Š Batch Attendance Progress: ${markedVisibleStudents}/${totalVisibleStudents} visible students marked`);
 
             const submitBtn = document.getElementById('submitAttendanceBtn');
             if (submitBtn) {
@@ -6057,32 +6413,32 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> Submit Attendance';
                     submitBtn.style.background = '#10B981';
-                    console.log('✅ All visible students marked - Submit button enabled');
+                    console.log('âœ… All visible students marked - Submit button enabled');
                 } else if (totalVisibleStudents > 0) {
                     // Not all visible students marked - disable submit
                     submitBtn.disabled = true;
                     const remaining = totalVisibleStudents - markedVisibleStudents;
                     submitBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Mark All Students (${remaining} remaining)`;
                     submitBtn.style.background = '#F59E0B';
-                    console.log(`⚠️ ${remaining} visible students remaining - Submit button disabled`);
+                    console.log(`âš ï¸ ${remaining} visible students remaining - Submit button disabled`);
                 } else {
                     // No visible students (probably no batch selected)
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="fas fa-users"></i> Select Batch/Students First';
                     submitBtn.style.background = '#6B7280';
-                    console.log('⚠️ No visible students - Submit button disabled');
+                    console.log('âš ï¸ No visible students - Submit button disabled');
                 }
             }
         }
 
         // Update mark all functions (LOCAL ONLY - NO AUTO SAVE) - BATCH AWARE
         function markAllPresent() {
-            console.log('🔄 Marking visible batch students present locally (NO AUTO SAVE)');
+            console.log('ðŸ”„ Marking visible batch students present locally (NO AUTO SAVE)');
 
             // Only select VISIBLE student rows (not hidden by batch filtering)
             const visibleRows = document.querySelectorAll('tr[data-student-id]:not([style*="display: none"])');
 
-            console.log(`📊 Found ${visibleRows.length} visible students to mark present`);
+            console.log(`ðŸ“Š Found ${visibleRows.length} visible students to mark present`);
 
             visibleRows.forEach(row => {
                 const studentId = row.getAttribute('data-student-id');
@@ -6097,20 +6453,20 @@
                 localAttendanceData[studentId] = true;
             });
 
-            console.log('✅ Visible batch students marked present locally:', Object.keys(localAttendanceData).length, 'students');
-            console.log('🚫 NO Firebase save performed - waiting for Submit button');
+            console.log('âœ… Visible batch students marked present locally:', Object.keys(localAttendanceData).length, 'students');
+            console.log('ðŸš« NO Firebase save performed - waiting for Submit button');
 
             // Check completion status
             checkAttendanceCompletion();
         }
 
         function markAllAbsent() {
-            console.log('🔄 Marking visible batch students absent locally (NO AUTO SAVE)');
+            console.log('ðŸ”„ Marking visible batch students absent locally (NO AUTO SAVE)');
 
             // Only select VISIBLE student rows (not hidden by batch filtering)
             const visibleRows = document.querySelectorAll('tr[data-student-id]:not([style*="display: none"])');
 
-            console.log(`📊 Found ${visibleRows.length} visible students to mark absent`);
+            console.log(`ðŸ“Š Found ${visibleRows.length} visible students to mark absent`);
 
             visibleRows.forEach(row => {
                 const studentId = row.getAttribute('data-student-id');
@@ -6125,8 +6481,8 @@
                 localAttendanceData[studentId] = false;
             });
 
-            console.log('✅ Visible batch students marked absent locally:', Object.keys(localAttendanceData).length, 'students');
-            console.log('🚫 NO Firebase save performed - waiting for Submit button');
+            console.log('âœ… Visible batch students marked absent locally:', Object.keys(localAttendanceData).length, 'students');
+            console.log('ðŸš« NO Firebase save performed - waiting for Submit button');
 
             // Check completion status
             checkAttendanceCompletion();
@@ -6134,7 +6490,7 @@
 
         // Function to submit attendance (ONLY when Submit button is clicked)
         async function submitAttendance() {
-            console.log('🚀 SUBMIT ATTENDANCE CLICKED - Starting Firebase save process');
+            console.log('ðŸš€ SUBMIT ATTENDANCE CLICKED - Starting Firebase save process');
 
             // Wait for Firebase to be ready
             await waitForFirebase();
@@ -6145,12 +6501,12 @@
             const markedStudents = Object.keys(localAttendanceData).length;
 
             if (markedStudents === 0 || totalStudents === 0) {
-                alert(`⚠️ Please mark at least one student!\n\nMarked: ${markedStudents} students\nTotal: ${totalStudents} students`);
-                console.log(`❌ Submit blocked - No students marked`);
+                alert(`âš ï¸ Please mark at least one student!\n\nMarked: ${markedStudents} students\nTotal: ${totalStudents} students`);
+                console.log(`âŒ Submit blocked - No students marked`);
                 return;
             }
 
-            console.log(`✅ Proceeding with ${markedStudents}/${totalStudents} students marked`);
+            console.log(`âœ… Proceeding with ${markedStudents}/${totalStudents} students marked`);
 
             // Get form data
             const department = document.getElementById('department').value;
@@ -6165,7 +6521,7 @@
             const actualDivision = departmentHasDivisions(department) ? division : null;
 
             if (!department || !year || !subject || !selectedDate || !selectedLectureType) {
-                alert('⚠️ Please fill all required fields!');
+                alert('âš ï¸ Please fill all required fields!');
                 return;
             }
 
@@ -6173,18 +6529,18 @@
             const presentCount = Object.values(localAttendanceData).filter(status => status === true).length;
             const absentCount = totalStudents - presentCount;
 
-            const confirmMsg = `📊 Confirm Attendance Submission:\n\n` +
-                `🏫 Class: ${year}${department}${actualDivision ? '-' + actualDivision : ''}${batch ? '-' + batch : ''}\n` +
-                `📚 Subject: ${subject}\n` +
-                `📅 Date: ${selectedDate}\n` +
-                `🎯 Type: ${selectedLectureType}\n\n` +
-                `✅ Present: ${presentCount}\n` +
-                `❌ Absent: ${absentCount}\n` +
-                `📊 Total: ${totalStudents}\n\n` +
+            const confirmMsg = `--- Confirm Attendance Submission ---\n\n` +
+                `Class: ${year}${department}${actualDivision ? '-' + actualDivision : ''}${batch ? '-' + batch : ''}\n` +
+                `Subject: ${subject}\n` +
+                `Date: ${selectedDate}\n` +
+                `Type: ${selectedLectureType}\n\n` +
+                `Present: ${presentCount}\n` +
+                `Absent: ${absentCount}\n` +
+                `Total: ${totalStudents}\n\n` +
                 `Are you sure you want to submit this attendance?`;
 
             if (!confirm(confirmMsg)) {
-                console.log('❌ User cancelled attendance submission');
+                console.log('Submission cancelled by user');
                 return;
             }
 
@@ -6197,7 +6553,7 @@
             }
 
             try {
-                console.log('📦 Starting Firebase save with local data:', localAttendanceData);
+                console.log('ðŸ“¦ Starting Firebase save with local data:', localAttendanceData);
 
                 // Create attendance key with timestamp for multiple sessions
                 const classCode = year + department + (actualDivision ? '-' + actualDivision : '') + (batch ? '-' + batch : '');
@@ -6205,7 +6561,7 @@
                 const sessionTime = new Date().toLocaleTimeString('en-GB', { hour12: false }); // HH:MM:SS format
                 const attendanceKey = `${selectedDate}_${classCode}_${selectedLectureType}_${subject}_${timestamp}`;
 
-                console.log('🏫 Class code generation:', {
+                console.log('ðŸ« Class code generation:', {
                     department: department,
                     year: year,
                     division: division,
@@ -6236,16 +6592,16 @@
                     absentCount: absentCount
                 };
 
-                // 🚀 OPTIMIZED FIREBASE SAVE - Multiple cost-saving strategies
-                console.log('💾 Using optimized Firebase save with cost reduction...');
+                // ðŸš€ OPTIMIZED FIREBASE SAVE - Multiple cost-saving strategies
+                console.log('ðŸ’¾ Using optimized Firebase save with cost reduction...');
 
                 // Clear attendance cache to ensure fresh data
                 attendanceCache = null;
                 attendanceCacheTime = 0;
 
-                // 📱 Check if online - if offline, queue for later
+                // ðŸ“± Check if online - if offline, queue for later
                 if (!isOnline) {
-                    console.log('📱 Offline - queuing attendance for later sync');
+                    console.log('ðŸ“± Offline - queuing attendance for later sync');
                     offlineQueue.push({
                         key: attendanceKey,
                         data: attendanceData,
@@ -6256,28 +6612,28 @@
                     localStorage.setItem('offlineAttendance', JSON.stringify(offlineQueue));
 
                     // Show success message even when offline
-                    console.log('✅ Attendance queued for sync when online');
+                    console.log('âœ… Attendance queued for sync when online');
                 } else {
-                    // 💰 Use direct set operation for better performance and lower cost
-                    console.log('🔥 Attempting to save to Firebase with key:', attendanceKey);
-                    console.log('📦 Data being saved:', attendanceData);
+                    // ðŸ’° Use direct set operation for better performance and lower cost
+                    console.log('ðŸ”¥ Attempting to save to Firebase with key:', attendanceKey);
+                    console.log('ðŸ“¦ Data being saved:', attendanceData);
 
                     if (!window.db) {
                         throw new Error('Firebase database not initialized');
                     }
 
                     await window.db.ref(`attendance/${attendanceKey}`).set(attendanceData);
-                    console.log('✅ Attendance saved successfully to Firebase with key:', attendanceKey);
+                    console.log('âœ… Attendance saved successfully to Firebase with key:', attendanceKey);
                 }
 
-                console.log('✅ Attendance saved successfully to Firebase!');
+                console.log('âœ… Attendance saved successfully to Firebase!');
 
-                // 📧 Send Email Notification
+                // ðŸ“§ Send Email Notification
                 const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
                 const currentUser = firebase.auth().currentUser;
 
-                console.log('📊 Teacher Data:', teacherData);
-                console.log('📊 Current User:', currentUser);
+                console.log('ðŸ“Š Teacher Data:', teacherData);
+                console.log('ðŸ“Š Current User:', currentUser);
 
                 // Fallback email for testing
                 const fallbackEmail = 'sagar969999@gmail.com';
@@ -6301,10 +6657,10 @@
                     attendance_percentage: Math.round((presentCount / totalStudents) * 100)
                 };
 
-                console.log('📧 Final Email Data:', emailData);
-                console.log('📧 Sending attendance email notification...');
+                console.log('ðŸ“§ Final Email Data:', emailData);
+                console.log('ðŸ“§ Sending attendance email notification...');
                 const emailResult = await sendAttendanceEmail(emailData);
-                console.log('📧 Email result:', emailResult);
+                console.log('ðŸ“§ Email result:', emailResult);
 
                 // Show detailed success popup
                 showAttendanceSuccessPopup({
@@ -6342,8 +6698,8 @@
                 }
 
             } catch (error) {
-                console.error('❌ Error saving attendance:', error);
-                alert(`❌ Error saving attendance: ${error.message}`);
+                console.error('âŒ Error saving attendance:', error);
+                alert(`âŒ Error saving attendance: ${error.message}`);
 
                 // Re-enable submit button
                 if (submitBtn) {
@@ -6557,7 +6913,7 @@
             }
         }
 
-        // ❌ REMOVED updateAttendance function - NO AUTO SAVE ALLOWED!
+        // âŒ REMOVED updateAttendance function - NO AUTO SAVE ALLOWED!
         // All attendance saving now happens ONLY through submitAttendance() function
 
         // Load teacher's classes into the select dropdown
@@ -7075,16 +7431,16 @@
             loadAttendanceReport();
         }
 
-        // 📊 Complete Attendance Report Loading Function
+        // ðŸ“Š Complete Attendance Report Loading Function
         async function loadAttendanceReport() {
-            console.log('📊 Loading attendance report...');
+            console.log('ðŸ“Š Loading attendance report...');
 
             // Wait for Firebase to be ready
             await waitForFirebase();
 
             const reportContent = document.getElementById('reportContent');
             if (!reportContent) {
-                console.error('❌ Report content element not found');
+                console.error('âŒ Report content element not found');
                 return;
             }
 
@@ -7123,7 +7479,7 @@
                     return;
                 }
 
-                console.log('🔍 Filters:', { department, year, division, startDate, endDate, teacherKey });
+                console.log('ðŸ” Filters:', { department, year, division, startDate, endDate, teacherKey });
 
                 // Load attendance data from Firebase
                 // Load attendance data from Firebase - Optimized to fetch only this teacher's records
@@ -7133,7 +7489,7 @@
                     .once('value');
                 const attendanceData = attendanceSnapshot.val() || {};
 
-                console.log('📦 Raw attendance data loaded:', Object.keys(attendanceData).length, 'records');
+                console.log('ðŸ“¦ Raw attendance data loaded:', Object.keys(attendanceData).length, 'records');
 
                 // Filter attendance records
                 const filteredRecords = [];
@@ -7178,7 +7534,7 @@
                     filteredRecords.push({ key, ...record });
                 });
 
-                console.log('✅ Filtered records:', filteredRecords.length);
+                console.log('âœ… Filtered records:', filteredRecords.length);
 
                 if (filteredRecords.length === 0) {
                     reportContent.innerHTML = `
@@ -7284,10 +7640,10 @@
                 `;
 
                 reportContent.innerHTML = tableHTML;
-                console.log('✅ Report table generated successfully');
+                console.log('âœ… Report table generated successfully');
 
             } catch (error) {
-                console.error('❌ Error loading attendance report:', error);
+                console.error('âŒ Error loading attendance report:', error);
                 reportContent.innerHTML = `
                     <div class="error-state">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -7320,7 +7676,7 @@
             return match ? match[1] : '';
         }
 
-        // 🗑️ Delete Attendance Record Function
+        // ðŸ—‘ï¸ Delete Attendance Record Function
         async function deleteAttendanceRecord(recordKey, date, subject, className) {
             if (!recordKey) {
                 alert('Invalid record key');
@@ -7334,12 +7690,12 @@
             }
 
             try {
-                console.log('🗑️ Deleting attendance record:', recordKey);
+                console.log('ðŸ—‘ï¸ Deleting attendance record:', recordKey);
 
                 // Delete from Firebase
                 await firebase.database().ref(`attendance/${recordKey}`).remove();
 
-                console.log('✅ Attendance record deleted successfully');
+                console.log('âœ… Attendance record deleted successfully');
 
                 // Show success message
                 alert('Attendance record deleted successfully!');
@@ -7348,7 +7704,7 @@
                 loadAttendanceReport();
 
             } catch (error) {
-                console.error('❌ Error deleting attendance record:', error);
+                console.error('âŒ Error deleting attendance record:', error);
                 alert('Error deleting attendance record. Please try again.');
             }
         }
@@ -7357,7 +7713,7 @@
     <script>
         // Page initialization - preserve current page on refresh
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('🚀 Page loaded, initializing...');
+            console.log('ðŸš€ Page loaded, initializing...');
 
             // Initialize Lucide icons
             if (window.lucide) {
@@ -7368,9 +7724,9 @@
             const currentHash = window.location.hash.slice(1);
 
             if (currentHash && currentHash !== 'dashboard') {
-                console.log('📍 Preserving current page:', currentHash);
+                console.log('ðŸ“ Preserving current page:', currentHash);
             } else {
-                console.log('📍 Loading dashboard (fresh visit or dashboard refresh)');
+                console.log('ðŸ“ Loading dashboard (fresh visit or dashboard refresh)');
                 if (!currentHash) {
                     window.location.hash = 'dashboard';
                 }
