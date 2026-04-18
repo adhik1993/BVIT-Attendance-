@@ -183,6 +183,19 @@
         "certificateType"
       ]
     },
+    "itr_attendance": {
+      ".read": true,
+      ".write": "auth != null",
+      ".indexOn": ["date", "department", "company"]
+    },
+    "itrAttendance": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "systems": {
+      ".read": true,
+      ".write": "auth != null"
+    },
     ".read": false,
     ".write": false
   }

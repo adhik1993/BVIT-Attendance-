@@ -179,7 +179,8 @@ async function updateTeacherDetails(teacherId) {
         document.getElementById('editFirstName').value = teacher.firstName;
         document.getElementById('editLastName').value = teacher.lastName;
         document.getElementById('editEmail').value = teacher.email;
-        document.getElementById('editPhone').value = teacher.phone;
+        document.getElementById('editPhone').value = teacher.phone || '';
+        document.getElementById('editCompanyName').value = teacher.companyName || '';
         document.getElementById('editRole').value = teacher.role || 'Lecturer'; // ✅ FIXED: Added missing role field population
 
         // Set departments
@@ -243,6 +244,7 @@ async function updateTeacherDetails(teacherId) {
                     firstName: document.getElementById('editFirstName').value,
                     lastName: document.getElementById('editLastName').value,
                     phone: document.getElementById('editPhone').value,
+                    companyName: document.getElementById('editCompanyName').value,
                     role: document.getElementById('editRole').value, // ✅ FIXED: Added missing role field
                     departments: Array.from(departmentSelect.selectedOptions).map(option => ({
                         code: option.value,
@@ -789,6 +791,9 @@ class TeacherList {
                     <i class="fas fa-phone-alt" style="color: var(--secondary); font-size: 0.8rem;"></i>
                     ${teacher.phone || 'N/A'}
                 </div>
+            </td>
+            <td>
+                ${teacher.companyName ? `<span style="background:#EEF2FF;color:#4F46E5;padding:2px 10px;border-radius:20px;font-size:0.82rem;font-weight:600;">${teacher.companyName}</span>` : '<span style="color:#9CA3AF;">—</span>'}
             </td>
             <td>
                 <div class="tag-group">

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="mobile-fixes.css">
 
     <!-- Firebase SDKs -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -125,7 +126,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 💾 STUDENT CACHING - Reduce Firebase reads
+        // ðŸ’¾ STUDENT CACHING - Reduce Firebase reads
         let studentsCache = null;
         let studentsCacheTime = 0;
         const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
@@ -279,6 +280,7 @@
 
                 class: classCode,
                 division: division,
+                companyName: document.getElementById('companyName') ? document.getElementById('companyName').value : '',
                 lastUpdated: new Date().toISOString()
             };
 
@@ -459,10 +461,10 @@
 
                 // Check if we have a valid cache
                 if (studentsCache && (now - studentsCacheTime) < CACHE_DURATION) {
-                    console.log('✅ Pulling students from local cache (Zero Firebase Cost)');
+                    console.log('âœ… Pulling students from local cache (Zero Firebase Cost)');
                     students = studentsCache;
                 } else {
-                    console.log('🔄 Cache expired or empty, fetching fresh data from Firebase');
+                    console.log('ðŸ”„ Cache expired or empty, fetching fresh data from Firebase');
                     const snapshot = await firebase.database().ref('students').once('value');
                     students = snapshot.val();
 
@@ -522,7 +524,7 @@
                 const selectedClass = classFilter ? classFilter.value : '';
                 const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
 
-                // 🛑 STRICT RESTRICTION: Require BOTH Department AND Year (unless searching)
+                // ðŸ›‘ STRICT RESTRICTION: Require BOTH Department AND Year (unless searching)
                 if ((!selectedDepartment || !selectedClass) && !searchTerm) {
                     if (table) table.style.display = 'none';
                     if (emptyState) {
@@ -628,7 +630,8 @@
                         <td>${student.department}</td>
                         <td>${student.year}</td>
                         <td>${student.class}</td>
-                        <td>
+                         <td>${student.year === 'SY' && student.companyName ? '<span style="background:#EEF2FF;color:#4F46E5;padding:2px 10px;border-radius:20px;font-size:0.82rem;font-weight:600;">' + student.companyName + '</span>' : '<span style="color:#9CA3AF;">-</span>'}</td>
+                         <td>
                             <button class="action-btn edit-btn" onclick="editStudent('${student.id}')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
@@ -707,7 +710,7 @@
                     console.log('last_name:', student.last_name);
                     console.log('surname:', student.surname);
                     if (!student) {
-                        alert('विद्यार्थी सापडला नाही!');
+                        alert('Student data could not be found.');
                         return;
                     }
 
@@ -736,10 +739,14 @@
                     const editDepartment = document.getElementById('editDepartment');
                     const editYear = document.getElementById('editYear');
 
-                    // Handle name field - split full name into first and last name
+                    // Handle name field - check for firstName/lastName first, then fall back to combined name
                     let firstName = '';
                     let lastName = '';
-                    if (student.name) {
+
+                    if (student.firstName || student.lastName) {
+                        firstName = student.firstName || '';
+                        lastName = student.lastName || '';
+                    } else if (student.name) {
                         const nameParts = student.name.trim().split(' ');
                         firstName = nameParts[0] || '';
                         lastName = nameParts.slice(1).join(' ') || '';
@@ -751,8 +758,31 @@
                     if (editLastName) editLastName.value = lastName;
                     if (editEmail) editEmail.value = student.email || '';
                     if (editPhone) editPhone.value = student.phone || '';
-                    if (editDepartment) editDepartment.value = student.department || '';
-                    if (editYear) editYear.value = student.year || '';
+                    
+                    let deptVal = student.department || student.branch || ''; // fallback to branch if dept is missing
+                    if (deptVal === 'ME') deptVal = 'Mechanical Engineering';
+                    if (deptVal === 'CE') deptVal = 'Civil Engineering';
+                    if (deptVal === 'CT') deptVal = 'Computer Technology';
+                    if (deptVal === 'IT') deptVal = 'Information Technology';
+                    if (deptVal === 'EE') deptVal = 'Electrical Engineering';
+                    if (deptVal === 'ET' || deptVal === 'E & TC') deptVal = 'Electronics & Telecommunication';
+                    if (deptVal === 'AI') deptVal = 'Artificial Intelligence';
+                    if (editDepartment) editDepartment.value = deptVal;
+                    
+                    let yearVal = student.year || '';
+                    if (yearVal === '1' || yearVal === 'First' || yearVal === 'First Year') yearVal = 'FY';
+                    else if (yearVal === '2' || yearVal === 'Second' || yearVal === 'Second Year') yearVal = 'SY';
+                    else if (yearVal === '3' || yearVal === 'Third' || yearVal === 'Third Year') yearVal = 'TY';
+                    else if (yearVal === '4' || yearVal === 'Fourth' || yearVal === 'Fourth Year' || yearVal === 'Final' || yearVal === 'Final Year') yearVal = 'BE';
+                    if (editYear) editYear.value = yearVal;
+                    
+                    if (document.getElementById('editCompanyName')) {
+                        // Must be AFTER editYear.value is set to prevent handleEditYearChange from clearing it!
+                        document.getElementById('editCompanyName').value = student.companyName || '';
+                        if (yearVal === 'SY') {
+                            document.getElementById('editCompanyGroup').style.display = 'block';
+                        }
+                    }
 
                     console.log('Form fields populated. Checking values:');
                     console.log('Roll No field value:', editRollNo ? editRollNo.value : 'Element not found');
@@ -770,6 +800,10 @@
                     } else {
                         divisionGroup.style.display = 'none';
                     }
+
+                    // Also make sure to update the dropdown change listener
+                    handleEditDepartmentChange(); // Trigger this to ensure UI is in sync
+                    if (typeof handleEditYearChange === 'function') handleEditYearChange();
 
                     // Update class options and set value
                     updateEditClassOptions();
@@ -821,7 +855,7 @@
                     });
 
                     if (!canUpdate) {
-                        alert('हा रोल नंबर दुसऱ्या विद्यार्थ्याचा आहे! कृपया वेगळा रोल नंबर वापरा.');
+                        alert('à¤¹à¤¾ à¤°à¥‹à¤² à¤¨à¤‚à¤¬à¤° à¤¦à¥à¤¸à¤±à¥à¤¯à¤¾ à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥à¤¯à¤¾à¤šà¤¾ à¤†à¤¹à¥‡! à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¥‡à¤—à¤³à¤¾ à¤°à¥‹à¤² à¤¨à¤‚à¤¬à¤° à¤µà¤¾à¤ªà¤°à¤¾.');
                         return;
                     }
 
@@ -845,45 +879,48 @@
                     const studentData = {
                         rollNo: newRollNo,
                         name: fullName,
+                        firstName: firstName,
+                        lastName: lastName,
                         email: document.getElementById('editEmail').value,
                         phone: document.getElementById('editPhone').value,
                         department: department,
                         year: year,
                         division: division,
                         class: classCode,
+                        companyName: document.getElementById('editCompanyName') ? document.getElementById('editCompanyName').value : '',
                         lastUpdated: new Date().toISOString()
                     };
 
                     // Validate data
                     if (!firstName || !lastName) {
-                        alert('कृपया नाव भरा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¨à¤¾à¤µ à¤­à¤°à¤¾');
                         return;
                     }
 
                     if (!studentData.email) {
-                        alert('कृपया ईमेल भरा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ˆà¤®à¥‡à¤² à¤­à¤°à¤¾');
                         return;
                     }
 
                     if (!studentData.phone) {
-                        alert('कृपया फोन नंबर भरा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤«à¥‹à¤¨ à¤¨à¤‚à¤¬à¤° à¤­à¤°à¤¾');
                         return;
                     }
 
                     if (!studentData.department) {
-                        alert('कृपया विभाग निवडा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¤¿à¤­à¤¾à¤— à¤¨à¤¿à¤µà¤¡à¤¾');
                         return;
                     }
 
                     if (!studentData.year) {
-                        alert('कृपया वर्ष निवडा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¤°à¥à¤· à¤¨à¤¿à¤µà¤¡à¤¾');
                         return;
                     }
 
 
 
                     if (department === 'Computer Technology' && !division) {
-                        alert('कृपया विभाग निवडा');
+                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¤à¥à¤•à¤¡à¥€ à¤¨à¤¿à¤µà¤¡à¤¾ (A, B, à¤•à¤¿à¤‚à¤µà¤¾ C)');
                         return;
                     }
 
@@ -894,7 +931,7 @@
                             document.getElementById('editStudentModal').style.display = 'none';
 
                             // Show success message
-                            alert('विद्यार्थ्याची माहिती यशस्वीरित्या अपडेट केली!');
+                            alert('à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥à¤¯à¤¾à¤šà¥€ à¤®à¤¾à¤¹à¤¿à¤¤à¥€ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¤¿à¤¤à¥à¤¯à¤¾ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¥‡à¤²à¥€!');
 
                             // Clear cache to force fresh load
                             studentsCache = null;
@@ -2784,6 +2821,13 @@
                 <a href="import-students.html" class="btn btn-outline">
                     <i class="fas fa-file-import"></i> Bulk Import
                 </a>
+                <button onclick="downloadStudentCompanyTemplate()" class="btn btn-outline" style="border-color: #3b82f6; color: #3b82f6;" title="Download Sample Excel File">
+                    <i class="fas fa-download"></i> Sample File
+                </button>
+                <button onclick="document.getElementById('companyExcelInput').click()" class="btn btn-outline" style="border-color: #10b981; color: #10b981;">
+                    <i class="fas fa-file-excel"></i> Update Companies
+                </button>
+                <input type="file" id="companyExcelInput" accept=".xlsx, .xls" style="display: none;" onchange="handleCompanyExcelUpload(event)">
                 <button id="bulkDeleteBtn" class="btn" style="display: none; background: var(--danger); color: white;"
                     onclick="bulkDeleteStudents()">
                     <i class="fas fa-trash-alt"></i> Delete Selected
@@ -2838,6 +2882,7 @@
                                 <th>Department</th>
                                 <th>Year</th>
                                 <th>Class</th>
+                                <th>Company Name</th>
                                 <th style="text-align: right;">Actions</th>
                             </tr>
                         </thead>
@@ -2915,7 +2960,7 @@
                         </div>
                         <div class="field-group">
                             <label class="field-label">Academic Year</label>
-                            <select id="year" class="input-field" required>
+                            <select id="year" class="input-field" required onchange="handleYearChange()">
                                 <option value="">Select Year</option>
                                 <option value="FY">First Year</option>
                                 <option value="SY">Second Year</option>
@@ -2942,6 +2987,12 @@
                                 <input type="radio" name="division" value="C"> Div C
                             </label>
                         </div>
+                    </div>
+
+                    <!-- Company Name Selection (Initially hidden) -->
+                    <div class="field-group" id="companyGroup" style="display: none;">
+                        <label class="field-label">Company Name</label>
+                        <input type="text" id="companyName" class="input-field" placeholder="Enter Company Name">
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
@@ -3000,7 +3051,8 @@
                     <div class="form-grid">
                         <div class="field-group">
                             <label class="field-label">Department</label>
-                            <select id="editDepartment" class="input-field" required>
+                            <select id="editDepartment" class="input-field" onchange="handleEditDepartmentChange()"
+                                required>
                                 <option value="Computer Technology">Computer Technology</option>
                                 <option value="Information Technology">Information Technology</option>
                                 <option value="Mechanical Engineering">Mechanical Engineering</option>
@@ -3012,7 +3064,7 @@
                         </div>
                         <div class="field-group">
                             <label class="field-label">Year</label>
-                            <select id="editYear" class="input-field" required>
+                            <select id="editYear" class="input-field" required onchange="handleEditYearChange()">
                                 <option value="FY">First Year</option>
                                 <option value="SY">Second Year</option>
                                 <option value="TY">Third Year</option>
@@ -3029,6 +3081,12 @@
                             <label class="tag"><input type="radio" name="editDivision" value="B"> Div B</label>
                             <label class="tag"><input type="radio" name="editDivision" value="C"> Div C</label>
                         </div>
+                    </div>
+
+                    <!-- Company Name Selection -->
+                    <div class="field-group" id="editCompanyGroup" style="display: none;">
+                        <label class="field-label">Company Name</label>
+                        <input type="text" id="editCompanyName" class="input-field" placeholder="Enter Company Name">
                     </div>
 
                     <div class="field-group" style="display:none;">
@@ -3108,6 +3166,38 @@
             } else {
                 group.style.display = 'none';
             }
+            if (typeof updateClassOptions === 'function') updateClassOptions();
+        }
+
+        // Year form triggers
+        function handleYearChange() {
+            const year = document.getElementById('year').value;
+            const companyGroup = document.getElementById('companyGroup');
+            if (companyGroup) {
+                if (year === 'SY') {
+                    companyGroup.style.display = 'block';
+                } else {
+                    companyGroup.style.display = 'none';
+                    document.getElementById('companyName').value = '';
+                }
+            }
+            if (typeof updateClassOptions === 'function') updateClassOptions();
+        }
+
+        function handleEditYearChange() {
+            const year = document.getElementById('editYear').value;
+            const editCompanyGroup = document.getElementById('editCompanyGroup');
+            if (editCompanyGroup) {
+                if (year === 'SY') {
+                    editCompanyGroup.style.display = 'block';
+                } else {
+                    editCompanyGroup.style.display = 'none';
+                    if (document.getElementById('editCompanyName')) {
+                        document.getElementById('editCompanyName').value = '';
+                    }
+                }
+            }
+            if (typeof updateEditClassOptions === 'function') updateEditClassOptions();
         }
 
         // Search Clear
@@ -3136,7 +3226,122 @@
             }
         }
 
+        function downloadStudentCompanyTemplate() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel library not loaded yet. Please wait a second and try again.');
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['Roll No', 'Company Name'],
+                ['2701', 'TATA Motors'],
+                ['2702', 'Infosys']
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Auto size columns
+            const colWidths = [{ wch: 15 }, { wch: 30 }];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Template');
+            XLSX.writeFile(wb, 'Student_Company_Format.xlsx');
+        }
+
+        async function handleCompanyExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'xls'].includes(fileExtension)) {
+                alert('Please upload a valid Excel file (.xlsx or .xls)');
+                event.target.value = ''; // Reset input
+                return;
+            }
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (!jsonData || jsonData.length === 0) {
+                        alert('Excel file is empty or formatted incorrectly.');
+                        return;
+                    }
+
+                    // Look for required columns regardless of case and spacing
+                    let rollNoKey = null;
+                    let companyKey = null;
+
+                    const keys = Object.keys(jsonData[0] || {});
+                    keys.forEach(k => {
+                        const normalized = k.toLowerCase().replace(/[\s_-]+/g, '');
+                        if (normalized.includes('rollno') || normalized.includes('rollnumber')) rollNoKey = k;
+                        if (normalized.includes('company')) companyKey = k;
+                    });
+
+                    if (!rollNoKey || !companyKey) {
+                        alert('Excel must have these 2 columns: "Roll No" and "Company Name"');
+                        return;
+                    }
+
+                    // Gather students from Firebase
+                    const snap = await firebase.database().ref('students').once('value');
+                    const studentsData = snap.val() || {};
+                    const updates = {};
+                    let matchCount = 0;
+
+                    jsonData.forEach(row => {
+                        const excelRoll = (row[rollNoKey] || '').toString().trim();
+                        const newCompany = (row[companyKey] || '').toString().trim();
+
+                        if (excelRoll && newCompany) {
+                            // Find student in db
+                            const studentEntry = Object.entries(studentsData).find(([key, s]) => {
+                                return s.rollNo && s.rollNo.toString().trim() === excelRoll;
+                            });
+
+                            if (studentEntry) {
+                                const dbStudentId = studentEntry[0];
+                                updates[`students/${dbStudentId}/companyName`] = newCompany;
+                                matchCount++;
+                            }
+                        }
+                    });
+
+                    if (matchCount === 0) {
+                        alert('No matching students found for the provided Roll Numbers.');
+                        return;
+                    }
+
+                    if (confirm(`Ready to update Company Name for ${matchCount} students in the database. Proceed?`)) {
+                        await firebase.database().ref().update(updates);
+                        alert(`Successfully updated ITR Companies for ${matchCount} students!`);
+                        
+                        // Clear cache and reload table
+                        if (typeof studentsCache !== 'undefined') {
+                            studentsCache = null;
+                            studentsCacheTime = 0;
+                        }
+                        if (typeof loadStudents === 'function') loadStudents();
+                    }
+                };
+                
+                reader.onerror = (error) => {
+                    console.error('File reading error:', error);
+                    alert('Error reading Excel file');
+                };
+
+                reader.readAsBinaryString(file);
+            } catch (error) {
+                console.error('Excel upload processing error:', error);
+                alert('An error occurred while parsing the Excel file.');
+            } finally {
+                event.target.value = ''; // Reset input so it can be re-used
+            }
+        }
     </script>
 </body>
-
 </html>

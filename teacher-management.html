@@ -192,6 +192,18 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: 1px solid transparent;
         }
 
         .btn::after {
@@ -246,12 +258,14 @@
             background-color: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .btn-outline:hover {
-            background-color: #F9FAFB;
+            background-color: var(--border-color);
             color: var(--text-main);
-            border-color: #D1D5DB;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .btn-back {
@@ -887,9 +901,18 @@
                     <i class="fas fa-database" style="color: var(--primary)"></i>
                     Faculty Database
                 </h2>
-                <a href="import-teachers.html" class="btn btn-outline">
-                    <i class="fas fa-file-import"></i> Bulk Import
-                </a>
+                <div class="header-actions" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <a href="import-teachers.html" class="btn btn-outline" style="border-color: #6366f1; color: #6366f1;">
+                        <i class="fas fa-file-import"></i> Bulk Import
+                    </a>
+                    <button onclick="downloadTeacherCompanyTemplate()" class="btn btn-outline" style="border-color: #3b82f6; color: #3b82f6;" title="Download Sample Excel File">
+                        <i class="fas fa-download"></i> Sample File
+                    </button>
+                    <button onclick="document.getElementById('companyExcelInput').click()" class="btn btn-outline" style="border-color: #10b981; color: #10b981;">
+                        <i class="fas fa-file-excel"></i> Update Companies
+                    </button>
+                </div>
+                <input type="file" id="companyExcelInput" accept=".xlsx, .xls" style="display: none;" onchange="handleTeacherCompanyExcelUpload(event)">
             </div>
             <div class="card-body">
                 <div class="search-filter-section">
@@ -925,6 +948,7 @@
                                 <th>Faculty Member</th>
                                 <th>System ID</th>
                                 <th>Contact</th>
+                                <th>Company Name</th>
                                 <th>Academic Year</th>
                                 <th>Divisions</th>
                                 <th>Credentials</th>
@@ -989,6 +1013,13 @@
                                 <option value="Lab Assistant">Lab Assistant</option>
                                 <option value="HOD">HOD (Head of Department)</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" for="editCompanyName">Company Name</label>
+                            <input type="text" id="editCompanyName" class="input-field" placeholder="e.g. Google">
                         </div>
                     </div>
 
@@ -1107,6 +1138,16 @@
 
                     <div class="form-grid">
                         <div class="field-group">
+                            <label class="field-label" for="companyName">Company Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-building input-icon"></i>
+                                <input type="text" id="companyName" class="input-field" placeholder="e.g. Google">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="field-group">
                             <label class="field-label">Assigned Departments</label>
                             <select id="departmentSelect" class="input-field" multiple style="height: 120px;">
                                 <option value="CT">Computer Technology (CT)</option>
@@ -1169,6 +1210,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Load Firebase first -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1219,6 +1261,7 @@
                 const email = document.getElementById('email').value;
                 const phone = document.getElementById('phone').value;
                 const role = document.getElementById('role').value;
+                const companyName = document.getElementById('companyName').value;
 
                 // Get selected departments
                 const departmentSelect = document.getElementById('departmentSelect');
@@ -1270,6 +1313,7 @@
                     email: email,
                     phone: phone,
                     role: role,
+                    companyName: companyName,
                     departments: selectedDepartments,
                     classes: selectedClasses,
                     divisions: divisions,
@@ -1633,6 +1677,135 @@
         // Add SheetJS (XLSX) library
         const xlsxScript = document.createElement('script');
         xlsxScript.src = 'https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js';
+        document.head.appendChild(xlsxScript);
+
+        // Update department count display initially
+        document.addEventListener('DOMContentLoaded', () => {
+            const count = document.querySelectorAll('#departmentFilter option').length - 1; // Exclude default option
+            const display = document.getElementById('deptCountDisplay');
+            if (display) {
+                display.textContent = count;
+            }
+        });
+
+        function downloadTeacherCompanyTemplate() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel library not loaded yet. Please wait a second and try again.');
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['System ID', 'Company Name'],
+                ['CT001', 'TATA Motors, Infosys'],
+                ['IT042', 'Google']
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Auto size columns
+            const colWidths = [{ wch: 15 }, { wch: 30 }];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Template');
+            XLSX.writeFile(wb, 'Teacher_Company_Format.xlsx');
+        }
+
+        async function handleTeacherCompanyExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'xls'].includes(fileExtension)) {
+                alert('Please upload a valid Excel file (.xlsx or .xls)');
+                event.target.value = ''; // Reset input
+                return;
+            }
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (!jsonData || jsonData.length === 0) {
+                        alert('Excel file is empty or formatted incorrectly.');
+                        return;
+                    }
+
+                    // Look for required columns regardless of case and spacing
+                    let systemIdKey = null;
+                    let companyKey = null;
+
+                    const keys = Object.keys(jsonData[0] || {});
+                    keys.forEach(k => {
+                        const normalized = k.toLowerCase().replace(/[\s_-]+/g, '');
+                        if (normalized.includes('systemid') || normalized.includes('teacherid') || normalized === 'id') systemIdKey = k;
+                        if (normalized.includes('company')) companyKey = k;
+                    });
+
+                    if (!systemIdKey || !companyKey) {
+                        alert('Excel must have these 2 columns: "System ID" and "Company Name"');
+                        return;
+                    }
+
+                    // Gather teachers from Firebase
+                    const snap = await firebase.database().ref('teachers').once('value');
+                    const teachersData = snap.val() || {};
+                    const updates = {};
+                    let matchCount = 0;
+
+                    jsonData.forEach(row => {
+                        const excelSystemId = (row[systemIdKey] || '').toString().trim();
+                        const newCompany = (row[companyKey] || '').toString().trim();
+
+                        if (excelSystemId && newCompany) {
+                            // Find teacher in db by their teacherId (System ID) case-insensitively
+                            const teacherEntry = Object.entries(teachersData).find(([key, t]) => {
+                                const tId = (t.teacherId && t.teacherId !== '') ? t.teacherId.toString().trim() : key;
+                                return tId.toLowerCase() === excelSystemId.toLowerCase();
+                            });
+
+                            if (teacherEntry) {
+                                const dbTeacherId = teacherEntry[0];
+                                updates[`teachers/${dbTeacherId}/companyName`] = newCompany;
+                                matchCount++;
+                            }
+                        }
+                    });
+
+                    if (matchCount === 0) {
+                        alert('No matching Faculty found for the provided System IDs.');
+                        return;
+                    }
+
+                    if (confirm(`Ready to update Company Name for ${matchCount} faculty members. Proceed?`)) {
+                        await firebase.database().ref().update(updates);
+                        alert(`Successfully updated Company Names for ${matchCount} faculty members!`);
+                        
+                        // Clear cache and reload table
+                        if (window.TeacherList && typeof window.TeacherList.prototype.loadTeachers === 'function') {
+                            window.location.reload(); // Simple reload for teachers page
+                        } else {
+                            window.location.reload();
+                        }
+                    }
+                };
+                
+                reader.onerror = (error) => {
+                    console.error('File reading error:', error);
+                    alert('Error reading Excel file');
+                };
+
+                reader.readAsBinaryString(file);
+            } catch (error) {
+                console.error('Excel upload processing error:', error);
+                alert('An error occurred while parsing the Excel file.');
+            } finally {
+                event.target.value = ''; // Reset input so it can be re-used
+            }
+        }
+
         // Scroll Progress
         window.onscroll = function () {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;

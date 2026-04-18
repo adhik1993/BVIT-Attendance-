@@ -793,12 +793,24 @@
                     <span class="nav-text">Feedback Report</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showItrReport()" id="itrReportNavLink">
+                    <i class="fas fa-industry" style="color:#10b981;"></i>
+                    <span class="nav-text" style="color:#10b981;font-weight:600;">ITR Report</span>
+                </a>
+            </li>
 
 
             <li class="nav-item">
                 <a href="settings.html" class="nav-link">
                     <i class="fas fa-cog"></i>
                     <span class="nav-text">Settings</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showSystemsSection()">
+                    <i class="fas fa-desktop"></i>
+                    <span class="nav-text">System Records</span>
                 </a>
             </li>
         </ul>
@@ -868,6 +880,115 @@
                     <div class="chart-container">
                         <canvas id="departmentChart"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Records Section -->
+        <div id="systemsSection" style="display: none;">
+            <div class="header">
+                <h1 class="page-title"><i class="fas fa-desktop"></i> System Records</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <div
+                style="background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:2rem;">
+                <div
+                    style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem; align-items:end;">
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Filter by
+                            Department:</label>
+                        <select id="sysFilterDept" onchange="filterSystemsTable()"
+                            style="width:100%; padding:0.75rem; border:1px solid var(--border); border-radius:8px;">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Filter by Room/Lab
+                            No:</label>
+                        <select id="sysFilterRoom" onchange="filterSystemsTable()"
+                            style="width:100%; padding:0.75rem; border:1px solid var(--border); border-radius:8px;">
+                            <option value="">All Rooms</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Search:</label>
+                        <input type="text" id="sysSearchInput" oninput="filterSystemsTable()"
+                            placeholder="Search system name, IP, stock no..."
+                            style="width:100%; padding:0.75rem; border:1px solid var(--border); border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Filter by IP:</label>
+                        <select id="sysFilterDuplicateIP" onchange="filterSystemsTable()"
+                            style="width:100%; padding:0.75rem; border:1px solid var(--border); border-radius:8px;">
+                            <option value="">All IP Addresses</option>
+                            <option value="duplicates">Show Duplicate IPs Only</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button onclick="exportSystemsToExcel()"
+                            style="width:100%; padding:0.75rem 1rem; background:linear-gradient(135deg,#059669,#047857); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.95rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); overflow:hidden;">
+                <div
+                    style="padding:1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;"><i class="fas fa-table"></i> All System Records</h3>
+                    <span id="sysCount"
+                        style="background:#e0e7ff; color:#4f46e5; padding:0.25rem 0.75rem; border-radius:20px; font-size:0.9rem; font-weight:600;">0
+                        Records</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="systemsTable" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f8fafc;">
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    #</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Department</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Room/Lab No</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Dead Stock No</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    System Name</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    IP Address</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    User Name</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Added By</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Date</th>
+                                <th
+                                    style="padding:1rem; text-align:left; font-weight:600; border-bottom:2px solid #e2e8f0;">
+                                    Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="systemsTableBody">
+                            <tr>
+                                <td colspan="10" style="padding:2rem; text-align:center; color:#6b7280;"><i
+                                        class="fas fa-spinner fa-spin"></i> Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1192,6 +1313,230 @@
             </div>
         </div>
 
+        <!-- ITR Report Section -->
+        <div id="itrReportSection" style="display: none;">
+            <div class="header">
+                <h1 class="page-title">
+                    <i class="fas fa-industry" style="color:#10b981;"></i> ITR Attendance Report
+                </h1>
+                <div class="header-actions">
+                    <button class="btn"
+                        style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; font-weight: 500; transition: all 0.3s ease;"
+                        onclick="toggleItrFilters()"
+                        onmouseover="this.style.background='var(--primary)'; this.style.color='white';"
+                        onmouseout="this.style.background='rgba(99, 102, 241, 0.1)'; this.style.color='var(--primary)';">
+                        <i class="fas fa-sliders-h"></i> Smart Filter & Search
+                    </button>
+                    <button class="btn btn-primary" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div id="itrFilterPanel"
+                style="background:white;padding:2rem;border-radius:16px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);margin-bottom:2.5rem; display: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border:1px solid rgba(226, 232, 240, 0.8); position:relative; overflow:hidden;">
+                <!-- Decorative top gradient -->
+                <div
+                    style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, #6366f1, #10b981);">
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid #f1f5f9; padding-bottom:1rem;">
+                    <h3
+                        style="margin:0; font-size:1.15rem; color:#1e293b; display:flex; align-items:center; gap:0.5rem; font-weight:700;">
+                        <div
+                            style="width:32px; height:32px; border-radius:8px; background:rgba(99, 102, 241, 0.1); display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-sliders-h" style="color:#6366f1;"></i>
+                        </div>
+                        Advanced Filtering Options
+                    </h3>
+                    <button onclick="toggleItrFilters()"
+                        style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem; transition:color 0.2s;"
+                        onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+                    <!-- Search Row -->
+                    <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+                        <div style="flex:2; min-width: 300px;">
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Quick
+                                Search</label>
+                            <div style="position:relative;">
+                                <i class="fas fa-search"
+                                    style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
+                                <input type="text" id="adminItrStudentSearch" onkeyup="filterAdminItrTable()"
+                                    placeholder="Search by name, roll number, or company..."
+                                    style="width:100%;padding:0.875rem 1rem 0.875rem 2.75rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;transition:all 0.3s;background:#f8fafc;"
+                                    onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';this.style.background='white'"
+                                    onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none';this.style.background='#f8fafc'">
+                            </div>
+                        </div>
+                        <div style="flex:1; min-width: 250px;">
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Attendance
+                                Criteria</label>
+                            <select id="adminItrCriteria"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;appearance:none;background-image:url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');background-repeat:no-repeat;background-position:right%201rem%20top%2050%25;background-size:0.65rem%20auto;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='#ffffff url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='none';"
+                                onchange="handleAdminItrCriteriaChange()">
+                                <option value="All">All Attendance</option>
+                                <option value="<50">Below 50%</option>
+                                <option value="<60">Below 60%</option>
+                                <option value="<70">Below 70%</option>
+                                <option value="<75">Below 75%</option>
+                                <option value="<85">Below 85%</option>
+                                <option value="Custom">Custom Percentage</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Custom Filter Container (Hidden by default) -->
+                    <div id="adminItrCriteriaValueContainer"
+                        style="display:none; background:#f8fafc; padding:1.25rem; border-radius:10px; border:1px dashed #cbd5e1; align-items:flex-end; gap:1rem;">
+                        <div style="flex:1;">
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Operator</label>
+                            <select id="adminItrCustomOperator" onchange="handleCustomOperatorChange()"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:white;">
+                                <option value="<">Less Than (<)< /option>
+                                <option value=">">Greater Than (>)</option>
+                                <option value="Between">Between Values</option>
+                            </select>
+                        </div>
+                        <div style="flex:2;" id="adminItrSingleInputContainer">
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Percentage
+                                (%)</label>
+                            <input type="number" id="adminItrCriteriaValue" onkeyup="filterAdminItrTable()"
+                                onchange="filterAdminItrTable()"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;"
+                                placeholder="E.g. 75">
+                        </div>
+                        <div style="flex:2; display:none; gap:1rem;" id="adminItrBetweenInputs">
+                            <div style="flex:1;">
+                                <label
+                                    style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Min
+                                    (%)</label>
+                                <input type="number" id="adminItrMin" onkeyup="filterAdminItrTable()"
+                                    onchange="filterAdminItrTable()"
+                                    style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;"
+                                    placeholder="E.g. 60">
+                            </div>
+                            <div style="flex:1;">
+                                <label
+                                    style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Max
+                                    (%)</label>
+                                <input type="number" id="adminItrMax" onkeyup="filterAdminItrTable()"
+                                    onchange="filterAdminItrTable()"
+                                    style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;"
+                                    placeholder="E.g. 80">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div
+                        style="height:1px; background:linear-gradient(90deg, transparent, #e2e8f0, transparent); margin:0.25rem 0;">
+                    </div>
+
+                    <!-- Date & Selection Grid -->
+                    <div
+                        style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1.25rem;">
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">From
+                                Date</label>
+                            <input type="date" id="itrStartDate"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='white';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc';this.style.boxShadow='none';">
+                        </div>
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">To
+                                Date</label>
+                            <input type="date" id="itrEndDate"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='white';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc';this.style.boxShadow='none';">
+                        </div>
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Department</label>
+                            <select id="itrReportDept" onchange="loadItrReportCompanies(); updateItrReportTeachers();"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;appearance:none;background-image:url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');background-repeat:no-repeat;background-position:right%201rem%20top%2050%25;background-size:0.65rem%20auto;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='#ffffff url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='none';">
+                                <option value="">All Departments</option>
+                                <option value="Computer_Technology">Computer Technology</option>
+                                <option value="Information_Technology">Information Technology</option>
+                                <option value="Mechanical_Engineering">Mechanical Engineering</option>
+                                <option value="Civil_Engineering">Civil Engineering</option>
+                                <option value="Electrical_Engineering">Electrical Engineering</option>
+                                <option value="Electronics___Telecommunication">Electronics &amp; Telecommunication
+                                </option>
+                                <option value="Artificial_Intelligence">Artificial Intelligence</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Company</label>
+                            <select id="itrReportCompany"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;appearance:none;background-image:url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');background-repeat:no-repeat;background-position:right%201rem%20top%2050%25;background-size:0.65rem%20auto;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='#ffffff url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='none';"
+                                title=""
+                                onchange="this.title=this.options[this.selectedIndex].text; updateItrReportTeachers();">
+                                <option value="">All Companies</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.875rem;color:#475569;">Teacher</label>
+                            <select id="itrReportTeacher"
+                                style="width:100%;padding:0.875rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;background:#f8fafc;cursor:pointer;transition:all 0.3s;appearance:none;background-image:url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');background-repeat:no-repeat;background-position:right%201rem%20top%2050%25;background-size:0.65rem%20auto;"
+                                onfocus="this.style.borderColor='#6366f1';this.style.background='#ffffff url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='0 0 0 4px rgba(99, 102, 241, 0.1)';"
+                                onblur="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc url(\'data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E\') no-repeat right 1rem top 50%';this.style.backgroundSize='0.65rem auto';this.style.boxShadow='none';">
+                                <option value="">All Teachers</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Actions Row -->
+                    <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:0.5rem;">
+                        <button onclick="exportAdminItrToExcel()" class="btn"
+                            style="padding:0.875rem 1.5rem;background:white;color:#334155;border:1px solid #e2e8f0;border-radius:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.3s;box-shadow:0 1px 2px rgba(0,0,0,0.05);"
+                            title="Export Analytics"
+                            onmouseover="this.style.background='#f8fafc';this.style.borderColor='#cbd5e1';this.style.color='#1e293b';this.style.transform='translateY(-1px)';"
+                            onmouseout="this.style.background='white';this.style.borderColor='#e2e8f0';this.style.color='#334155';this.style.transform='none';">
+                            <i class="fas fa-file-excel" style="color:#10b981;"></i> Export to Excel
+                        </button>
+                        <button onclick="loadItrReport()" class="btn"
+                            style="padding:0.875rem 2.5rem;background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:white;border:none;border-radius:10px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:0.5rem;box-shadow:0 4px 12px rgba(99, 102, 241, 0.25);transition:all 0.3s;"
+                            onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 16px rgba(99, 102, 241, 0.35)';"
+                            onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 12px rgba(99, 102, 241, 0.25)';">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="itrReportResults">
+                <div style="text-align:center;padding:3rem;color:#6b7280;">
+                    <i class="fas fa-filter" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
+                    <p>Select date range and click "Load"</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Batch Management Section -->
         <div id="batchManagementSection" style="display: none;">
             <div class="header">
@@ -1507,6 +1852,7 @@
             students: null,
             teachers: null,
             attendance: null,
+            systems: null,
             cacheTime: 0,
             CACHE_DURATION: 10 * 60 * 1000, // 10 minutes cache
 
@@ -1518,6 +1864,7 @@
                 this.students = null;
                 this.teachers = null;
                 this.attendance = null;
+                this.systems = null;
                 this.cacheTime = 0;
                 console.log('🗑️ Dashboard cache cleared');
             }
@@ -1599,24 +1946,32 @@
                 const totalTeachers = teachersData ? Object.keys(teachersData).length : 0;
                 document.getElementById('totalTeachers').textContent = totalTeachers;
 
-                // Calculate average attendance
-                let totalAttendance = 0;
-                let attendanceCount = 0;
+                // Calculate average attendance - WEIGHTED AVERAGE
+                let globalPresent = 0;
+                let globalTotal = 0;
 
                 if (attendanceData) {
                     const entries = Object.values(attendanceData);
                     entries.forEach(dateData => {
                         const students = dateData.students || {};
-                        const presentCount = Object.values(students).filter(status => status === true).length;
+                        const studentValues = Object.values(students);
+
+                        // Robust present check (handles boolean true, string 'true', string 'Present')
+                        const presentCount = studentValues.filter(status =>
+                            status === true || status === 'true' || status === 'Present'
+                        ).length;
+
                         const totalCount = Object.keys(students).length;
-                        if (totalCount > 0) {
-                            totalAttendance += (presentCount / totalCount) * 100;
-                            attendanceCount++;
-                        }
+
+                        // Accumulate totals
+                        globalPresent += presentCount;
+                        globalTotal += totalCount;
                     });
                 }
 
-                const averageAttendance = attendanceCount > 0 ? (totalAttendance / attendanceCount).toFixed(1) : 0;
+                // Calculate weighted percentage
+                const averageAttendance = globalTotal > 0 ? ((globalPresent / globalTotal) * 100).toFixed(1) : '0.0';
+
                 document.getElementById('averageAttendance').textContent = averageAttendance + '%';
                 document.getElementById('performanceRate').textContent = averageAttendance + '%';
 
@@ -2131,12 +2486,929 @@
         // Show Dashboard Section
         function showDashboard() {
             document.getElementById('feedbackReportSection').style.display = 'none';
+            document.getElementById('attendanceCheckSection').style.display = 'none';
+            if (document.getElementById('systemsSection')) document.getElementById('systemsSection').style.display = 'none';
+            if (document.getElementById('itrReportSection')) document.getElementById('itrReportSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
-            document.querySelector('.page-title').textContent = 'Dashboard Overview';
 
             // Update nav active state
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             document.querySelector('.nav-link[href="#"]').classList.add('active');
+        }
+
+        function toggleItrFilters() {
+            const panel = document.getElementById('itrFilterPanel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        // Show ITR Report Section
+        function showItrReport() {
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('feedbackReportSection').style.display = 'none';
+            document.getElementById('attendanceCheckSection').style.display = 'none';
+            if (document.getElementById('systemsSection')) document.getElementById('systemsSection').style.display = 'none';
+            document.getElementById('itrReportSection').style.display = 'block';
+
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('itrReportNavLink').classList.add('active');
+
+            // Set today date and 7 days ago date
+            const todayDate = new Date();
+            const todayStr = todayDate.toISOString().split('T')[0];
+            const startDate = new Date(todayDate);
+            startDate.setDate(startDate.getDate() - 7);
+            const startDateStr = startDate.toISOString().split('T')[0];
+
+            if (document.getElementById('itrStartDate')) document.getElementById('itrStartDate').value = startDateStr;
+            if (document.getElementById('itrEndDate')) document.getElementById('itrEndDate').value = todayStr;
+
+            loadItrReportCompanies();
+            loadItrReportTeachers();
+        }
+
+        async function loadItrReportTeachers() {
+            const dropdown = document.getElementById('itrReportTeacher');
+            if (!dropdown || dropdown.options.length > 1) return;
+            try {
+                const snap = await window.db.ref('teachers').once('value');
+                const teachers = snap.val();
+                if (teachers) {
+                    const names = new Set();
+                    Object.values(teachers).forEach(t => {
+                        const name = t.name || `${t.firstName || ''} ${t.lastName || ''}`.trim();
+                        if (name) names.add(name);
+                    });
+                    [...names].sort().forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = name;
+                        dropdown.appendChild(opt);
+                    });
+                }
+            } catch (e) { console.error('Error loading teachers:', e); }
+        }
+
+        async function updateItrReportTeachers() {
+            const dropdown = document.getElementById('itrReportTeacher');
+            const deptFilter = document.getElementById('itrReportDept')?.value;
+            const compFilter = document.getElementById('itrReportCompany')?.value;
+
+            if (!dropdown) return;
+
+            const prevSelected = dropdown.value;
+            dropdown.innerHTML = '<option value="">-- Loading Teachers... --</option>';
+
+            try {
+                // If no filters selected, load all teachers fast from 'teachers' node
+                if (!deptFilter && !compFilter) {
+                    const snap = await window.db.ref('teachers').once('value');
+                    const teachers = snap.val() || {};
+                    const names = new Set();
+                    Object.values(teachers).forEach(t => {
+                        const name = t.name || `${t.firstName || ''} ${t.lastName || ''}`.trim();
+                        if (name) names.add(name);
+                    });
+                    dropdown.innerHTML = '<option value="">-- All Teachers --</option>';
+                    [...names].sort().forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = name;
+                        dropdown.appendChild(opt);
+                    });
+                    if (Array.from(names).includes(prevSelected)) dropdown.value = prevSelected;
+                    return;
+                }
+
+                // If filtered, find active teachers from itr_attendance log
+                const startDate = document.getElementById('itrStartDate')?.value;
+                const endDate = document.getElementById('itrEndDate')?.value;
+                let snap;
+
+                if (startDate && endDate) {
+                    if (startDate === endDate) {
+                        snap = await window.db.ref('itr_attendance/' + startDate).once('value');
+                    } else {
+                        snap = await window.db.ref('itr_attendance')
+                            .orderByKey()
+                            .startAt(startDate)
+                            .endAt(endDate)
+                            .once('value');
+                    }
+                } else {
+                    snap = await window.db.ref('itr_attendance').once('value');
+                }
+
+                let allData = snap.val() || {};
+
+                if (startDate && endDate && startDate === endDate && Object.keys(allData).length > 0) {
+                    const single = allData;
+                    allData = {};
+                    allData[startDate] = single;
+                }
+
+                const activeTeachers = new Set();
+
+                Object.entries(allData).forEach(([dateStr, deptData]) => {
+                    if (typeof deptData !== 'object' || !deptData) return;
+                    Object.entries(deptData).forEach(([deptKey, companyData]) => {
+                        if (deptFilter && deptKey !== deptFilter) return;
+
+                        if (typeof companyData !== 'object' || !companyData) return;
+                        Object.entries(companyData).forEach(([compKey, records]) => {
+                            const compName = compKey.replace(/_/g, ' ');
+                            if (compFilter && compName !== compFilter && compKey !== compFilter) return;
+
+                            if (typeof records !== 'object' || !records) return;
+                            Object.values(records).forEach(rec => {
+                                if (rec && rec.markedBy) {
+                                    activeTeachers.add(rec.markedBy);
+                                }
+                            });
+                        });
+                    });
+                });
+
+                dropdown.innerHTML = '<option value="">-- All Teachers --</option>';
+                [...activeTeachers].sort().forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    dropdown.appendChild(opt);
+                });
+                if (Array.from(activeTeachers).includes(prevSelected)) dropdown.value = prevSelected;
+
+            } catch (e) {
+                console.error('Error loading filtered teachers:', e);
+                dropdown.innerHTML = '<option value="">-- All Teachers --</option>';
+            }
+        }
+
+        async function loadItrReportCompanies() {
+            const sel = document.getElementById('itrReportCompany');
+            const deptFilter = document.getElementById('itrReportDept')?.value;
+            if (!sel) return;
+            try {
+                const snap = await window.db.ref('students').once('value');
+                const students = snap.val() || {};
+                const companies = new Set();
+
+                // Map the dropdown value to possible database values
+                let targetFullName = '';
+                let targetCode = '';
+                if (deptFilter) {
+                    const filterMap = {
+                        'Computer_Technology': { full: 'Computer Technology', code: 'CT' },
+                        'Information_Technology': { full: 'Information Technology', code: 'IT' },
+                        'Mechanical_Engineering': { full: 'Mechanical Engineering', code: 'ME' },
+                        'Civil_Engineering': { full: 'Civil Engineering', code: 'CE' },
+                        'Electrical_Engineering': { full: 'Electrical Engineering', code: 'EE' },
+                        'Electronics___Telecommunication': { full: 'Electronics & Telecommunication', code: 'ET' },
+                        'Artificial_Intelligence': { full: 'Artificial Intelligence', code: 'AI' }
+                    };
+                    if (filterMap[deptFilter]) {
+                        targetFullName = filterMap[deptFilter].full;
+                        targetCode = filterMap[deptFilter].code;
+                    } else {
+                        targetFullName = deptFilter.replace(/_/g, ' ');
+                    }
+                }
+
+                Object.values(students).forEach(s => {
+                    const isSY = (s.year === 'SY' || s.year === '2' || s.year === 'Second' || String(s.class || '').toUpperCase().includes('SY'));
+                    if (isSY && s.companyName) {
+                        let sDept = (s.department || s.branch || '').trim();
+                        let sDeptSanitized = sDept.replace(/[^a-zA-Z0-9]/g, '_');
+
+                        let isDeptMatch = false;
+                        if (!deptFilter) {
+                            isDeptMatch = true;
+                        } else {
+                            if (sDept === deptFilter || sDeptSanitized === deptFilter) isDeptMatch = true;
+                            if (targetFullName && sDept.toLowerCase() === targetFullName.toLowerCase()) isDeptMatch = true;
+                            if (targetCode && sDept.toUpperCase() === targetCode) isDeptMatch = true;
+                        }
+
+                        if (isDeptMatch) {
+                            companies.add(s.companyName.trim());
+                        }
+                    }
+                });
+                sel.innerHTML = '<option value="">-- All Companies --</option>';
+                Array.from(companies).sort().forEach(c => { sel.innerHTML += `<option value="${c}">${c}</option>`; });
+            } catch (e) { console.error(e); }
+        }
+
+        // Helper: sanitize dept/company keys (must match teacher-panel logic)
+        function sanitizeItrKey(str) {
+            return str.replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
+        async function loadItrReport() {
+            const startDate = document.getElementById('itrStartDate').value;
+            const endDate = document.getElementById('itrEndDate').value;
+            const filterCompany = document.getElementById('itrReportCompany').value;
+            const filterTeacher = document.getElementById('itrReportTeacher')?.value || '';
+            const filterDept = document.getElementById('itrReportDept')?.value || '';
+            const resultsDiv = document.getElementById('itrReportResults');
+            if (!startDate || !endDate) { alert('Please select a date range'); return; }
+
+            const cacheKey = `admin_itr_report_v3_${startDate}_${endDate}_${filterDept}_${filterCompany}_${filterTeacher}`;
+            const cachedBody = sessionStorage.getItem(cacheKey);
+            if (cachedBody) {
+                resultsDiv.innerHTML = cachedBody;
+                return;
+            }
+
+            resultsDiv.innerHTML = '<p style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Analyzing Attendance Data...</p>';
+
+            try {
+                let snap;
+                if (startDate === endDate) {
+                    snap = await window.db.ref('itr_attendance/' + startDate).once('value');
+                } else {
+                    snap = await window.db.ref('itr_attendance')
+                        .orderByKey()
+                        .startAt(startDate)
+                        .endAt(endDate)
+                        .once('value');
+                }
+
+                let allData = snap.val();
+                if (startDate === endDate && allData) {
+                    const single = allData;
+                    allData = {};
+                    allData[startDate] = single;
+                }
+
+                if (!allData) {
+                    resultsDiv.innerHTML = '<div style="text-align:center;padding:3rem;color:#6b7280;"><i class="fas fa-inbox" style="font-size:3rem;margin-bottom:1rem;display:block;"></i><p>No ITR attendance found for this date range.</p></div>';
+                    return;
+                }
+
+                const studentStats = {};
+                const detailedItrRecords = [];
+                let companyLabels = {};
+                let deptLabels = {};
+
+                Object.entries(allData).forEach(([dateStr, deptData]) => {
+                    Object.entries(deptData).forEach(([deptKey, companyData]) => {
+                        if (filterDept && deptKey !== filterDept) return;
+                        const deptLabel = deptKey.replace(/_/g, ' ');
+                        deptLabels[deptKey] = deptLabel;
+
+                        Object.entries(companyData).forEach(([companyKey, records]) => {
+                            const companyName = Object.values(records)[0]?.company || companyKey.replace(/_/g, ' ');
+                            if (filterCompany && companyName !== filterCompany) return;
+                            companyLabels[companyKey] = companyName;
+
+                            Object.entries(records).forEach(([studentId, rec]) => {
+                                // Apply Teacher Filter
+                                if (filterTeacher && rec.markedBy !== filterTeacher) return;
+
+                                // Extract detailed record
+                                detailedItrRecords.push({
+                                    studentId: studentId,
+                                    date: dateStr,
+                                    status: rec.status,
+                                    markedBy: rec.markedBy || rec.teacherName || '-',
+                                    deptKey: deptKey,
+                                    companyKey: companyKey,
+                                    companyName: companyName,
+                                    deptLabel: deptLabel
+                                });
+
+                                // Collect consolidated stats
+                                if (!studentStats[studentId]) {
+                                    studentStats[studentId] = { present: 0, absent: 0, total: 0, teachers: new Set(), deptKey, companyKey, name: rec.name || studentId };
+                                }
+                                studentStats[studentId].total++;
+
+                                if (rec.status === 'present') {
+                                    studentStats[studentId].present++;
+                                } else {
+                                    studentStats[studentId].absent++;
+                                }
+                                if (rec.markedBy) {
+                                    studentStats[studentId].teachers.add(rec.markedBy);
+                                }
+                            });
+                        });
+                    });
+                });
+
+                if (Object.keys(studentStats).length === 0) {
+                    resultsDiv.innerHTML = '<div style="text-align:center;padding:3rem;color:#6b7280;"><i class="fas fa-inbox" style="font-size:3rem;margin-bottom:1rem;display:block;"></i><p>No matching records found.</p></div>';
+                    return;
+                }
+
+                const studSnap = await window.db.ref('students').once('value');
+                const allStudents = studSnap.val() || {};
+
+                const companyGroups = {};
+                Object.entries(studentStats).forEach(([studentId, stat]) => {
+                    if (!companyGroups[stat.companyKey]) {
+                        companyGroups[stat.companyKey] = {
+                            companyName: companyLabels[stat.companyKey],
+                            deptLabel: deptLabels[stat.deptKey],
+                            students: []
+                        };
+                    }
+                    const studentData = allStudents[studentId] || {};
+                    const realName = studentData.name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || studentId;
+                    const rollNo = studentData.rollNo || '-';
+                    const percentage = stat.total > 0 ? Math.round((stat.present / stat.total) * 100) : 0;
+
+                    companyGroups[stat.companyKey].students.push({
+                        ...stat, studentId, rollNo, percentage, name: realName
+                    });
+                });
+
+                let companyWiseHtml = `
+                    <style>
+                        .itr-view-switcher {
+                            display: inline-flex;
+                            gap: 10px;
+                            margin-bottom: 20px;
+                            background: white;
+                            padding: 10px;
+                            border-radius: 12px;
+                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                        }
+                        .itr-view-btn {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            background: #f3f4f6;
+                            color: #4b5563;
+                        }
+                        .itr-view-btn.itr-active {
+                            background: #4f46e5;
+                            color: white;
+                            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+                        }
+                    </style>
+                    <div class="itr-view-switcher">
+                        <button id="itrCompanyBtn" class="itr-view-btn itr-active" onclick="switchItrView('company')">Company-wise View</button>
+                        <button id="itrStudentBtn" class="itr-view-btn" onclick="switchItrView('student')">Consolidated View</button>
+                    </div>
+
+                    <div id="itrCompanyView" style="display:block;">
+                    <div style="margin-bottom:2rem;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                        <div style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                            <h3 style="margin:0;font-size:1.1rem;"><i class="fas fa-building"></i> Company-wise ITR Attendance</h3>
+                            <button onclick="exportAdminItrCompanyToExcel()" class="btn-primary" style="padding:0.5rem 1rem; border-radius:8px; border:none; background:white; color:#4f46e5; font-weight:bold; cursor:pointer;">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table style="width:100%;border-collapse:collapse;min-width:900px;background:white;font-family:'Inter',sans-serif;" id="itrCompanyMasterTable">
+                                <thead>
+                                    <tr>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">ROLL NO</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DEPT</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">YEAR</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DIV</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">COMPANY NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">TEACHER NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DATE</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:center;">STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                // Calculate sort and rendering.
+                detailedItrRecords.sort((a, b) => {
+                    if (a.date !== b.date) return b.date.localeCompare(a.date); // Newest first
+                    if (a.companyName !== b.companyName) return a.companyName.localeCompare(b.companyName);
+                    return a.studentId.localeCompare(b.studentId);
+                });
+
+                detailedItrRecords.forEach(record => {
+                    const studentData = allStudents[record.studentId] || {};
+                    const realName = studentData.name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || record.studentId;
+                    const rollNo = studentData.rollNo || '-';
+                    const year = studentData.year || '-';
+                    const div = studentData.division || '-';
+
+                    const statusHtml = record.status === 'present'
+                        ? '<span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:4px;font-size:0.85rem;font-weight:600;"><i class="fas fa-check"></i> PRESENT</span>'
+                        : '<span style="background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:4px;font-size:0.85rem;font-weight:600;"><i class="fas fa-times"></i> ABSENT</span>';
+
+                    companyWiseHtml += `<tr class="admin-itr-company-row">
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#374151;">${rollNo}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#111827;">${realName.toUpperCase()}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.deptLabel}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${year}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${div}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.companyName}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#6b7280;">${record.markedBy}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.date}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;">${statusHtml}</td>
+                    </tr>`;
+                });
+
+                companyWiseHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </div> <!-- End of itrCompanyView -->
+                `;
+
+                let html = companyWiseHtml + `
+                    <div id="itrStudentView" style="display:none;">
+                    <div style="margin-bottom:2rem;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                        <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                            <h3 style="margin:0;font-size:1.1rem;"><i class="fas fa-list-alt"></i> Consolidated ITR Attendance (Student-wise)</h3>
+                            <button onclick="exportAdminItrToExcel()" class="btn-primary" style="padding:0.5rem 1rem; border-radius:8px; border:none; background:white; color:#059669; font-weight:bold; cursor:pointer;">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table style="width:100%;border-collapse:collapse;min-width:900px;background:white;font-family:'Inter',sans-serif;" id="itrMasterTable">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">ROLL NO</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">NAME</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">DEPT</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">COMPANY</th>
+                                        <th colspan="4" style="padding:1rem;background:#10B981;color:white;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,0.1);">ITR ATTENDANCE</th>
+                                        <th rowspan="2" style="padding:1rem;background:#4F46E5;color:white;text-align:center;font-weight:600;vertical-align:middle;">MARKED BY</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="padding:0.75rem;background:#D1FAE5;color:#065F46;font-weight:600;text-align:center;">PRES</th>
+                                        <th style="padding:0.75rem;background:#FEE2E2;color:#991B1B;font-weight:600;text-align:center;">ABS</th>
+                                        <th style="padding:0.75rem;background:#F3F4F6;color:#4B5563;font-weight:600;text-align:center;">TOT</th>
+                                        <th style="padding:0.75rem;background:#E0E7FF;color:#4F46E5;font-weight:600;text-align:center;">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                let grandTotalStudents = Object.keys(studentStats).length;
+                let grandPresent = 0;
+                let grandAbsent = 0;
+                let sumPercentages = 0;
+
+                // Flatten all students into one array for easier single-table rendering
+                let allCombinedStudents = [];
+                Object.values(companyGroups).forEach(group => {
+                    group.students.forEach(s => {
+                        allCombinedStudents.push({
+                            ...s,
+                            companyName: group.companyName,
+                            deptLabel: group.deptLabel
+                        });
+                    });
+                });
+
+                // Sort flattened list by department, company, then roll no
+                allCombinedStudents.sort((a, b) => {
+                    if (a.deptLabel !== b.deptLabel) return a.deptLabel.localeCompare(b.deptLabel);
+                    if (a.companyName !== b.companyName) return a.companyName.localeCompare(b.companyName);
+                    return (parseInt(a.rollNo) || 0) - (parseInt(b.rollNo) || 0);
+                });
+
+                allCombinedStudents.forEach(s => {
+                    grandPresent += s.present;
+                    grandAbsent += s.absent;
+                    sumPercentages += s.percentage;
+
+                    let healthColor = s.percentage >= 75 ? '#10b981' : (s.percentage >= 60 ? '#f59e0b' : '#ef4444');
+                    let healthBg = s.percentage >= 75 ? '#d1fae5' : (s.percentage >= 60 ? '#fef3c7' : '#fee2e2');
+
+                    let teacherStr = Array.from(s.teachers || []).join(', ');
+                    if (!teacherStr) teacherStr = '-';
+
+                    html += `<tr class="admin-itr-row">
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#374151;">${s.rollNo}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#111827;">${(s.name || '').toString().toUpperCase()}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${s.deptLabel}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${s.companyName}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;color:#10B981;font-weight:700;">${s.present}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;color:#EF4444;font-weight:700;">${s.absent}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-weight:600;color:#374151;">${s.total}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-weight:700;color:${healthColor};" data-percentage="${s.percentage}">
+                            ${s.percentage}%
+                        </td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-size:0.82rem;color:#6b7280;">${teacherStr}</td>
+                    </tr>`;
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </div> <!-- End of itrStudentView -->
+                `;
+
+                let avgPercentage = grandTotalStudents > 0 ? Math.round(sumPercentages / grandTotalStudents) : 0;
+
+                html = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-bottom:2rem;">
+                        <div class="stat-card" style="box-shadow:0 2px 8px rgba(0,0,0,0.05);background:white;padding:1.5rem;border-radius:12px;display:flex;align-items:center;gap:1.5rem;">
+                            <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;font-size:2rem;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-users"></i></div>
+                            <div><div class="stat-value" style="font-size:1.8rem;font-weight:700;color:#1f2937;">${grandTotalStudents}</div><div class="stat-label" style="color:#6b7280;font-size:0.9rem;">Total Students</div></div>
+                        </div>
+                        <div class="stat-card" style="box-shadow:0 2px 8px rgba(0,0,0,0.05);background:white;padding:1.5rem;border-radius:12px;display:flex;align-items:center;gap:1.5rem;">
+                            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:2rem;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-check-circle"></i></div>
+                            <div><div class="stat-value" style="font-size:1.8rem;font-weight:700;color:#1f2937;">${grandPresent}</div><div class="stat-label" style="color:#6b7280;font-size:0.9rem;">Total Present Days</div></div>
+                        </div>
+                        <div class="stat-card" style="box-shadow:0 2px 8px rgba(0,0,0,0.05);background:white;padding:1.5rem;border-radius:12px;display:flex;align-items:center;gap:1.5rem;">
+                            <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;font-size:2rem;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times-circle"></i></div>
+                            <div><div class="stat-value" style="font-size:1.8rem;font-weight:700;color:#1f2937;">${grandAbsent}</div><div class="stat-label" style="color:#6b7280;font-size:0.9rem;">Total Absent Days</div></div>
+                        </div>
+                        <div class="stat-card" style="box-shadow:0 2px 8px rgba(0,0,0,0.05);background:white;padding:1.5rem;border-radius:12px;display:flex;align-items:center;gap:1.5rem;">
+                            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;font-size:2rem;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-percent"></i></div>
+                            <div><div class="stat-value" style="font-size:1.8rem;font-weight:700;color:#1f2937;">${avgPercentage}%</div><div class="stat-label" style="color:#6b7280;font-size:0.9rem;">Avg Attendance</div></div>
+                        </div>
+                    </div>
+                    ${html}
+                `;
+
+                resultsDiv.innerHTML = html;
+                sessionStorage.setItem(cacheKey, resultsDiv.innerHTML);
+            } catch (e) {
+                resultsDiv.innerHTML = '<p style="color:red;">Error: ' + e.message + '</p>';
+                console.error(e);
+            }
+        }
+
+        function switchItrView(view) {
+            const companyView = document.getElementById('itrCompanyView');
+            const studentView = document.getElementById('itrStudentView');
+            const companyBtn = document.getElementById('itrCompanyBtn');
+            const studentBtn = document.getElementById('itrStudentBtn');
+
+            if (!companyView || !studentView) return;
+
+            if (view === 'company') {
+                companyView.style.display = 'block';
+                studentView.style.display = 'none';
+                companyBtn.classList.add('itr-active');
+                studentBtn.classList.remove('itr-active');
+            } else {
+                companyView.style.display = 'none';
+                studentView.style.display = 'block';
+                companyBtn.classList.remove('itr-active');
+                studentBtn.classList.add('itr-active');
+            }
+        }
+
+        function handleAdminItrCriteriaChange() {
+            const val = document.getElementById('adminItrCriteria').value;
+            const valContainer = document.getElementById('adminItrCriteriaValueContainer');
+
+            if (val === 'Custom') {
+                valContainer.style.display = 'block';
+                handleCustomOperatorChange(); // initialize inner inputs display
+            } else {
+                valContainer.style.display = 'none';
+            }
+            filterAdminItrTable();
+        }
+
+        function handleCustomOperatorChange() {
+            const operator = document.getElementById('adminItrCustomOperator')?.value;
+            const singleInput = document.getElementById('adminItrCriteriaValue');
+            const betweenInputs = document.getElementById('adminItrBetweenInputs');
+
+            if (!singleInput || !betweenInputs) return;
+
+            if (operator === 'Between') {
+                singleInput.style.display = 'none';
+                betweenInputs.style.display = 'flex';
+            } else {
+                singleInput.style.display = 'block';
+                betweenInputs.style.display = 'none';
+            }
+            filterAdminItrTable();
+        }
+
+        function filterAdminItrTable() {
+            const input = document.getElementById('adminItrStudentSearch');
+            const mainCriteria = document.getElementById('adminItrCriteria')?.value || 'All';
+            const operator = document.getElementById('adminItrCustomOperator')?.value || '<';
+            const criteriaVal = parseFloat(document.getElementById('adminItrCriteriaValue')?.value) || 0;
+            const criteriaMin = parseFloat(document.getElementById('adminItrMin')?.value) || 0;
+            const criteriaMax = parseFloat(document.getElementById('adminItrMax')?.value) || 100;
+
+            if (!input) return;
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('.admin-itr-row');
+
+            rows.forEach(row => {
+                const rollNo = row.cells[0]?.textContent.toLowerCase() || '';
+                const name = row.cells[1]?.textContent.toLowerCase() || '';
+                const company = row.cells[3]?.textContent.toLowerCase() || '';
+
+                const percentage = parseFloat(row.cells[7]?.getAttribute('data-percentage')) || 0;
+
+                // Match Search String
+                let matchSearch = rollNo.includes(filter) || name.includes(filter) || company.includes(filter);
+
+                // Match Criteria
+                let matchCriteria = true;
+                if (mainCriteria === 'Custom') {
+                    if (operator === '<') { matchCriteria = percentage < criteriaVal; }
+                    else if (operator === '>') { matchCriteria = percentage > criteriaVal; }
+                    else if (operator === 'Between') { matchCriteria = percentage >= criteriaMin && percentage <= criteriaMax; }
+                }
+                else if (mainCriteria === '<50') { matchCriteria = percentage < 50; }
+                else if (mainCriteria === '<60') { matchCriteria = percentage < 60; }
+                else if (mainCriteria === '<70') { matchCriteria = percentage < 70; }
+                else if (mainCriteria === '<75') { matchCriteria = percentage < 75; }
+                else if (mainCriteria === '<85') { matchCriteria = percentage < 85; }
+
+                if (matchSearch && matchCriteria) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function exportAdminItrToExcel() {
+            let csv = 'Roll No,Student Name,Department,Company,Present,Absent,Total Days,Attendance %,Marked By\n';
+            const rows = document.querySelectorAll('.admin-itr-row');
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    let rowData = [];
+                    for (let i = 0; i < row.cells.length; i++) {
+                        let text = row.cells[i].innerText.replace(/,/g, '');
+                        if (text.includes('\n')) text = text.split('\n')[0];
+                        rowData.push(text);
+                    }
+                    csv += rowData.join(',') + '\n';
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'ITR_Attendance_Student_Report.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportAdminItrCompanyToExcel() {
+            let csv = 'Roll No,Name,Dept,Year,Div,Company Name,Teacher Name,Date,Status\n';
+            const rows = document.querySelectorAll('.admin-itr-company-row');
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    let rowData = [];
+                    for (let i = 0; i < row.cells.length; i++) {
+                        let text = row.cells[i].innerText.replace(/,/g, '');
+                        if (text.includes('\n')) text = text.split('\n')[0];
+                        rowData.push(text);
+                    }
+                    csv += rowData.join(',') + '\n';
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'ITR_Attendance_Company_Report.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ===== SYSTEMS SECTION =====
+        let allSystemsData = [];
+
+        function showSystemsSection() {
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('feedbackReportSection').style.display = 'none';
+            document.getElementById('attendanceCheckSection').style.display = 'none';
+            document.getElementById('systemsSection').style.display = 'block';
+            loadSystemsData();
+        }
+
+        async function loadSystemsData() {
+            try {
+                await waitForFirebase();
+                const systemsVal = await getCachedData('systems', 'systems');
+
+                allSystemsData = [];
+                const depts = new Set();
+
+                if (systemsVal) {
+                    Object.keys(systemsVal).forEach(key => {
+                        const s = systemsVal[key];
+                        allSystemsData.push({ id: key, ...s });
+                        if (s.department) depts.add(s.department);
+                    });
+
+                    // Sort the systems by department, then by room number
+                    allSystemsData.sort((a, b) => {
+                        const deptA = (a.department || '').toLowerCase();
+                        const deptB = (b.department || '').toLowerCase();
+                        if (deptA < deptB) return -1;
+                        if (deptA > deptB) return 1;
+
+                        const roomA = (a.roomNo || '').toLowerCase();
+                        const roomB = (b.roomNo || '').toLowerCase();
+                        if (roomA < roomB) return -1;
+                        if (roomA > roomB) return 1;
+
+                        return 0;
+                    });
+                }
+
+                // Populate dept filter
+                const deptFilter = document.getElementById('sysFilterDept');
+                deptFilter.innerHTML = '<option value="">All Departments</option>';
+                depts.forEach(d => {
+                    const o = document.createElement('option');
+                    o.value = d; o.textContent = d;
+                    deptFilter.appendChild(o);
+                });
+
+                // Populate Room filter
+                const rooms = new Set();
+                allSystemsData.forEach(s => { if (s.roomNo) rooms.add(s.roomNo.trim()); });
+                const roomFilter = document.getElementById('sysFilterRoom');
+                roomFilter.innerHTML = '<option value="">All Rooms</option>';
+                [...rooms].sort().forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r; o.textContent = r;
+                    roomFilter.appendChild(o);
+                });
+
+                renderSystemsTable(allSystemsData);
+            } catch (err) {
+                document.getElementById('systemsTableBody').innerHTML = `<tr><td colspan="10" style="padding:2rem;text-align:center;color:red;">Error loading data: ${err.message}</td></tr>`;
+            }
+        }
+
+        function filterSystemsTable() {
+            const dept = document.getElementById('sysFilterDept').value;
+            const room = document.getElementById('sysFilterRoom').value;
+            const search = document.getElementById('sysSearchInput').value.toLowerCase();
+            const duplicateFilter = document.getElementById('sysFilterDuplicateIP').value;
+
+            // Compute IP counts for duplicate filtering
+            const ipCounts = {};
+            if (duplicateFilter === 'duplicates' && typeof allSystemsData !== 'undefined') {
+                allSystemsData.forEach(s => {
+                    if (s.ipAddress && s.ipAddress.trim() !== '') {
+                        ipCounts[s.ipAddress] = (ipCounts[s.ipAddress] || 0) + 1;
+                    }
+                });
+            }
+
+            const filtered = allSystemsData.filter(s => {
+                const matchDept = !dept || (s.department || '') === dept;
+                const matchRoom = !room || (s.roomNo || '').trim() === room;
+                const matchSearch = !search ||
+                    (s.systemName || '').toLowerCase().includes(search) ||
+                    (s.ipAddress || '').toLowerCase().includes(search) ||
+                    (s.roomNo || '').toLowerCase().includes(search) ||
+                    (s.deadStockNo || '').toLowerCase().includes(search) ||
+                    (s.userName || '').toLowerCase().includes(search);
+                const matchDuplicate = duplicateFilter !== 'duplicates' || (s.ipAddress && ipCounts[s.ipAddress] > 1);
+                return matchDept && matchRoom && matchSearch && matchDuplicate;
+            });
+            renderSystemsTable(filtered);
+        }
+
+        function exportSystemsToExcel() {
+            const dept = document.getElementById('sysFilterDept').value;
+            const room = document.getElementById('sysFilterRoom').value;
+            const search = document.getElementById('sysSearchInput').value.toLowerCase();
+            const duplicateFilter = document.getElementById('sysFilterDuplicateIP').value;
+
+            // Compute IP counts for duplicate filtering
+            const ipCounts = {};
+            if (duplicateFilter === 'duplicates' && typeof allSystemsData !== 'undefined') {
+                allSystemsData.forEach(s => {
+                    if (s.ipAddress && s.ipAddress.trim() !== '') {
+                        ipCounts[s.ipAddress] = (ipCounts[s.ipAddress] || 0) + 1;
+                    }
+                });
+            }
+
+            const filtered = allSystemsData.filter(s => {
+                const matchDept = !dept || (s.department || '') === dept;
+                const matchRoom = !room || (s.roomNo || '').trim() === room;
+                const matchSearch = !search ||
+                    (s.systemName || '').toLowerCase().includes(search) ||
+                    (s.ipAddress || '').toLowerCase().includes(search) ||
+                    (s.roomNo || '').toLowerCase().includes(search) ||
+                    (s.deadStockNo || '').toLowerCase().includes(search) ||
+                    (s.userName || '').toLowerCase().includes(search);
+                const matchDuplicate = duplicateFilter !== 'duplicates' || (s.ipAddress && ipCounts[s.ipAddress] > 1);
+                return matchDept && matchRoom && matchSearch && matchDuplicate;
+            });
+
+            if (filtered.length === 0) {
+                alert('Export करण्यासाठी कोणताही data नाही!');
+                return;
+            }
+
+            // Build CSV content
+            const headers = ['#', 'Department', 'Room/Lab No', 'Dead Stock No', 'System Name', 'IP Address', 'User Name', 'Added By', 'Date'];
+            const rows = filtered.map((s, i) => [
+                i + 1,
+                s.department || '',
+                s.roomNo || '',
+                s.deadStockNo || '',
+                s.systemName || '',
+                s.ipAddress || '',
+                s.userName || '',
+                s.addedBy || '',
+                s.addedAt ? new Date(s.addedAt).toLocaleDateString('en-IN') : ''
+            ]);
+
+            // Build Excel-compatible HTML table
+            let tableHtml = `<table border="1"><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+            rows.forEach(row => {
+                tableHtml += `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+            });
+            tableHtml += '</tbody></table>';
+
+            const blob = new Blob([`\uFEFF${tableHtml}`], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SystemRecords_${new Date().toISOString().slice(0, 10)}.xls`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function renderSystemsTable(data) {
+            const tbody = document.getElementById('systemsTableBody');
+            document.getElementById('sysCount').textContent = data.length + ' Records';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="padding:2rem;text-align:center;color:#6b7280;"><i class="fas fa-inbox"></i> No system records found</td></tr>`;
+                return;
+            }
+
+            const ipCounts = {};
+            if (typeof allSystemsData !== 'undefined') {
+                allSystemsData.forEach(s => {
+                    if (s.ipAddress && s.ipAddress.trim() !== '') {
+                        ipCounts[s.ipAddress] = (ipCounts[s.ipAddress] || 0) + 1;
+                    }
+                });
+            }
+
+            tbody.innerHTML = data.map((s, i) => {
+                const date = s.addedAt ? new Date(s.addedAt).toLocaleDateString('en-IN') : '-';
+                const isDuplicateIP = s.ipAddress && ipCounts[s.ipAddress] > 1;
+                const ipStyle = isDuplicateIP ? 'color: #dc2626; font-weight: bold; background: #fee2e2; padding: 0.2rem 0.5rem; border-radius: 4px;' : 'color: #4f46e5;';
+
+                return `<tr style="border-bottom:1px solid #f1f5f9; transition:background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                    <td style="padding:0.9rem 1rem;color:#6b7280;">${i + 1}</td>
+                    <td style="padding:0.9rem 1rem;font-weight:500;">${s.department || '-'}</td>
+                    <td style="padding:0.9rem 1rem;">${s.roomNo || '-'}</td>
+                    <td style="padding:0.9rem 1rem;">${s.deadStockNo || '-'}</td>
+                    <td style="padding:0.9rem 1rem;font-weight:500;">${s.systemName || '-'}</td>
+                    <td style="padding:0.9rem 1rem;font-family:monospace;"><span style="${ipStyle}">${s.ipAddress || '-'}</span></td>
+                    <td style="padding:0.9rem 1rem;">${s.userName || '-'}</td>
+                    <td style="padding:0.9rem 1rem;color:#6b7280;font-size:0.85rem;">${s.addedBy || '-'}</td>
+                    <td style="padding:0.9rem 1rem;color:#6b7280;font-size:0.85rem;">${date}</td>
+                    <td style="padding:0.9rem 1rem;">
+                        <button onclick="deleteSystemRecord('${s.id}')" style="background:#fee2e2;color:#dc2626;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function deleteSystemRecord(id) {
+            if (!confirm('हे record delete करायचे आहे का?')) return;
+            try {
+                await window.db.ref('systems/' + id).remove();
+                if (dashboardCache.systems && dashboardCache.systems[id]) {
+                    delete dashboardCache.systems[id];
+                }
+                allSystemsData = allSystemsData.filter(s => s.id !== id);
+                filterSystemsTable();
+                alert('Record deleted successfully!');
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
         }
 
         // Load Feedback Data from Firebase
