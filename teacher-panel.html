@@ -3074,8 +3074,6 @@
                 if (allowedCompanies.length > 0) {
                     companiesToShow = allowedCompanies.filter(c => allCompanies.has(c));
                     if (companiesToShow.length === 0 && allCompanies.size === 0) companiesToShow = allowedCompanies;
-                } else {
-                    companiesToShow = Array.from(allCompanies);
                 }
 
                 companiesToShow.forEach(c => {
@@ -3344,8 +3342,8 @@
                     allowedCompanies = teacherCompany.split(',').map(s => s.trim()).filter(s => s);
                 }
 
-                // Admins see all, but for exact report we might restrict to teacher's allowed if present
-                const companiesToShow = allowedCompanies.length > 0 ? allowedCompanies : Array.from(allCompanies);
+                // Teachers should only see their assigned companies in the report filter
+                const companiesToShow = allowedCompanies.length > 0 ? allowedCompanies : [];
 
                 companiesToShow.forEach(c => {
                     const selected = (allowedCompanies.length === 1 && c === allowedCompanies[0]) ? 'selected' : '';
