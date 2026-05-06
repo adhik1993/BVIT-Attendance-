@@ -3119,8 +3119,18 @@
             const saveSection = document.getElementById('itrSaveSection');
             if (!listDiv) return;
 
+            const divContainer = document.getElementById('itrDivisionContainer');
+            const divSelect = document.getElementById('itrDivision');
+            const divisionStr = (divContainer && divContainer.style.display !== 'none' && divSelect) ? divSelect.value : '';
+
             if (!dept || !company) {
                 listDiv.innerHTML = '<div class="empty-state"><i class="fas fa-filter"></i><p>Please select Department and Company</p></div>';
+                if (saveSection) saveSection.style.display = 'none';
+                return;
+            }
+
+            if ((dept === 'Computer Technology' || dept === 'CT') && !divisionStr) {
+                listDiv.innerHTML = '<div class="empty-state"><i class="fas fa-filter"></i><p>Please select Division</p></div>';
                 if (saveSection) saveSection.style.display = 'none';
                 return;
             }
@@ -3146,10 +3156,6 @@
                     'Electrical Engineering': ['EE', 'ELECTRICAL', 'ELECTRICAL ENGINEERING', 'EP'],
                     'Artificial Intelligence': ['AI', 'ARTIFICIAL INTELLIGENCE', 'AN']
                 };
-
-                const divContainer = document.getElementById('itrDivisionContainer');
-                const divSelect = document.getElementById('itrDivision');
-                const divisionStr = (divContainer && divContainer.style.display !== 'none' && divSelect) ? divSelect.value : '';
 
                 const filtered = Object.entries(all).filter(([id, s]) => {
                     const isSY = (s.year === 'SY' || s.year === '2' || s.year === 'Second' || String(s.class || '').toUpperCase().includes('SY'));
