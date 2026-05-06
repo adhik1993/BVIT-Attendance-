@@ -3037,28 +3037,39 @@
                 const allCompanies = new Set();
 
                 const deptMap = {
-                    'Computer Technology': 'CT',
-                    'Information Technology': 'IT',
-                    'Electronics & Telecommunication': 'ET',
-                    'Mechanical Engineering': 'ME',
-                    'Civil Engineering': 'CE',
-                    'Electrical Engineering': 'EE',
-                    'Artificial Intelligence': 'AI'
+                    'Computer Technology': ['CT', 'COMPUTER TECHNOLOGY', 'COMPUTER', 'COMP', 'CO', 'CM'],
+                    'Information Technology': ['IT', 'INFORMATION TECHNOLOGY', 'INFO TECH', 'IF'],
+                    'Electronics & Telecommunication': ['ET', 'ELECTRONICS', 'E&TC', 'ELECTRONICS & TELECOMMUNICATION', 'EJ'],
+                    'Mechanical Engineering': ['ME', 'MECHANICAL', 'MECH', 'MECHANICAL ENGINEERING'],
+                    'Civil Engineering': ['CE', 'CIVIL', 'CIVIL ENGINEERING'],
+                    'Electrical Engineering': ['EE', 'ELECTRICAL', 'ELECTRICAL ENGINEERING', 'EP'],
+                    'Artificial Intelligence': ['AI', 'ARTIFICIAL INTELLIGENCE', 'AN']
                 };
-                const deptCode = deptMap[dept] || dept;
 
                 Object.values(students).forEach(s => {
                     const isSY = (s.year === 'SY' || s.year === '2' || s.year === 'Second' || String(s.class || '').toUpperCase().includes('SY'));
-                    const isDept = (!dept || s.department === dept || s.branch === dept || s.department === deptCode || s.branch === deptCode);
+                    
+                    let isDept = false;
+                    if (!dept) {
+                        isDept = true;
+                    } else {
+                        const targetDepts = deptMap[dept] || [dept.toUpperCase()];
+                        const sDept = (s.department || '').toString().toUpperCase().trim();
+                        const sBranch = (s.branch || '').toString().toUpperCase().trim();
+                        const sDeptCode = (s.dept || '').toString().toUpperCase().trim();
+                        isDept = targetDepts.includes(sDept) || targetDepts.includes(sBranch) || targetDepts.includes(sDeptCode) || sDept === dept.toUpperCase() || sBranch === dept.toUpperCase() || sDeptCode === dept.toUpperCase();
+                    }
                     
                     const divContainer = document.getElementById('itrDivisionContainer');
                     let isDiv = true;
                     if (divContainer && divContainer.style.display !== 'none' && divisionStr) {
-                        isDiv = ((s.division || '').toString().toUpperCase() === divisionStr.toString().toUpperCase());
+                        const studentDiv = (s.division || 'A').toString().toUpperCase();
+                        isDiv = (studentDiv === divisionStr.toString().toUpperCase());
                     }
 
-                    if (isSY && isDept && isDiv && s.companyName) {
-                        allCompanies.add((s.companyName || '').trim());
+                    const studentCompany = (s.companyName || s.company || '').toString().trim();
+                    if (isSY && isDept && isDiv && studentCompany) {
+                        allCompanies.add(studentCompany);
                     }
                 });
                 
@@ -3072,8 +3083,16 @@
 
                 let companiesToShow = [];
                 if (allowedCompanies.length > 0) {
-                    companiesToShow = allowedCompanies.filter(c => allCompanies.has(c));
-                    if (companiesToShow.length === 0 && allCompanies.size === 0) companiesToShow = allowedCompanies;
+                    companiesToShow = allowedCompanies.filter(c => {
+                        const normC = c.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        return Array.from(allCompanies).some(ac => {
+                            const normAc = ac.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return normAc && normC && (normAc === normC || normAc.includes(normC) || normC.includes(normAc));
+                        });
+                    });
+                    if (companiesToShow.length === 0) companiesToShow = allowedCompanies;
+                } else {
+                    companiesToShow = Array.from(allCompanies);
                 }
 
                 companiesToShow.forEach(c => {
@@ -3119,15 +3138,14 @@
                     sessionStorage.setItem('allStudentsCache_v1', JSON.stringify(all));
                 }
                 const deptMap = {
-                    'Computer Technology': 'CT',
-                    'Information Technology': 'IT',
-                    'Electronics & Telecommunication': 'ET',
-                    'Mechanical Engineering': 'ME',
-                    'Civil Engineering': 'CE',
-                    'Electrical Engineering': 'EE',
-                    'Artificial Intelligence': 'AI'
+                    'Computer Technology': ['CT', 'COMPUTER TECHNOLOGY', 'COMPUTER', 'COMP', 'CO', 'CM'],
+                    'Information Technology': ['IT', 'INFORMATION TECHNOLOGY', 'INFO TECH', 'IF'],
+                    'Electronics & Telecommunication': ['ET', 'ELECTRONICS', 'E&TC', 'ELECTRONICS & TELECOMMUNICATION', 'EJ'],
+                    'Mechanical Engineering': ['ME', 'MECHANICAL', 'MECH', 'MECHANICAL ENGINEERING'],
+                    'Civil Engineering': ['CE', 'CIVIL', 'CIVIL ENGINEERING'],
+                    'Electrical Engineering': ['EE', 'ELECTRICAL', 'ELECTRICAL ENGINEERING', 'EP'],
+                    'Artificial Intelligence': ['AI', 'ARTIFICIAL INTELLIGENCE', 'AN']
                 };
-                const deptCode = deptMap[dept] || dept;
 
                 const divContainer = document.getElementById('itrDivisionContainer');
                 const divSelect = document.getElementById('itrDivision');
@@ -3135,14 +3153,35 @@
 
                 const filtered = Object.entries(all).filter(([id, s]) => {
                     const isSY = (s.year === 'SY' || s.year === '2' || s.year === 'Second' || String(s.class || '').toUpperCase().includes('SY'));
-                    const isDept = (!dept || s.department === dept || s.branch === dept || s.department === deptCode || s.branch === deptCode);
+                    
+                    let isDept = false;
+                    if (!dept) {
+                        isDept = true;
+                    } else {
+                        const targetDepts = deptMap[dept] || [dept.toUpperCase()];
+                        const sDept = (s.department || '').toString().toUpperCase().trim();
+                        const sBranch = (s.branch || '').toString().toUpperCase().trim();
+                        const sDeptCode = (s.dept || '').toString().toUpperCase().trim();
+                        isDept = targetDepts.includes(sDept) || targetDepts.includes(sBranch) || targetDepts.includes(sDeptCode) || sDept === dept.toUpperCase() || sBranch === dept.toUpperCase() || sDeptCode === dept.toUpperCase();
+                    }
                     
                     let isDiv = true;
                     if (divisionStr) {
-                        isDiv = ((s.division || '').toString().toUpperCase() === divisionStr.toString().toUpperCase());
+                        const studentDiv = (s.division || 'A').toString().toUpperCase().trim();
+                        isDiv = (studentDiv === divisionStr.toString().toUpperCase().trim());
                     }
 
-                    const isCompany = (s.companyName || '').trim() === company.trim();
+                    const studentCompany = (s.companyName || s.company || '').toString().trim().toLowerCase();
+                    const teacherCompanyStr = company.trim().toLowerCase();
+                    
+                    const normStudent = studentCompany.replace(/[^a-z0-9]/g, '');
+                    const normTeacher = teacherCompanyStr.replace(/[^a-z0-9]/g, '');
+                    
+                    let isCompany = false;
+                    if (normStudent && normTeacher) {
+                        isCompany = (normStudent === normTeacher || normStudent.includes(normTeacher) || normTeacher.includes(normStudent));
+                    }
+                    
                     return isSY && isDept && isDiv && isCompany;
                 });
 
