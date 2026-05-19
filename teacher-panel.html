@@ -3185,7 +3185,7 @@
                     
                     let isCompany = false;
                     if (normStudent && normTeacher) {
-                        isCompany = (normStudent === normTeacher || normStudent.includes(normTeacher) || normTeacher.includes(normStudent));
+                        isCompany = (normStudent === normTeacher);
                     }
                     
                     return isSY && isDept && isDiv && isCompany;
