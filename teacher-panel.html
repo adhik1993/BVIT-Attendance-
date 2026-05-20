@@ -3095,6 +3095,17 @@
                     companiesToShow = Array.from(allCompanies);
                 }
 
+                // Cache the companies list for student loading
+                window._itrAllowedCompaniesToShow = companiesToShow;
+
+                if (companiesToShow.length > 1) {
+                    const allOpt = document.createElement('option');
+                    allOpt.value = 'ALL';
+                    allOpt.textContent = '-- All Assigned Companies --';
+                    allOpt.selected = true;
+                    companySelect.appendChild(allOpt);
+                }
+
                 companiesToShow.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
@@ -3178,14 +3189,25 @@
                     }
 
                     const studentCompany = (s.companyName || s.company || '').toString().trim().toLowerCase();
-                    const teacherCompanyStr = company.trim().toLowerCase();
-                    
                     const normStudent = studentCompany.replace(/[^a-z0-9]/g, '');
-                    const normTeacher = teacherCompanyStr.replace(/[^a-z0-9]/g, '');
                     
                     let isCompany = false;
-                    if (normStudent && normTeacher) {
-                        isCompany = (normStudent === normTeacher);
+                    if (company === 'ALL') {
+                        const allowed = window._itrAllowedCompaniesToShow || [];
+                        if (allowed.length > 0) {
+                            isCompany = allowed.some(ac => {
+                                const normAc = ac.toLowerCase().replace(/[^a-z0-9]/g, '');
+                                return normStudent && normAc && (normStudent === normAc || normStudent.includes(normAc) || normAc.includes(normStudent));
+                            });
+                        } else {
+                            isCompany = normStudent !== '';
+                        }
+                    } else {
+                        const teacherCompanyStr = company.trim().toLowerCase();
+                        const normTeacher = teacherCompanyStr.replace(/[^a-z0-9]/g, '');
+                        if (normStudent && normTeacher) {
+                            isCompany = (normStudent === normTeacher);
+                        }
                     }
                     
                     return isSY && isDept && isDiv && isCompany;
@@ -3291,15 +3313,28 @@
             try {
                 const updates = {};
                 const deptKey = dept.replace(/[^a-zA-Z0-9]/g, '_');
-                const companyKey = company.replace(/[.#$/[\]]/g, '_');
+                
+                // Get cached students list to look up student company name
+                let allStudents = {};
+                const cacheStr = sessionStorage.getItem('allStudentsCache_v1');
+                if (cacheStr) {
+                    allStudents = JSON.parse(cacheStr);
+                }
+
                 const currentUid = firebase.auth().currentUser?.uid || '';
                 Object.entries(window._itrAttendance).forEach(([studentId, status]) => {
                     if (status !== null) {
-                        const key = `itr_attendance/${date}/${deptKey}/${companyKey}/${studentId}`;
+                        const studentObj = allStudents[studentId] || {};
+                        const studentCompany = (studentObj.companyName || studentObj.company || '').toString().trim();
+                        // Use student's actual company, fallback to selected company if not found
+                        const finalCompany = studentCompany || company;
+                        const studentCompanyKey = finalCompany.replace(/[.#$/[\]]/g, '_');
+
+                        const key = `itr_attendance/${date}/${deptKey}/${studentCompanyKey}/${studentId}`;
                         updates[key] = {
                             status: status ? 'present' : 'absent',
                             studentId,
-                            company,
+                            company: finalCompany,
                             department: dept,
                             year: 'SY',
                             date,
