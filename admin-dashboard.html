@@ -79,8 +79,8 @@
         .sidebar {
             width: 280px;
             background: var(--sidebar-bg);
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
+            height: 100vh;
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
             position: fixed;
             left: 0;
             top: 0;
@@ -88,6 +88,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
         }
 
         .sidebar-header {
@@ -148,6 +149,23 @@
 
         .nav-menu {
             list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 5px;
+        }
+        .nav-menu::-webkit-scrollbar {
+            width: 4px;
+        }
+        .nav-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .nav-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        .nav-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .nav-item {
@@ -592,10 +610,9 @@
 
         /* Add logout button styles */
         .logout-button {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
+            position: relative;
+            margin-top: auto;
+            width: 100%;
             padding: 12px;
             background: var(--danger);
             color: white;
@@ -610,7 +627,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             min-height: 44px;
-            /* Added for better touch targets */
+            flex-shrink: 0;
         }
 
         .logout-button:hover {
@@ -622,34 +639,30 @@
             font-size: 1.2rem;
         }
 
-        /* Update sidebar padding to accommodate logout button */
-        .sidebar {
-            padding-bottom: 100px;
-        }
-
         /* Mobile styles for logout button */
         @media (max-width: 1024px) {
             .sidebar .logout-button {
-                position: absolute;
-                left: 20px;
-                bottom: 70px;
-                width: 48px;
-                height: 48px;
-                padding: 0;
-                border-radius: 50%;
+                position: relative;
+                margin-top: auto;
+                left: auto;
+                bottom: auto;
+                width: 100%;
+                height: auto;
+                padding: 12px;
+                border-radius: 8px;
                 justify-content: center;
                 align-items: center;
                 min-width: unset;
-                min-height: unset;
+                min-height: 44px;
             }
 
             .sidebar .logout-button span {
-                display: none;
+                display: inline;
             }
 
             .sidebar .logout-button i {
-                font-size: 1.3rem;
-                margin: 0;
+                font-size: 1.2rem;
+                margin-right: 10px;
             }
 
             .header-logout {
@@ -663,9 +676,9 @@
             }
         }
 
-        /* Ensure sidebar is scrollable and on top */
+        /* Ensure sidebar is on top */
         .sidebar {
-            overflow-y: auto;
+            overflow-y: hidden;
             z-index: 9999;
         }
 
@@ -2661,17 +2674,23 @@
                 let targetCode = '';
                 if (deptFilter) {
                     const filterMap = {
-                        'Computer_Technology': { full: 'Computer Technology', code: 'CT' },
-                        'Information_Technology': { full: 'Information Technology', code: 'IT' },
-                        'Mechanical_Engineering': { full: 'Mechanical Engineering', code: 'ME' },
-                        'Civil_Engineering': { full: 'Civil Engineering', code: 'CE' },
-                        'Electrical_Engineering': { full: 'Electrical Engineering', code: 'EE' },
-                        'Electronics___Telecommunication': { full: 'Electronics & Telecommunication', code: 'ET' },
-                        'Artificial_Intelligence': { full: 'Artificial Intelligence', code: 'AI' }
+                        'Computer_Technology': { full: 'Computer Technology', code: 'CT', variations: ['CT', 'COMPUTER TECHNOLOGY', 'COMPUTER', 'COMP'] },
+                        'Information_Technology': { full: 'Information Technology', code: 'IT', variations: ['IT', 'INFORMATION TECHNOLOGY', 'INFO TECH'] },
+                        'Mechanical_Engineering': { full: 'Mechanical Engineering', code: 'ME', variations: ['ME', 'MECHANICAL', 'MECH', 'MECHANICAL ENGINEERING'] },
+                        'Civil_Engineering': { full: 'Civil Engineering', code: 'CE', variations: ['CE', 'CIVIL', 'CIVIL ENGINEERING'] },
+                        'Electrical_Engineering': { full: 'Electrical Engineering', code: 'EE', variations: ['EE', 'ELECTRICAL', 'ELECTRICAL ENGINEERING'] },
+                        'Electronics___Telecommunication': { full: 'Electronics & Telecommunication', code: 'ET', variations: ['ET', 'ELECTRONICS', 'E&TC', 'ELECTRONICS & TELECOMMUNICATION'] },
+                        'Artificial_Intelligence': { full: 'Artificial Intelligence', code: 'AI', variations: ['AI', 'ARTIFICIAL INTELLIGENCE'] }
                     };
+                    
+                    let targetFullName = '';
+                    let targetCode = '';
+                    let targetVariations = [];
+                    
                     if (filterMap[deptFilter]) {
                         targetFullName = filterMap[deptFilter].full;
                         targetCode = filterMap[deptFilter].code;
+                        targetVariations = filterMap[deptFilter].variations;
                     } else {
                         targetFullName = deptFilter.replace(/_/g, ' ');
                     }
@@ -2690,6 +2709,7 @@
                             if (sDept === deptFilter || sDeptSanitized === deptFilter) isDeptMatch = true;
                             if (targetFullName && sDept.toLowerCase() === targetFullName.toLowerCase()) isDeptMatch = true;
                             if (targetCode && sDept.toUpperCase() === targetCode) isDeptMatch = true;
+                            if (targetVariations && targetVariations.includes(sDept.toUpperCase())) isDeptMatch = true;
                         }
 
                         if (isDeptMatch) {

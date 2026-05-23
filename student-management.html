@@ -289,9 +289,9 @@
 
             console.log('Adding student with data:', studentData);
 
-            // Validate division for Computer Engineering
-            if (department === 'Computer Engineering' && !division) {
-                alert('Please select a division for Computer Engineering');
+            // Validate division for Computer Technology
+            if (department === 'Computer Technology' && !division) {
+                alert('कृपया तुकडी निवडा (A, B, किंवा C)');
                 return;
             }
 
@@ -790,9 +790,13 @@
                     console.log('Last Name field value:', editLastName ? editLastName.value : 'Element not found');
 
 
+                    // Trigger dropdown change listeners to ensure UI is in sync
+                    handleEditDepartmentChange();
+                    if (typeof handleEditYearChange === 'function') handleEditYearChange();
+
                     // Handle division checkboxes
                     const divisionGroup = document.getElementById('editDivisionGroup');
-                    if (student.department === 'Computer Technology') {
+                    if (deptVal === 'Computer Technology') {
                         divisionGroup.style.display = 'block';
                         document.querySelectorAll('input[name="editDivision"]').forEach(checkbox => {
                             checkbox.checked = student.division === checkbox.value;
@@ -800,10 +804,6 @@
                     } else {
                         divisionGroup.style.display = 'none';
                     }
-
-                    // Also make sure to update the dropdown change listener
-                    handleEditDepartmentChange(); // Trigger this to ensure UI is in sync
-                    if (typeof handleEditYearChange === 'function') handleEditYearChange();
 
                     // Update class options and set value
                     updateEditClassOptions();
@@ -855,7 +855,7 @@
                     });
 
                     if (!canUpdate) {
-                        alert('à¤¹à¤¾ à¤°à¥‹à¤² à¤¨à¤‚à¤¬à¤° à¤¦à¥à¤¸à¤±à¥à¤¯à¤¾ à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥à¤¯à¤¾à¤šà¤¾ à¤†à¤¹à¥‡! à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¥‡à¤—à¤³à¤¾ à¤°à¥‹à¤² à¤¨à¤‚à¤¬à¤° à¤µà¤¾à¤ªà¤°à¤¾.');
+                        alert('हा रोल नंबर दुसऱ्या विद्यार्थ्याचा आहे! कृपया दुसरा रोल नंबर वापरा.');
                         return;
                     }
 
@@ -893,34 +893,34 @@
 
                     // Validate data
                     if (!firstName || !lastName) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¨à¤¾à¤µ à¤­à¤°à¤¾');
+                        alert('कृपया नाव भरा');
                         return;
                     }
 
                     if (!studentData.email) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ˆà¤®à¥‡à¤² à¤­à¤°à¤¾');
+                        alert('कृपया ईमेल भरा');
                         return;
                     }
 
                     if (!studentData.phone) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤«à¥‹à¤¨ à¤¨à¤‚à¤¬à¤° à¤­à¤°à¤¾');
+                        alert('कृपया फोन नंबर भरा');
                         return;
                     }
 
                     if (!studentData.department) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¤¿à¤­à¤¾à¤— à¤¨à¤¿à¤µà¤¡à¤¾');
+                        alert('कृपया विभाग निवडा');
                         return;
                     }
 
                     if (!studentData.year) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤µà¤°à¥à¤· à¤¨à¤¿à¤µà¤¡à¤¾');
+                        alert('कृपया वर्ष निवडा');
                         return;
                     }
 
 
 
                     if (department === 'Computer Technology' && !division) {
-                        alert('à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¤à¥à¤•à¤¡à¥€ à¤¨à¤¿à¤µà¤¡à¤¾ (A, B, à¤•à¤¿à¤‚à¤µà¤¾ C)');
+                        alert('कृपया तुकडी निवडा (A, B, किंवा C)');
                         return;
                     }
 
@@ -931,7 +931,7 @@
                             document.getElementById('editStudentModal').style.display = 'none';
 
                             // Show success message
-                            alert('à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥à¤¯à¤¾à¤šà¥€ à¤®à¤¾à¤¹à¤¿à¤¤à¥€ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¤¿à¤¤à¥à¤¯à¤¾ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¥‡à¤²à¥€!');
+                            alert('विद्यार्थ्याची माहिती यशस्वीरित्या अपडेट केली!');
 
                             // Clear cache to force fresh load
                             studentsCache = null;
@@ -1111,7 +1111,7 @@
             if (!department || !divisionGroup) return;
 
             // Show/hide division checkboxes based on department
-            if (department.value === 'Computer Engineering') {
+            if (department.value === 'Computer Technology') {
                 divisionGroup.style.display = 'block';
             } else {
                 divisionGroup.style.display = 'none';
@@ -1148,8 +1148,8 @@
             let options = [];
 
             switch (department.value) {
-                case 'Computer Engineering':
-                    deptCode = 'CM';
+                case 'Computer Technology':
+                    deptCode = 'CT';
                     // Get selected divisions
                     const selectedDivisions = Array.from(document.querySelectorAll('input[name="division"]:checked')).map(cb => cb.value);
 
@@ -1157,7 +1157,7 @@
                     if (selectedDivisions.length === 0) {
                         ['A', 'B', 'C'].forEach(div => {
                             options.push({
-                                code: `${yearCode}${deptCode} (${div})`,
+                                code: `${yearCode}${deptCode}-${div}`,
                                 name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
                             });
                         });
@@ -1165,7 +1165,7 @@
                         // Show only selected divisions
                         selectedDivisions.forEach(div => {
                             options.push({
-                                code: `${yearCode}${deptCode} (${div})`,
+                                code: `${yearCode}${deptCode}-${div}`,
                                 name: `${yearCode}${deptCode} (${div}) - ${yearCode} ${department.value}`
                             });
                         });
