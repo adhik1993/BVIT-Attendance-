@@ -68,7 +68,8 @@
             --primary: #818cf8;
             --primary-light: rgba(129, 140, 248, 0.15);
             --primary-dark: #4f46e5;
-            --secondary: #ec4899; /* Neon Pink/Magenta */
+            --secondary: #ec4899;
+            /* Neon Pink/Magenta */
             --danger: #f87171;
             --warning: #fbbf24;
             --bg-glass: rgba(15, 23, 42, 0.75);
@@ -86,7 +87,8 @@
             --primary: #34d399;
             --primary-light: rgba(52, 211, 153, 0.15);
             --primary-dark: #059669;
-            --secondary: #06b6d4; /* Cyan */
+            --secondary: #06b6d4;
+            /* Cyan */
             --danger: #fda4af;
             --warning: #fde047;
             --bg-glass: rgba(6, 20, 18, 0.75);
@@ -209,6 +211,7 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         .nav-menu::-webkit-scrollbar {
             display: none;
         }
@@ -356,10 +359,21 @@
             transition: all 0.3s ease;
         }
 
-        .stat-students.stat-card::before { background: linear-gradient(90deg, #6366f1, #4f46e5); }
-        .stat-teachers.stat-card::before { background: linear-gradient(90deg, #10b981, #059669); }
-        .stat-attendance.stat-card::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
-        .stat-performance.stat-card::before { background: linear-gradient(90deg, #ec4899, #db2777); }
+        .stat-students.stat-card::before {
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+        }
+
+        .stat-teachers.stat-card::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .stat-attendance.stat-card::before {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .stat-performance.stat-card::before {
+            background: linear-gradient(90deg, #ec4899, #db2777);
+        }
 
         /* 🌌 Glowing shadows on Hover based on card class */
         .stat-students.stat-card:hover {
@@ -787,7 +801,7 @@
                 left: 0;
             }
 
-            .sidebar.active ~ .sidebar-overlay {
+            .sidebar.active~.sidebar-overlay {
                 display: block;
             }
 
@@ -877,8 +891,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 🎛️ Dynamic Theme Selector Styling */
@@ -927,7 +948,7 @@
             display: inline-block;
             position: relative;
         }
-        
+
         .ping-pulse::after {
             content: '';
             width: 100%;
@@ -940,10 +961,17 @@
             animation: ping 1.5s ease-in-out infinite;
             opacity: 0.8;
         }
-        
+
         @keyframes ping {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(3.5); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(3.5);
+                opacity: 0;
+            }
         }
 
         /* 📑 Floating Glassmorphic Modal */
@@ -977,15 +1005,22 @@
         }
 
         @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* 📢 Broadcast Announcements Log Items */
         .broadcast-item {
             padding: 0.65rem 0.75rem;
             border-radius: 8px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
             font-size: 0.85rem;
             display: flex;
@@ -1116,17 +1151,21 @@
                 <div class="header-actions" style="align-items: center;">
                     <!-- Theme Selector Control Pill -->
                     <div class="theme-control-pill">
-                        <button id="themeBtnCosmic" class="theme-btn" onclick="changeTheme('cosmic')" title="Cosmic Nebula (Dark)">
+                        <button id="themeBtnCosmic" class="theme-btn" onclick="changeTheme('cosmic')"
+                            title="Cosmic Nebula (Dark)">
                             <i class="fas fa-moon"></i>
                         </button>
-                        <button id="themeBtnAurora" class="theme-btn" onclick="changeTheme('aurora')" title="Aurora Emerald (Mint)">
+                        <button id="themeBtnAurora" class="theme-btn" onclick="changeTheme('aurora')"
+                            title="Aurora Emerald (Mint)">
                             <i class="fas fa-feather"></i>
                         </button>
-                        <button id="themeBtnLight" class="theme-btn" onclick="changeTheme('light')" title="Frosted Glass (Light)">
+                        <button id="themeBtnLight" class="theme-btn" onclick="changeTheme('light')"
+                            title="Frosted Glass (Light)">
                             <i class="fas fa-sun"></i>
                         </button>
                     </div>
-                    <button class="logout-button header-logout" onclick="handleLogout()" title="Logout" style="margin: 0;">
+                    <button class="logout-button header-logout" onclick="handleLogout()" title="Logout"
+                        style="margin: 0;">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
@@ -1162,7 +1201,7 @@
                     <div class="stat-value" id="performanceRate">Loading...</div>
                     <div class="stat-label">Performance Rate</div>
                 </div>
-                
+
 
             </div>
 
@@ -2535,7 +2574,7 @@
                             sub: `Teacher | Role: ${t.role || 'Lecturer'}`,
                             email: t.email || 'N/A',
                             contact: t.phone || 'N/A',
-                            extra: `Depts: ${t.departments ? t.departments.map(d=>d.code).join(',') : 'None'}`
+                            extra: `Depts: ${t.departments ? t.departments.map(d => d.code).join(',') : 'None'}`
                         });
                     }
                 });
@@ -3309,11 +3348,11 @@
                         'Electronics___Telecommunication': { full: 'Electronics & Telecommunication', code: 'ET', variations: ['ET', 'ELECTRONICS', 'E&TC', 'ELECTRONICS & TELECOMMUNICATION'] },
                         'Artificial_Intelligence': { full: 'Artificial Intelligence', code: 'AI', variations: ['AI', 'ARTIFICIAL INTELLIGENCE'] }
                     };
-                    
+
                     let targetFullName = '';
                     let targetCode = '';
                     let targetVariations = [];
-                    
+
                     if (filterMap[deptFilter]) {
                         targetFullName = filterMap[deptFilter].full;
                         targetCode = filterMap[deptFilter].code;
@@ -3363,7 +3402,7 @@
             const resultsDiv = document.getElementById('itrReportResults');
             if (!startDate || !endDate) { alert('Please select a date range'); return; }
 
-            const cacheKey = `admin_itr_report_v7_${startDate}_${endDate}_${filterDept}_${filterCompany}_${filterTeacher}`;
+            const cacheKey = `admin_itr_report_v11_${startDate}_${endDate}_${filterDept}_${filterCompany}_${filterTeacher}`;
             const cachedBody = sessionStorage.getItem(cacheKey);
             if (cachedBody) {
                 resultsDiv.innerHTML = cachedBody;
@@ -3479,25 +3518,57 @@
                             display: inline-flex;
                             gap: 10px;
                             margin-bottom: 20px;
-                            background: white;
-                            padding: 10px;
+                            background: var(--bg-glass);
+                            padding: 8px;
                             border-radius: 12px;
-                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                            box-shadow: var(--shadow-premium);
+                            border: 1px solid var(--border);
+                            backdrop-filter: blur(10px);
+                            -webkit-backdrop-filter: blur(10px);
                         }
                         .itr-view-btn {
-                            padding: 10px 20px;
+                            padding: 8px 16px;
                             border: none;
                             border-radius: 8px;
+                            font-family: 'Outfit', sans-serif;
                             font-weight: 600;
+                            font-size: 0.9rem;
                             cursor: pointer;
                             transition: all 0.3s ease;
-                            background: #f3f4f6;
-                            color: #4b5563;
+                            background: transparent;
+                            color: var(--text-muted);
+                        }
+                        .itr-view-btn:hover {
+                            background: var(--primary-light);
+                            color: var(--primary);
                         }
                         .itr-view-btn.itr-active {
-                            background: #4f46e5;
-                            color: white;
-                            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+                            background: var(--primary);
+                            color: white !important;
+                            box-shadow: 0 4px 12px var(--primary-light);
+                        }
+                        /* Premium Table Enhancements */
+                        .itr-premium-table {
+                            width: 100%;
+                            border-collapse: separate;
+                            border-spacing: 0;
+                            min-width: 900px;
+                            background: var(--bg-glass);
+                            font-family: 'Outfit', sans-serif !important;
+                            transition: all 0.3s ease;
+                        }
+                        .itr-premium-table th {
+                            font-family: 'Outfit', sans-serif !important;
+                            font-size: 0.9rem;
+                            letter-spacing: 0.03em;
+                            text-transform: uppercase;
+                        }
+                        .itr-premium-table td {
+                            font-family: 'Outfit', sans-serif !important;
+                            transition: background 0.2s ease;
+                        }
+                        .itr-premium-table tbody tr:hover td {
+                            background: var(--primary-light) !important;
                         }
                     </style>
                     <div class="itr-view-switcher">
@@ -3514,18 +3585,18 @@
                             </button>
                         </div>
                         <div style="overflow-x:auto;">
-                            <table style="width:100%;border-collapse:collapse;min-width:900px;background:white;font-family:'Inter',sans-serif;" id="itrCompanyMasterTable">
+                            <table class="itr-premium-table" id="itrCompanyMasterTable" style="width:100%;border-collapse:collapse;min-width:900px;background:var(--bg-glass);">
                                 <thead>
                                     <tr>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">ROLL NO</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">NAME</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DEPT</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">YEAR</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DIV</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">COMPANY NAME</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">TEACHER NAME</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:left;">DATE</th>
-                                        <th style="padding:1rem;color:white;font-weight:600;background:#3730A3;border-right:1px solid rgba(255,255,255,0.1);text-align:center;">STATUS</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">ROLL NO</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">DEPT</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">YEAR</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">DIV</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">COMPANY NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">TEACHER NAME</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:left;font-family:'Outfit',sans-serif;">DATE</th>
+                                        <th style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);text-align:center;font-family:'Outfit',sans-serif;">STATUS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -3534,11 +3605,11 @@
                 // Calculate sort and rendering.
                 detailedItrRecords.sort((a, b) => {
                     if (a.date !== b.date) return b.date.localeCompare(a.date); // Newest first
-                    
+
                     const rollA = parseInt((allStudents[a.studentId]?.rollNo || '').toString().replace(/\D/g, '')) || 0;
                     const rollB = parseInt((allStudents[b.studentId]?.rollNo || '').toString().replace(/\D/g, '')) || 0;
                     if (rollA !== rollB) return rollA - rollB;
-                    
+
                     return a.companyName.localeCompare(b.companyName);
                 });
 
@@ -3554,15 +3625,15 @@
                         : '<span style="background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:4px;font-size:0.85rem;font-weight:600;"><i class="fas fa-times"></i> ABSENT</span>';
 
                     companyWiseHtml += `<tr class="admin-itr-company-row">
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#374151;">${rollNo}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#111827;">${realName.toUpperCase()}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.deptLabel}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${year}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${div}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.companyName}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#6b7280;">${record.markedBy}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${record.date}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;">${statusHtml}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-weight:600; color:var(--text-main); font-family:'Outfit',sans-serif;">${rollNo}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-weight:600; color:var(--text-main); font-family:'Outfit',sans-serif; letter-spacing:0.02em;">${realName.toUpperCase()}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${record.deptLabel}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${year}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${div}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${record.companyName}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.85rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${record.markedBy}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${record.date}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center; font-family:'Outfit',sans-serif;">${statusHtml}</td>
                     </tr>`;
                 });
 
@@ -3584,21 +3655,21 @@
                             </button>
                         </div>
                         <div style="overflow-x:auto;">
-                            <table style="width:100%;border-collapse:collapse;min-width:900px;background:white;font-family:'Inter',sans-serif;" id="itrMasterTable">
+                            <table class="itr-premium-table" id="itrMasterTable" style="width:100%;border-collapse:collapse;min-width:900px;background:var(--bg-glass);">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">ROLL NO</th>
-                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">NAME</th>
-                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">DEPT</th>
-                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:#4F46E5;border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;">COMPANY</th>
-                                        <th colspan="4" style="padding:1rem;background:#10B981;color:white;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,0.1);">ITR ATTENDANCE</th>
-                                        <th rowspan="2" style="padding:1rem;background:#4F46E5;color:white;text-align:center;font-weight:600;vertical-align:middle;">MARKED BY</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;font-family:'Outfit',sans-serif;">ROLL NO</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;font-family:'Outfit',sans-serif;">NAME</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;font-family:'Outfit',sans-serif;">DEPT</th>
+                                        <th rowspan="2" style="padding:1rem;color:white;font-weight:600;background:var(--primary-dark);border-right:1px solid rgba(255,255,255,0.1);vertical-align:middle;text-align:left;font-family:'Outfit',sans-serif;">COMPANY</th>
+                                        <th colspan="4" style="padding:1rem;background:#10B981;color:white;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,0.1);font-family:'Outfit',sans-serif;">ITR ATTENDANCE</th>
+                                        <th rowspan="2" style="padding:1rem;background:var(--primary-dark);color:white;text-align:center;font-weight:600;vertical-align:middle;font-family:'Outfit',sans-serif;">MARKED BY</th>
                                     </tr>
                                     <tr>
-                                        <th style="padding:0.75rem;background:#D1FAE5;color:#065F46;font-weight:600;text-align:center;">PRES</th>
-                                        <th style="padding:0.75rem;background:#FEE2E2;color:#991B1B;font-weight:600;text-align:center;">ABS</th>
-                                        <th style="padding:0.75rem;background:#F3F4F6;color:#4B5563;font-weight:600;text-align:center;">TOT</th>
-                                        <th style="padding:0.75rem;background:#E0E7FF;color:#4F46E5;font-weight:600;text-align:center;">%</th>
+                                        <th style="padding:0.75rem;background:rgba(16,185,129,0.12);color:#10b981;font-weight:600;text-align:center;border-right:1px solid rgba(255,255,255,0.05);font-family:'Outfit',sans-serif;">PRES</th>
+                                        <th style="padding:0.75rem;background:rgba(239,68,68,0.12);color:#ef4444;font-weight:600;text-align:center;border-right:1px solid rgba(255,255,255,0.05);font-family:'Outfit',sans-serif;">ABS</th>
+                                        <th style="padding:0.75rem;background:rgba(99,102,241,0.12);color:#6366f1;font-weight:600;text-align:center;border-right:1px solid rgba(255,255,255,0.05);font-family:'Outfit',sans-serif;">TOT</th>
+                                        <th style="padding:0.75rem;background:rgba(245,158,11,0.12);color:#f59e0b;font-weight:600;text-align:center;font-family:'Outfit',sans-serif;">%</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -3642,17 +3713,17 @@
                     if (!teacherStr) teacherStr = '-';
 
                     html += `<tr class="admin-itr-row">
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#374151;">${s.rollNo}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-weight:600; color:#111827;">${(s.name || '').toString().toUpperCase()}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${s.deptLabel}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.85rem; color:#4B5563;">${s.companyName}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;color:#10B981;font-weight:700;">${s.present}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;color:#EF4444;font-weight:700;">${s.absent}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-weight:600;color:#374151;">${s.total}</td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-weight:700;color:${healthColor};" data-percentage="${s.percentage}">
-                            ${s.percentage}%
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-weight:600; color:var(--text-main); font-family:'Outfit',sans-serif;">${s.rollNo}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-weight:600; color:var(--text-main); font-family:'Outfit',sans-serif; letter-spacing:0.02em;">${(s.name || '').toString().toUpperCase()}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${s.deptLabel}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--text-muted); font-family:'Outfit',sans-serif;">${s.companyName}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center; font-family:'Outfit',sans-serif;"><span style="color:#10b981; font-weight:700; font-size:1.05rem;">${s.present}</span></td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center; font-family:'Outfit',sans-serif;"><span style="color:#ef4444; font-weight:700; font-size:1.05rem;">${s.absent}</span></td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center; font-family:'Outfit',sans-serif;"><span style="color:#6366f1; font-weight:700; font-size:1.05rem;">${s.total}</span></td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center; font-family:'Outfit',sans-serif;" data-percentage="${s.percentage}">
+                            <span style="color:${healthColor}; font-weight:700; font-size:1.05rem;">${s.percentage}%</span>
                         </td>
-                        <td style="padding:0.75rem 1rem; border-bottom:1px solid #f1f5f9; text-align:center;font-size:0.82rem;color:#6b7280;">${teacherStr}</td>
+                        <td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); text-align:center;font-size:0.85rem;color:var(--text-muted);font-family:'Outfit',sans-serif;">${teacherStr}</td>
                     </tr>`;
                 });
 
@@ -6764,7 +6835,7 @@
             console.log('🔄 Changing theme to:', themeName);
             const body = document.body;
             body.className = ''; // Reset body classes
-            
+
             // Remove active state from all buttons
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
 
@@ -6824,7 +6895,7 @@
 
                 await window.db.ref('notifications').push(newNotification);
                 showToast('Notification broadcasted successfully!', 'success');
-                
+
                 // Clear input fields
                 titleInput.value = '';
                 bodyInput.value = '';
@@ -6860,7 +6931,7 @@
                     items.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'broadcast-item';
-                        
+
                         let priorityColor = '#6366f1';
                         if (item.priority === 'urgent') priorityColor = '#ef4444';
                         else if (item.priority === 'event') priorityColor = '#f59e0b';
@@ -6984,13 +7055,13 @@
 
                 const blob = new Blob([JSON.stringify(backupData, null, 4)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
-                
+
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `bvit_attendance_backup_${getLocalFormattedDate(new Date())}.json`;
                 document.body.appendChild(a);
                 a.click();
-                
+
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast('Complete Database JSON downloaded successfully!', 'success');
@@ -7108,7 +7179,7 @@
                 // Clear search input and open modal
                 document.getElementById('modalStudentSearch').value = '';
                 document.getElementById('attendanceDetailsModal').style.display = 'flex';
-                
+
             } catch (err) {
                 console.error(err);
                 showToast('Failed to load sheet details.', 'error');
@@ -7140,7 +7211,7 @@
 
             try {
                 const students = await getCachedData('students', 'students') || {};
-                
+
                 let csv = 'Roll No,Student Name,Status\r\n';
                 const marked = record.students || {};
 
@@ -7197,48 +7268,71 @@
     </script>
 
     <!-- Attendance Details Floating Modal -->
-    <div id="attendanceDetailsModal" class="modal-backdrop" onclick="if(event.target===this) closeAttendanceDetailsModal()">
+    <div id="attendanceDetailsModal" class="modal-backdrop"
+        onclick="if(event.target===this) closeAttendanceDetailsModal()">
         <div class="details-modal">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem;" id="modalLectureTitle">Lecture Details</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" id="modalLectureSubtitle">Date: -- | Subject: --</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"
+                        id="modalLectureSubtitle">Date: -- | Subject: --</p>
                 </div>
-                <button onclick="closeAttendanceDetailsModal()" style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+                <button onclick="closeAttendanceDetailsModal()"
+                    style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s;"
+                    onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <!-- Quick stats row -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="background: rgba(16, 185, 129, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.15);">
+                <div
+                    style="background: rgba(16, 185, 129, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.15);">
                     <div style="font-size: 1.35rem; font-weight: 800; color: #10b981;" id="modalPresentCount">0</div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase;">Present</span>
+                    <span
+                        style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase;">Present</span>
                 </div>
-                <div style="background: rgba(239, 68, 68, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.15);">
+                <div
+                    style="background: rgba(239, 68, 68, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.15);">
                     <div style="font-size: 1.35rem; font-weight: 800; color: #ef4444;" id="modalAbsentCount">0</div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444; text-transform: uppercase;">Absent</span>
+                    <span
+                        style="font-size: 0.75rem; font-weight: 700; color: #ef4444; text-transform: uppercase;">Absent</span>
                 </div>
-                <div style="background: var(--primary-light); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
-                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary);" id="modalPercentCount">0.0%</div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">Ratio</span>
+                <div
+                    style="background: var(--primary-light); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary);" id="modalPercentCount">
+                        0.0%</div>
+                    <span
+                        style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">Ratio</span>
                 </div>
             </div>
 
             <!-- Search student in modal -->
             <div style="margin-bottom: 1rem; position: relative;">
-                <input type="text" id="modalStudentSearch" oninput="filterModalStudents()" placeholder="Search student name or roll..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.25rem !important; border: 1px solid var(--border) !important; border-radius: 10px !important; background: var(--bg-input) !important; color: var(--text-main) !important; outline: none !important; font-size: 0.9rem;">
-                <i class="fas fa-search" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+                <input type="text" id="modalStudentSearch" oninput="filterModalStudents()"
+                    placeholder="Search student name or roll..."
+                    style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.25rem !important; border: 1px solid var(--border) !important; border-radius: 10px !important; background: var(--bg-input) !important; color: var(--text-main) !important; outline: none !important; font-size: 0.9rem;">
+                <i class="fas fa-search"
+                    style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
             </div>
 
             <!-- Student Grid Table Scrollable -->
-            <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,0.15); padding: 0.5rem;">
-                <table style="width: 100% !important; margin-top: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important;">
+            <div
+                style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,0.15); padding: 0.5rem;">
+                <table
+                    style="width: 100% !important; margin-top: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important;">
                     <thead>
                         <tr style="background: transparent !important;">
-                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">Roll No</th>
-                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">Student Name</th>
-                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important; text-align: center !important;">Status</th>
+                            <th
+                                style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">
+                                Roll No</th>
+                            <th
+                                style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">
+                                Student Name</th>
+                            <th
+                                style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important; text-align: center !important;">
+                                Status</th>
                         </tr>
                     </thead>
                     <tbody id="modalStudentTableBody">
@@ -7249,10 +7343,12 @@
 
             <!-- Modal footer export -->
             <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
-                <button onclick="exportModalAttendanceCSV()" class="btn btn-secondary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 10px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-input); color: var(--text-main);">
+                <button onclick="exportModalAttendanceCSV()" class="btn btn-secondary"
+                    style="padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 10px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-input); color: var(--text-main);">
                     <i class="fas fa-file-csv"></i> Export CSV Sheet
                 </button>
-                <button onclick="closeAttendanceDetailsModal()" class="btn btn-primary" style="padding: 0.5rem 1.5rem; font-size: 0.85rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; width: auto;">
+                <button onclick="closeAttendanceDetailsModal()" class="btn btn-primary"
+                    style="padding: 0.5rem 1.5rem; font-size: 0.85rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; width: auto;">
                     Close
                 </button>
             </div>
