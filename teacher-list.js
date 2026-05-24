@@ -29,6 +29,13 @@ function generatePassword() {
     return password.split('').sort(() => Math.random() - 0.5).join('');
 }
 
+// Function to clear teachers cache
+function clearTeachersCache() {
+    sessionStorage.removeItem('teachersCache_v1');
+    sessionStorage.removeItem('teachersCacheTime_v1');
+    console.log('🗑️ Teachers cache cleared');
+}
+
 // Check if user is admin
 async function checkIsAdmin(userId) {
     try {
@@ -120,11 +127,10 @@ async function updateTeacherRoles() {
         const updates = {};
 
         Object.entries(teachers).forEach(([id, teacher]) => {
-            const isAssistant = isLabAssistant(teacher.firstName, teacher.lastName);
-            if (isAssistant && (!teacher.role || teacher.role !== 'Lab Assistant')) {
-                updates[`teachers/${id}/role`] = 'Lab Assistant';
-            } else if (!isAssistant && (!teacher.role || teacher.role !== 'Lecturer')) {
-                updates[`teachers/${id}/role`] = 'Lecturer';
+            // Only set default role if the teacher does not have a role yet
+            if (!teacher.role) {
+                const isAssistant = isLabAssistant(teacher.firstName, teacher.lastName);
+                updates[`teachers/${id}/role`] = isAssistant ? 'Lab Assistant' : 'Lecturer';
             }
         });
 
@@ -302,6 +308,7 @@ async function updateTeacherDetails(teacherId) {
 
                 // Close modal and refresh
                 modal.style.display = 'none';
+                clearTeachersCache();
                 window.location.reload();
 
             } catch (error) {
@@ -374,6 +381,11 @@ class TeacherList {
         if (deptFilter) {
             deptFilter.addEventListener('change', () => this.filterTeachers());
         }
+
+        const roleFilter = document.getElementById('roleFilter');
+        if (roleFilter) {
+            roleFilter.addEventListener('change', () => this.filterTeachers());
+        }
     }
 
 
@@ -382,13 +394,18 @@ class TeacherList {
 
         const searchTerm = this.searchInput ? this.searchInput.value.trim().toLowerCase() : '';
         const selectedDepartment = document.getElementById('departmentFilter')?.value;
+        const selectedRole = document.getElementById('roleFilter')?.value;
 
         // Clear existing rows
         if (this.tableBody) this.tableBody.innerHTML = '';
 
-        // If no department selected AND no search term, you can either show ALL or show empty
-        // Let's show ALL by default because it's better UX, but keep the department grouping
-        const isFiltering = !!selectedDepartment || !!searchTerm;
+        // Check if any filter is active. If not, show empty state message.
+        const isFiltering = !!selectedDepartment || !!selectedRole || !!searchTerm;
+        if (!isFiltering) {
+            this.showEmptyState('शिक्षकांची यादी पाहण्यासाठी कृपया वरून विभाग (Department), हुद्दा (Role) निवडा किंवा नाव सर्च करा.');
+            this.updateResultCounter(0, Object.keys(this.allTeachers).length);
+            return;
+        }
 
         // Group teachers by department
         const teachersByDept = {};
@@ -424,6 +441,10 @@ class TeacherList {
                 phone.includes(searchTerm);
 
             if (!matchesSearch) return;
+
+            // Check matches role
+            const matchesRole = !selectedRole || (teacher.role || 'Lecturer') === selectedRole;
+            if (!matchesRole) return;
 
             // Get assigned departments
             const teacherDepts = teacher.departments || [];
@@ -480,7 +501,7 @@ class TeacherList {
             const headerRow = document.createElement('tr');
             headerRow.className = 'department-header';
             headerRow.innerHTML = `
-                <td colspan="7">
+                <td colspan="8">
                     <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text}; padding: 12px 20px; border-radius: 8px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
                         <div>
                             <i class="${deptCode === 'none' ? 'fas fa-question-circle' : 'fas fa-graduation-cap'}"></i>
@@ -537,7 +558,7 @@ class TeacherList {
         if (!this.tableBody) return;
         this.tableBody.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <div class="empty-container animate-slide">
                         <i class="fas fa-users-viewfinder empty-icon"></i>
                         <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.75rem; letter-spacing: -0.02em;">
@@ -558,6 +579,21 @@ class TeacherList {
             // Wait for Firebase
             await waitForFirebase();
             console.log('Firebase ready');
+
+            // Bypass check for mock admin session
+            const isAdminSession = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+            if (isAdminSession) {
+                console.log('Admin logged in via sessionStorage, bypassing Firebase Auth checks');
+                // Update roles first
+                await updateTeacherRoles();
+
+                // Then set up teachers listener
+                this.setupTeachersListener();
+
+                // Fix existing teachers without teacherId
+                await this.fixExistingTeachers();
+                return;
+            }
 
             // Wait for auth state
             const user = await new Promise((resolve) => {
@@ -595,6 +631,9 @@ class TeacherList {
             // Then set up teachers listener
             this.setupTeachersListener();
 
+            // Fix existing teachers without teacherId
+            await this.fixExistingTeachers();
+
         } catch (error) {
             console.error('Error initializing teacher list:', error);
             if (this.tableBody) {
@@ -612,11 +651,13 @@ class TeacherList {
             this.teachersRef.off();
         }
 
-        // Check if we have a valid cache
+        // Check if we have a valid cache in sessionStorage
+        const cachedData = sessionStorage.getItem('teachersCache_v1');
+        const cachedTime = sessionStorage.getItem('teachersCacheTime_v1');
         const now = Date.now();
-        if (this.teachersCache && (now - this.teachersCacheTime) < this.CACHE_DURATION) {
-            console.log('✅ Pulling teachers from local cache');
-            this.allTeachers = this.teachersCache;
+        if (cachedData && cachedTime && (now - parseInt(cachedTime)) < this.CACHE_DURATION) {
+            console.log('✅ Pulling teachers from local sessionStorage cache (Zero Firebase Reads)');
+            this.allTeachers = JSON.parse(cachedData);
             this.filterTeachers();
             return;
         }
@@ -626,19 +667,21 @@ class TeacherList {
         this.teachersRef.once('value',
             (snapshot) => {
                 this.allTeachers = snapshot.val();
-                this.teachersCache = this.allTeachers;
-                this.teachersCacheTime = Date.now();
+                sessionStorage.setItem('teachersCache_v1', JSON.stringify(this.allTeachers));
+                sessionStorage.setItem('teachersCacheTime_v1', Date.now().toString());
                 this.filterTeachers();
             },
             (error) => console.error('Teachers fetch error:', error)
         );
 
-        // Optional: Keep live listener but ONLY for background updates, not table refreshes
+        // Keep live listener in background, but only to sync cache
         this.teachersRef.on('value', (snapshot) => {
-            this.allTeachers = snapshot.val();
-            this.teachersCache = this.allTeachers;
-            this.teachersCacheTime = Date.now();
-            // Don't auto-refresh to avoid UI jump, unless we're in a specific state
+            const data = snapshot.val();
+            if (data) {
+                this.allTeachers = data;
+                sessionStorage.setItem('teachersCache_v1', JSON.stringify(data));
+                sessionStorage.setItem('teachersCacheTime_v1', Date.now().toString());
+            }
         });
     }
 
@@ -703,7 +746,7 @@ class TeacherList {
             const headerRow = document.createElement('tr');
             headerRow.className = 'department-header';
             headerRow.innerHTML = `
-                <td colspan="7">
+                <td colspan="8">
                     <div class="dept-banner" style="background: ${colors.bg}; color: ${colors.text};">
                         <div>
                             <i class="${deptCode === 'none' ? 'fas fa-question-circle' : (colors.icon || 'fas fa-graduation-cap')}"></i>
@@ -793,7 +836,12 @@ class TeacherList {
                 </div>
             </td>
             <td>
-                ${teacher.companyName ? `<span style="background:#EEF2FF;color:#4F46E5;padding:2px 10px;border-radius:20px;font-size:0.82rem;font-weight:600;">${teacher.companyName}</span>` : '<span style="color:#9CA3AF;">—</span>'}
+                ${teacher.companyName ? `
+                    <span class="company-badge" title="${teacher.companyName}">
+                        <i class="fas fa-building"></i>
+                        <span style="display: inline-block; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;">${teacher.companyName}</span>
+                    </span>` : '<span style="color:#9CA3AF; font-weight: 500;">—</span>'
+                }
             </td>
             <td>
                 <div class="tag-group">
@@ -833,49 +881,7 @@ class TeacherList {
         }, 50);
     }
 
-    async initialize() {
-        console.log('Initializing teacher list...');
-        try {
-            // Wait for Firebase
-            await waitForFirebase();
-            console.log('Firebase ready');
-
-            // Wait for auth state
-            const user = await new Promise((resolve) => {
-                const unsubscribe = window.firebase.auth().onAuthStateChanged((user) => {
-                    unsubscribe();
-                    resolve(user);
-                });
-            });
-
-            if (!user) {
-                console.error('No user found');
-                window.location.href = 'admin-login.html';
-                return;
-            }
-            console.log('User found:', user.uid);
-
-            // Check if admin
-            const isAdmin = await checkIsAdmin(user.uid);
-            if (!isAdmin) {
-                console.error('User is not admin');
-                window.location.href = 'admin-login.html';
-                return;
-            }
-            console.log('Admin verified');
-
-            // Update roles first
-            await updateTeacherRoles();
-
-            // Then set up teachers listener
-            this.setupTeachersListener();
-
-            // Fix existing teachers without teacherId
-            await this.fixExistingTeachers();
-        } catch (error) {
-            console.error('Error initializing teacher list:', error);
-        }
-    }
+    // Duplicate initialize method removed
 
     // Fix existing teachers without teacherId
     async fixExistingTeachers() {
@@ -984,6 +990,7 @@ async function deleteTeacher(teacherId) {
         }
 
         alert('शिक्षक यशस्वीरित्या डिलीट केला!');
+        clearTeachersCache();
         window.location.reload();
 
     } catch (error) {
@@ -1014,6 +1021,7 @@ async function editTeacher(teacherId) {
         await window.firebase.database().ref('teachers/' + teacherId).update(updatedData);
 
         alert('Teacher updated successfully!');
+        clearTeachersCache();
         window.location.reload();
 
     } catch (error) {
@@ -1118,6 +1126,7 @@ document.getElementById('addTeacherForm').addEventListener('submit', async (e) =
 
         console.log('Teacher saved to DB!');
         alert('शिक्षक यशस्वीरित्या जोडला!\n\nInitial Password: ' + password + '\nTeacher ID: ' + teacherId);
+        clearTeachersCache();
         window.location.reload();
 
     } catch (error) {
@@ -1146,6 +1155,18 @@ if (tableBody) {
 if (window.waitForFirebase) {
     window.waitForFirebase().then(() => {
         console.log('Firebase ready, setting up auth listener...');
+        
+        // Handle mock admin session immediately
+        const isAdminSession = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+        if (isAdminSession) {
+            console.log('Admin logged in via sessionStorage, initializing teacher list immediately...');
+            if (!window.teacherList) {
+                window.teacherList = new TeacherList();
+            }
+            window.teacherList.initialize();
+            return;
+        }
+
         if (window.firebase && window.firebase.auth) {
             window.firebase.auth().onAuthStateChanged((user) => {
                 if (user) {

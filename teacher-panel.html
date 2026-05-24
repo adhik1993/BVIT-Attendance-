@@ -88,7 +88,7 @@
         .sidebar {
             width: var(--sidebar-width);
             background: var(--darker);
-            min-height: 100vh;
+            height: 100vh;
             padding: 1.5rem;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed;
@@ -96,8 +96,9 @@
             top: 0;
             bottom: 0;
             z-index: 100;
-            padding-bottom: 80px;
             border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-header {
@@ -127,6 +128,14 @@
 
         .nav-menu {
             list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .nav-menu::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
 
         .nav-item {
@@ -397,10 +406,8 @@
 
         /* Logout Button */
         .logout-button {
-            position: absolute;
-            bottom: 2rem;
-            left: 1.5rem;
-            right: 1.5rem;
+            margin-top: auto;
+            width: 100%;
             padding: 0.875rem;
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -414,6 +421,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }
 
         .logout-button:hover {
@@ -2492,6 +2500,11 @@
     </main>
 
     <script>
+        // Helper to get local formatted date (YYYY-MM-DD) avoiding timezone shifts
+        function getLocalFormattedDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
         // Global teacher data
         let teacherData = null;
 
@@ -2912,6 +2925,11 @@
                 return;
             }
 
+            const todayStr = (() => {
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            })();
+
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
             const teacherCompany = teacherData ? (teacherData.companyName || '') : '';
             const teacherDepts = (teacherData && teacherData.departments) ? teacherData.departments : [];
@@ -2968,7 +2986,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-calendar-alt"></i> Date</label>
-                            <input type="date" id="itrDate" value="${new Date().toISOString().split('T')[0]}" onchange="itrLoadStudents()">
+                            <input type="date" id="itrDate" value="${todayStr}" onchange="itrLoadStudents()">
                         </div>
                     </div>
                     <div id="itrStudentList" class="attendance-list" style="margin-top:2rem;">
@@ -3032,8 +3050,8 @@
             const divisionStr = document.getElementById('itrDivision')?.value;
             if (!companySelect) return;
             try {
-                const snap = await firebase.database().ref('students').once('value');
-                const students = snap.val() || {};
+                console.log('🔄 Fetching ITR students for company list filter using cache optimization');
+                const students = await window.loadStudentsWithCache() || {};
                 const allCompanies = new Set();
 
                 const deptMap = {
@@ -3149,15 +3167,11 @@
             listDiv.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading students...</p></div>';
 
             try {
-                let all = {};
-                const cacheStr = sessionStorage.getItem('allStudentsCache_v1');
-                if (cacheStr) {
-                    all = JSON.parse(cacheStr);
-                } else {
-                    const snap = await firebase.database().ref('students').once('value');
-                    all = snap.val() || {};
-                    sessionStorage.setItem('allStudentsCache_v1', JSON.stringify(all));
-                }
+                console.log('🔄 Fetching ITR students using cache optimization');
+                const all = await window.loadStudentsWithCache() || {};
+                
+                // Store in window for save access (avoids sessionStorage reads)
+                window._itrStudentsMap = all;
                 const deptMap = {
                     'Computer Technology': ['CT', 'COMPUTER TECHNOLOGY', 'COMPUTER', 'COMP', 'CO', 'CM'],
                     'Information Technology': ['IT', 'INFORMATION TECHNOLOGY', 'INFO TECH', 'IF'],
@@ -3314,12 +3328,8 @@
                 const updates = {};
                 const deptKey = dept.replace(/[^a-zA-Z0-9]/g, '_');
                 
-                // Get cached students list to look up student company name
-                let allStudents = {};
-                const cacheStr = sessionStorage.getItem('allStudentsCache_v1');
-                if (cacheStr) {
-                    allStudents = JSON.parse(cacheStr);
-                }
+                // Get students list to look up student company name
+                const allStudents = window._itrStudentsMap || {};
 
                 const currentUid = firebase.auth().currentUser?.uid || '';
                 Object.entries(window._itrAttendance).forEach(([studentId, status]) => {
@@ -3397,8 +3407,8 @@
             const startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
 
-            document.getElementById('itrStartDate').value = startDate.toISOString().split('T')[0];
-            document.getElementById('itrEndDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('itrStartDate').value = getLocalFormattedDate(startDate);
+            document.getElementById('itrEndDate').value = getLocalFormattedDate(endDate);
 
             loadTeacherItrReport();
         }
@@ -3511,6 +3521,25 @@
             reportContent.innerHTML = html;
         }
 
+        // 💾 ITR REPORTS CACHE SYSTEM - Reduce Firebase reads
+        const itrReportCache = {
+            data: null,
+            startDate: null,
+            endDate: null,
+            lastFetch: null,
+            CACHE_DURATION: 10 * 60 * 1000, // 10 minutes cache
+            isValid: function(start, end) {
+                return this.data && this.startDate === start && this.endDate === end && this.lastFetch && (Date.now() - this.lastFetch) < this.CACHE_DURATION;
+            },
+            clear: function() {
+                this.data = null;
+                this.startDate = null;
+                this.endDate = null;
+                this.lastFetch = null;
+                console.log('🗑️ ITR Report Cache cleared');
+            }
+        };
+
         async function loadTeacherItrReport() {
             const startDate = document.getElementById('itrStartDate').value;
             const endDate = document.getElementById('itrEndDate').value;
@@ -3518,6 +3547,13 @@
             
             if (!startDate || !endDate) {
                 showErrorMessage('Please select date range');
+                return;
+            }
+
+            // Check Cache
+            if (typeof itrReportCache !== 'undefined' && itrReportCache.isValid(startDate, endDate)) {
+                console.log('⚡ Using cached ITR report data (Zero Firebase Reads)');
+                renderTeacherItrReport(itrReportCache.data, reportContent);
                 return;
             }
 
@@ -3581,6 +3617,14 @@
                     });
                 }
                 
+                // Update Cache
+                if (typeof itrReportCache !== 'undefined') {
+                    itrReportCache.data = records;
+                    itrReportCache.startDate = startDate;
+                    itrReportCache.endDate = endDate;
+                    itrReportCache.lastFetch = Date.now();
+                }
+
                 renderTeacherItrReport(records, reportContent);
 
             } catch (error) {
@@ -3603,6 +3647,9 @@
             try {
                 await firebase.database().ref(path).remove();
                 showSuccessMessage('ITR Attendance record deleted successfully');
+                if (typeof itrReportCache !== 'undefined') {
+                    itrReportCache.clear();
+                }
                 loadTeacherItrReport();
             } catch (error) {
                 console.error('Error deleting record:', error);
@@ -4669,6 +4716,11 @@
                 return;
             }
 
+            const todayStr = (() => {
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            })();
+
             // Get teacher data from session storage
             const teacherData = JSON.parse(sessionStorage.getItem('teacherData'));
             console.log('Teacher data:', teacherData);
@@ -4767,7 +4819,7 @@
                             <i class="fas fa-calendar-alt"></i>
                             Date
                         </label>
-                        <input type="date" id="date" onchange="loadStudents()" value="${new Date().toISOString().split('T')[0]}">
+                        <input type="date" id="date" onchange="loadStudents()" value="${todayStr}">
                     </div>
                 </div>
 
@@ -4984,8 +5036,8 @@
             const startDate = new Date();
             startDate.setDate(startDate.getDate() - 7);
 
-            document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
-            document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('startDate').value = getLocalFormattedDate(startDate);
+            document.getElementById('endDate').value = getLocalFormattedDate(endDate);
 
             // Initialize division visibility
             updateReportDivisionVisibility();

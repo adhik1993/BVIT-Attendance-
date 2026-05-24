@@ -52,13 +52,69 @@
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --sidebar-bg: #0f172a;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
             --radius-lg: 1.5rem;
             --radius-md: 1rem;
-            --shadow-premium: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 8px 15px -6px rgba(0, 0, 0, 0.03);
+            --border: rgba(226, 232, 240, 0.8);
+            --bg-body: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* 🌌 Cosmic Nebula (Dark Mode - Default) */
+        body.cosmic-dark {
+            --primary: #818cf8;
+            --primary-light: rgba(129, 140, 248, 0.15);
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899; /* Neon Pink/Magenta */
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --bg-glass: rgba(15, 23, 42, 0.75);
+            --sidebar-bg: linear-gradient(180deg, #090b11 0%, #111322 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            --bg-body: radial-gradient(circle at 50% 50%, #0d1222 0%, #07090f 100%);
+            --bg-input: rgba(255, 255, 255, 0.06);
+        }
+
+        /* 🟢 Aurora Emerald (Mint/Forest Dark Mode) */
+        body.aurora-emerald {
+            --primary: #34d399;
+            --primary-light: rgba(52, 211, 153, 0.15);
+            --primary-dark: #059669;
+            --secondary: #06b6d4; /* Cyan */
+            --danger: #fda4af;
+            --warning: #fde047;
+            --bg-glass: rgba(6, 20, 18, 0.75);
+            --sidebar-bg: linear-gradient(180deg, #040d0c 0%, #081a17 100%);
+            --text-main: #ecfdf5;
+            --text-muted: #86efac;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            --bg-body: radial-gradient(circle at 50% 50%, #061816 0%, #020707 100%);
+            --bg-input: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ☀️ Frosted Glass (Ultra-Frosted Light Mode) */
+        body.light-glass {
+            --primary: #4f46e5;
+            --primary-light: rgba(79, 70, 229, 0.08);
+            --primary-dark: #3730a3;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-glass: rgba(255, 255, 255, 0.72);
+            --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: rgba(0, 0, 0, 0.08);
+            --shadow-premium: 0 10px 30px -5px rgba(99, 102, 241, 0.08);
+            --bg-body: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            --bg-input: rgba(255, 255, 255, 0.85);
         }
 
         * {
@@ -69,10 +125,11 @@
         }
 
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: var(--bg-body);
             min-height: 100vh;
             display: flex;
             color: var(--text-main);
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
         /* Sidebar Styles - Premium Look */
@@ -84,41 +141,37 @@
             position: fixed;
             left: 0;
             top: 0;
-            z-index: 1000;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
             box-sizing: border-box;
+            overflow-y: hidden;
         }
 
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-
-        .logo-text {
-            color: white;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        /* Sidebar Header */
         .sidebar-header {
             display: flex;
             align-items: center;
             gap: 1rem;
             padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 6px rgba(99, 102, 241, 0.3));
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
 
         /* Back to Dashboard Link */
@@ -151,21 +204,13 @@
             list-style: none;
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             padding-right: 5px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         .nav-menu::-webkit-scrollbar {
-            width: 4px;
-        }
-        .nav-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .nav-menu::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-        .nav-menu::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+            display: none;
         }
 
         .nav-item {
@@ -183,18 +228,30 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
             margin: 0.25rem 0;
+            position: relative;
         }
 
         .nav-link:hover {
             background: rgba(255, 255, 255, 0.05);
             color: #f8fafc;
-            transform: translateX(5px);
+            transform: translateX(8px);
         }
 
         .nav-link.active {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 20px -3px rgba(99, 102, 241, 0.35);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            height: 50%;
+            width: 4px;
+            background: white;
+            border-radius: 0 4px 4px 0;
         }
 
         .nav-link i {
@@ -212,13 +269,14 @@
             margin-left: 280px;
             padding: 2.5rem;
             max-width: calc(100vw - 280px);
+            transition: all 0.4s ease;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .page-title {
@@ -228,7 +286,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.035em;
         }
 
         .header-actions {
@@ -236,156 +294,262 @@
             gap: 1rem;
         }
 
+        /* Modern Re-designed Buttons */
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1.6rem;
             border: none;
-            border-radius: 0.5rem;
-            font-weight: 500;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
         }
 
-        /* Stats Grid */
+        /* Re-designed Stats Cards - Extremely Premium Glassmorphic Gilded Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
             background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            padding: 2.25rem 1.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(25px);
+            padding: 2.25rem 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--border) !important;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             gap: 1rem;
             box-shadow: var(--shadow-premium);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-students.stat-card::before { background: linear-gradient(90deg, #6366f1, #4f46e5); }
+        .stat-teachers.stat-card::before { background: linear-gradient(90deg, #10b981, #059669); }
+        .stat-attendance.stat-card::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .stat-performance.stat-card::before { background: linear-gradient(90deg, #ec4899, #db2777); }
+
+        /* 🌌 Glowing shadows on Hover based on card class */
+        .stat-students.stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(99, 102, 241, 0.5) !important;
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3) !important;
+        }
+
+        .stat-teachers.stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.3) !important;
+        }
+
+        .stat-attendance.stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(245, 158, 11, 0.5) !important;
+            box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.3) !important;
+        }
+
+        .stat-performance.stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(236, 72, 153, 0.5) !important;
+            box-shadow: 0 20px 40px -10px rgba(236, 72, 153, 0.3) !important;
         }
 
         .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
+            width: 4.5rem;
+            height: 4.5rem;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
+            font-size: 2.1rem;
             margin-bottom: 0.5rem;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
             position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         /* Specific Card Themes */
         .stat-students .stat-icon {
-            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
         }
 
         .stat-teachers .stat-icon {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
         }
 
         .stat-attendance .stat-icon {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
+            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.4);
         }
 
         .stat-performance .stat-icon {
             background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
             color: white;
+            box-shadow: 0 10px 20px -5px rgba(236, 72, 153, 0.4);
+        }
+
+        /* Value text glow shadow in Dark Mode */
+        body.cosmic-dark .stat-value,
+        body.aurora-emerald .stat-value {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
         .stat-value {
-            font-size: 2.25rem;
-            font-weight: 800;
+            font-size: 2.8rem;
+            font-weight: 850;
             color: var(--text-main);
             line-height: 1;
+            letter-spacing: -0.03em;
+            transition: all 0.3s ease;
         }
 
         .stat-label {
-            font-size: 0.875rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 800;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        /* Re-designed Tables - Super Clean Glassmorphic Grid */
+        table {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            margin-top: 1.5rem;
+            background: var(--bg-glass) !important;
+            backdrop-filter: blur(20px);
+            border-radius: 16px !important;
+            overflow: hidden;
+            border: 1px solid var(--border) !important;
+            box-shadow: var(--shadow-premium) !important;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            padding: 1.25rem 1.25rem !important;
+            text-align: left !important;
+            text-transform: uppercase !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 0.075em !important;
+            border: none !important;
+        }
+
+        td {
+            padding: 1.25rem 1.25rem !important;
+            border-bottom: 1px solid var(--border) !important;
+            color: var(--text-main) !important;
+            font-size: 0.95rem !important;
+            transition: all 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        tr:hover td {
+            background: rgba(99, 102, 241, 0.05) !important;
+        }
+
+        /* Forms & Interactive Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        /* Charts Grid */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
+        .form-group input,
+        .form-group select {
+            padding: 0.875rem 1.25rem !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            font-size: 0.95rem !important;
+            background: var(--bg-input) !important;
+            backdrop-filter: blur(8px);
+            color: var(--text-main) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            outline: none !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01) !important;
         }
 
-        .chart-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-premium);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            background: var(--bg-glass) !important;
         }
 
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .chart-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-
-        /* Recent Activity Styles */
+        /* Recent Activity Gilded Cards */
         .activity-card {
             background: var(--bg-glass);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
             padding: 0;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-premium);
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-top: 2.5rem;
         }
 
         .activity-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 1.5rem;
+            padding: 1.5rem 2rem;
             color: white;
             display: flex;
             justify-content: space-between;
@@ -394,49 +558,37 @@
             overflow: hidden;
         }
 
-        .activity-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-            animation: rotate 20s linear infinite;
-        }
-
         .activity-header h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.35rem;
+            font-weight: 700;
             margin: 0;
             position: relative;
             z-index: 1;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .activity-header h3 i {
-            font-size: 1.5rem;
+            gap: 0.75rem;
+            letter-spacing: -0.02em;
         }
 
         .activity-list {
             list-style: none;
             margin: 0;
-            padding: 0;
+            padding: 1rem;
         }
 
         .activity-item {
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
+            gap: 1.25rem;
             padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            border-radius: 12px;
         }
 
         .activity-item:hover {
-            background: rgba(99, 102, 241, 0.05);
+            background: rgba(99, 102, 241, 0.04);
+            transform: translateX(5px);
         }
 
         .activity-item:last-child {
@@ -444,16 +596,17 @@
         }
 
         .activity-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 3.5rem;
+            height: 3.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
-            background: var(--primary-light);
+            border-radius: 16px;
+            background: rgba(99, 102, 241, 0.08);
             color: var(--primary);
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
         }
 
         .activity-content {
@@ -461,74 +614,85 @@
         }
 
         .activity-title {
-            font-weight: 500;
-            color: var(--text-dark);
+            font-weight: 600;
+            color: var(--text-main);
             margin-bottom: 0.25rem;
-            font-size: 1rem;
+            font-size: 1.05rem;
             line-height: 1.5;
         }
 
         .activity-details {
             display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
         }
 
         .activity-detail {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-light);
-            background: var(--light);
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 0.35rem 0.875rem;
+            border-radius: 20px;
+            font-weight: 500;
         }
 
         .activity-detail i {
-            font-size: 0.875rem;
             color: var(--primary);
         }
 
         .activity-time {
-            font-size: 0.875rem;
-            color: var(--text-light);
-            margin-top: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+            font-weight: 500;
         }
 
-        /* Quick Actions */
+        /* Quick Action Cards */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .action-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: var(--shadow-premium);
         }
 
         .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px -5px rgba(99, 102, 241, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.05);
             border-color: var(--primary);
         }
 
         .action-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--primary);
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.1) rotate(-5deg);
+            color: var(--primary-dark);
         }
 
         .action-title {
-            font-weight: 500;
-            color: var(--text-dark);
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 1.2rem;
         }
 
         /* Mobile Responsive Navigation Overlay */
@@ -539,8 +703,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 998;
         }
 
@@ -550,17 +714,60 @@
             position: fixed;
             top: 1.25rem;
             left: 1.25rem;
-            width: 45px;
-            height: 45px;
-            background: var(--sidebar-bg);
+            width: 48px;
+            height: 48px;
+            background: #0f172a;
             color: white;
-            border-radius: 12px;
+            border-radius: 16px;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             cursor: pointer;
-            z-index: 1001;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10001;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-toggle:hover {
+            transform: scale(1.05);
+            background: #1e293b;
+        }
+
+        /* Add Premium Logout Button Styles */
+        .logout-button {
+            margin-top: auto;
+            padding: 0.875rem;
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.15) !important;
+            border-radius: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.75rem !important;
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            width: 100% !important;
+            flex-shrink: 0 !important;
+        }
+
+        .logout-button:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        .logout-button i {
+            font-size: 1.15rem;
+        }
+
+        /* Sidebar Scrolling Overflow */
+        .sidebar {
+            z-index: 9999;
         }
 
         /* Responsive Sidebar Override */
@@ -573,7 +780,6 @@
                 left: -280px;
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 width: 280px !important;
-                /* Keep fixed width when active */
                 padding: 2rem 1.5rem !important;
             }
 
@@ -581,20 +787,21 @@
                 left: 0;
             }
 
-            .sidebar.active~.sidebar-overlay {
+            .sidebar.active ~ .sidebar-overlay {
                 display: block;
             }
 
             .logo-text,
             .nav-text {
                 display: block !important;
-                /* Re-enable text in slide-out menu */
             }
 
             .main-content {
                 margin-left: 0 !important;
-                padding-top: 5rem;
+                padding-top: 5.5rem;
                 max-width: 100%;
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
 
             .page-title {
@@ -604,65 +811,30 @@
             .header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 1rem;
+                gap: 1.25rem;
             }
-        }
 
-        /* Add logout button styles */
-        .logout-button {
-            position: relative;
-            margin-top: auto;
-            width: 100%;
-            padding: 12px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 44px;
-            flex-shrink: 0;
-        }
-
-        .logout-button:hover {
-            background: #DC2626;
-            transform: translateY(-2px);
-        }
-
-        .logout-button i {
-            font-size: 1.2rem;
-        }
-
-        /* Mobile styles for logout button */
-        @media (max-width: 1024px) {
             .sidebar .logout-button {
                 position: relative;
                 margin-top: auto;
                 left: auto;
                 bottom: auto;
-                width: 100%;
+                width: 100% !important;
                 height: auto;
-                padding: 12px;
-                border-radius: 8px;
+                padding: 0.875rem;
+                border-radius: 12px;
                 justify-content: center;
                 align-items: center;
                 min-width: unset;
-                min-height: 44px;
             }
 
             .sidebar .logout-button span {
-                display: inline;
+                display: inline !important;
             }
 
             .sidebar .logout-button i {
-                font-size: 1.2rem;
-                margin-right: 10px;
+                font-size: 1.15rem;
+                margin-right: 0;
             }
 
             .header-logout {
@@ -676,74 +848,176 @@
             }
         }
 
-        /* Ensure sidebar is on top */
-        .sidebar {
-            overflow-y: hidden;
-            z-index: 9999;
+        /* Status Badges & Animations */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        /* Remove charts related styles */
-        .charts-grid,
-        .chart-container,
-        .chart-header,
-        .chart-title,
-        .chart-actions {
+        .status-success {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #10b981 !important;
+        }
+
+        .status-danger {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #ef4444 !important;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: #f59e0b !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🎛️ Dynamic Theme Selector Styling */
+        .theme-control-pill {
+            display: inline-flex;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.25rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .theme-btn {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: #94a3b8;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-btn.active {
+            background: var(--primary) !important;
+            color: white !important;
+            box-shadow: 0 4px 10px var(--primary-light);
+        }
+
+        /* ⚡ Live Connection Ping Pulse Indicator */
+        .ping-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .ping-pulse::after {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background-color: inherit;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: ping 1.5s ease-in-out infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes ping {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3.5); opacity: 0; }
+        }
+
+        /* 📑 Floating Glassmorphic Modal */
+        .modal-backdrop {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Update grid layouts */
-        .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .quick-actions {
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        /* Make cards bigger */
-        .stat-card {
+        .details-modal {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-premium);
             padding: 2rem;
+            animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            color: var(--text-main);
         }
 
-        .action-card {
-            padding: 2rem;
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .stat-icon {
-            width: 4rem;
-            height: 4rem;
-            font-size: 2rem;
+        /* 📢 Broadcast Announcements Log Items */
+        .broadcast-item {
+            padding: 0.65rem 0.75rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            position: relative;
+            transition: all 0.2s ease;
         }
 
-        .action-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
+        .broadcast-item:hover {
+            background: rgba(99, 102, 241, 0.04);
+            border-color: var(--primary);
         }
 
-        .action-title {
-            font-size: 1.2rem;
+        /* Glowing card adjustments for Premium Space themes */
+        body.cosmic-dark .stat-card,
+        body.cosmic-dark .chart-card,
+        body.aurora-emerald .stat-card,
+        body.aurora-emerald .chart-card {
+            border-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Update activity card */
-        .activity-card {
-            margin-top: 2rem;
+        body.cosmic-dark .stat-card:hover,
+        body.cosmic-dark .chart-card:hover {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 25px rgba(129, 140, 248, 0.15) !important;
         }
 
-        .activity-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .activity-list {
-            padding: 1rem;
-        }
-
-        .activity-item {
-            padding: 1.5rem;
+        body.aurora-emerald .stat-card:hover,
+        body.aurora-emerald .chart-card:hover {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.15) !important;
         }
     </style>
 </head>
@@ -839,8 +1113,20 @@
         <div id="dashboardSection">
             <div class="header">
                 <h1 class="page-title">Dashboard Overview</h1>
-                <div class="header-actions">
-                    <button class="logout-button header-logout" onclick="handleLogout()" title="Logout">
+                <div class="header-actions" style="align-items: center;">
+                    <!-- Theme Selector Control Pill -->
+                    <div class="theme-control-pill">
+                        <button id="themeBtnCosmic" class="theme-btn" onclick="changeTheme('cosmic')" title="Cosmic Nebula (Dark)">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button id="themeBtnAurora" class="theme-btn" onclick="changeTheme('aurora')" title="Aurora Emerald (Mint)">
+                            <i class="fas fa-feather"></i>
+                        </button>
+                        <button id="themeBtnLight" class="theme-btn" onclick="changeTheme('light')" title="Frosted Glass (Light)">
+                            <i class="fas fa-sun"></i>
+                        </button>
+                    </div>
+                    <button class="logout-button header-logout" onclick="handleLogout()" title="Logout" style="margin: 0;">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
@@ -876,25 +1162,13 @@
                     <div class="stat-value" id="performanceRate">Loading...</div>
                     <div class="stat-label">Performance Rate</div>
                 </div>
+                
+
             </div>
 
 
 
-            <!-- Charts Section -->
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3 class="chart-title">Attendance Trend</h3>
-                    <div class="chart-container">
-                        <canvas id="attendanceChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3 class="chart-title">Department Statistics</h3>
-                    <div class="chart-container">
-                        <canvas id="departmentChart"></canvas>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         <!-- System Records Section -->
@@ -1858,6 +2132,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Helper to get local formatted date (YYYY-MM-DD) avoiding timezone shifts
+        function getLocalFormattedDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
         console.log('Firebase services ready');
 
         // 💾 DASHBOARD CACHING SYSTEM - Reduce Firebase reads
@@ -1986,12 +2265,358 @@
                 const averageAttendance = globalTotal > 0 ? ((globalPresent / globalTotal) * 100).toFixed(1) : '0.0';
 
                 document.getElementById('averageAttendance').textContent = averageAttendance + '%';
-                document.getElementById('performanceRate').textContent = averageAttendance + '%';
+
+                // Calculate Student Compliance Performance Rate (percentage of students with >= 75% attendance)
+                let studentStats = {};
+                if (attendanceData) {
+                    Object.values(attendanceData).forEach(dateData => {
+                        const students = dateData.students || {};
+                        Object.entries(students).forEach(([sid, status]) => {
+                            if (!studentStats[sid]) {
+                                studentStats[sid] = { present: 0, total: 0 };
+                            }
+                            const isPresent = (status === true || status === 'true' || status === 'Present');
+                            if (isPresent) {
+                                studentStats[sid].present++;
+                            }
+                            studentStats[sid].total++;
+                        });
+                    });
+                }
+
+                let compliantStudents = 0;
+                let totalActiveStudents = Object.keys(studentStats).length;
+
+                Object.values(studentStats).forEach(stats => {
+                    const rate = stats.total > 0 ? (stats.present / stats.total) * 100 : 0;
+                    if (rate >= 75) {
+                        compliantStudents++;
+                    }
+                });
+
+                const performanceRate = totalActiveStudents > 0 ? ((compliantStudents / totalActiveStudents) * 100).toFixed(1) : '0.0';
+                document.getElementById('performanceRate').textContent = performanceRate + '%';
+
+                // Update SVG Circular Attendance Health Card
+                const progressCircle = document.getElementById('attendanceProgressCircle');
+                const progressCenter = document.getElementById('attendancePercentCenter');
+                if (progressCircle && progressCenter) {
+                    progressCenter.textContent = averageAttendance + '%';
+                    const val = parseFloat(averageAttendance) || 0;
+                    // Radius = 45. Perimeter = 2 * Math.PI * 45 = 282.74
+                    const offset = 282.74 - (val / 100 * 282.74);
+                    progressCircle.style.strokeDashoffset = offset;
+                }
+
+                // Trigger Database Integrity Scan (Zero added cost - uses loaded cached lists)
+                scanDatabaseIntegrity();
 
             } catch (error) {
                 console.error('Error updating dashboard stats:', error);
             }
         }
+
+        // Helper to perform database integrity scans and quick fixes (Zero Added Cost - runs on loaded cached data)
+        async function scanDatabaseIntegrity() {
+            const container = document.getElementById('databaseIntegrityContainer');
+            if (!container) return;
+
+            try {
+                const [students, teachers] = await Promise.all([
+                    getCachedData('students', 'students') || {},
+                    getCachedData('teachers', 'teachers') || {}
+                ]);
+
+                // Fetch systems from DB separately since it's small and not cached globally
+                const systemsSnap = await window.db.ref('systems').once('value');
+                const systems = systemsSnap.val() || {};
+
+                // 1. Missing Student Class Codes
+                let missingClassCount = 0;
+                Object.values(students).forEach(s => {
+                    if (!s.class || s.class === 'undefined' || s.class === 'N/A') {
+                        missingClassCount++;
+                    }
+                });
+
+                // 2. Teachers with Missing Roles
+                let missingRoleCount = 0;
+                Object.values(teachers).forEach(t => {
+                    if (!t.role) {
+                        missingRoleCount++;
+                    }
+                });
+
+                // 3. Duplicate IPs in Systems
+                let duplicateIpCount = 0;
+                const ipMap = {};
+                Object.values(systems).forEach(sys => {
+                    if (sys.ipAddress) {
+                        const ip = sys.ipAddress.trim();
+                        ipMap[ip] = (ipMap[ip] || 0) + 1;
+                    }
+                });
+                Object.values(ipMap).forEach(count => {
+                    if (count > 1) {
+                        duplicateIpCount += (count - 1);
+                    }
+                });
+
+                // Update UI Indicators
+                const classCodeBadge = document.getElementById('classCodeBadge');
+                const teacherRoleBadge = document.getElementById('teacherRoleBadge');
+                const ipConflictBadge = document.getElementById('ipConflictBadge');
+
+                const fixClassBtn = document.getElementById('fixClassBtn');
+                const fixRoleBtn = document.getElementById('fixRoleBtn');
+
+                // Class Codes UI
+                if (missingClassCount > 0) {
+                    classCodeBadge.className = 'status-badge status-danger';
+                    classCodeBadge.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${missingClassCount} issues found`;
+                    fixClassBtn.style.display = 'inline-flex';
+                } else {
+                    classCodeBadge.className = 'status-badge status-success';
+                    classCodeBadge.innerHTML = `<i class="fas fa-check-circle"></i> Healthy`;
+                    fixClassBtn.style.display = 'none';
+                }
+
+                // Teacher Roles UI
+                if (missingRoleCount > 0) {
+                    teacherRoleBadge.className = 'status-badge status-danger';
+                    teacherRoleBadge.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${missingRoleCount} issues found`;
+                    fixRoleBtn.style.display = 'inline-flex';
+                } else {
+                    teacherRoleBadge.className = 'status-badge status-success';
+                    teacherRoleBadge.innerHTML = `<i class="fas fa-check-circle"></i> Healthy`;
+                    fixRoleBtn.style.display = 'none';
+                }
+
+                // IP Conflicts UI
+                if (duplicateIpCount > 0) {
+                    ipConflictBadge.className = 'status-badge status-warning';
+                    ipConflictBadge.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${duplicateIpCount} conflicts`;
+                } else {
+                    ipConflictBadge.className = 'status-badge status-success';
+                    ipConflictBadge.innerHTML = `<i class="fas fa-check-circle"></i> Healthy`;
+                }
+
+            } catch (err) {
+                console.error('Error scanning database integrity:', err);
+            }
+        }
+
+        async function autoFixClassCodes() {
+            if (!confirm('Are you sure you want to regenerate and fix missing class codes for all students? This will update their class field based on Year, Department, and Division.')) return;
+            const btn = document.getElementById('fixClassBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
+
+            try {
+                const snap = await window.db.ref('students').once('value');
+                const students = snap.val() || {};
+                const updates = {};
+
+                const deptMap = {
+                    'Computer Technology': 'CT', 'Information Technology': 'IT', 'Electronics & Telecommunication': 'ET',
+                    'Mechanical Engineering': 'ME', 'Civil Engineering': 'CE', 'Electrical Engineering': 'EE',
+                    'Artificial Intelligence': 'AI', 'CT': 'CT', 'IT': 'IT', 'ET': 'ET', 'ME': 'ME', 'CE': 'CE', 'EE': 'EE', 'AI': 'AI'
+                };
+
+                Object.entries(students).forEach(([id, s]) => {
+                    if (!s.class || s.class === 'undefined' || s.class === 'N/A') {
+                        let deptCode = deptMap[s.department || s.branch] || 'ME';
+                        let yearCode = s.year || 'SY';
+                        if (yearCode === '1' || yearCode === 'First' || yearCode === 'First Year') yearCode = 'FY';
+                        else if (yearCode === '2' || yearCode === 'Second' || yearCode === 'Second Year') yearCode = 'SY';
+                        else if (yearCode === '3' || yearCode === 'Third' || yearCode === 'Third Year') yearCode = 'TY';
+                        else if (yearCode === '4' || yearCode === 'Fourth' || yearCode === 'Fourth Year') yearCode = 'BE';
+
+                        const generated = yearCode + deptCode + (s.division ? '-' + s.division : '');
+                        updates[`students/${id}/class`] = generated;
+                    }
+                });
+
+                if (Object.keys(updates).length > 0) {
+                    await window.db.ref().update(updates);
+                    showToast(`Fixed class codes for ${Object.keys(updates).length} students!`, 'success');
+                } else {
+                    showToast('No class code anomalies found!', 'info');
+                }
+
+                dashboardCache.clear();
+                await updateDashboardStats();
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to fix class codes.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> Auto-Fix';
+            }
+        }
+
+        async function autoFixTeacherRoles() {
+            if (!confirm('Are you sure you want to assign default roles to teachers with blank roles? All blank roles will be set to "Lecturer" by default.')) return;
+            const btn = document.getElementById('fixRoleBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
+
+            try {
+                const snap = await window.db.ref('teachers').once('value');
+                const teachers = snap.val() || {};
+                const updates = {};
+
+                Object.entries(teachers).forEach(([id, t]) => {
+                    if (!t.role) {
+                        updates[`teachers/${id}/role`] = 'Lecturer';
+                    }
+                });
+
+                if (Object.keys(updates).length > 0) {
+                    await window.db.ref().update(updates);
+                    showToast(`Assigned default roles for ${Object.keys(updates).length} teachers!`, 'success');
+                } else {
+                    showToast('No teacher role anomalies found!', 'info');
+                }
+
+                dashboardCache.clear();
+                await updateDashboardStats();
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to fix teacher roles.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> Auto-Fix';
+            }
+        }
+
+        // --- DIRECTORY SMART SEARCH DIRECTLY FROM DASHBOARD ---
+        async function performDirectorySearch() {
+            const query = document.getElementById('directorySearchInput').value.trim().toLowerCase();
+            const resultsBox = document.getElementById('directorySearchResults');
+            if (!query) {
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            try {
+                const [students, teachers] = await Promise.all([
+                    getCachedData('students', 'students') || {},
+                    getCachedData('teachers', 'teachers') || {}
+                ]);
+
+                const matches = [];
+
+                // Search Students
+                Object.entries(students).forEach(([id, s]) => {
+                    const name = `${s.firstName || ''} ${s.lastName || ''}`.trim();
+                    const roll = (s.rollNo || '').toString();
+                    if (name.toLowerCase().includes(query) || roll.includes(query)) {
+                        matches.push({
+                            id,
+                            type: 'student',
+                            name,
+                            sub: `Student | Class: ${s.class || 'N/A'}`,
+                            email: s.email || 'N/A',
+                            contact: s.phone || 'N/A',
+                            extra: `Roll: ${s.rollNo || 'N/A'}`
+                        });
+                    }
+                });
+
+                // Search Teachers
+                Object.entries(teachers).forEach(([id, t]) => {
+                    const name = t.name || `${t.firstName || ''} ${t.lastName || ''}`.trim();
+                    if (name.toLowerCase().includes(query)) {
+                        matches.push({
+                            id,
+                            type: 'teacher',
+                            name,
+                            sub: `Teacher | Role: ${t.role || 'Lecturer'}`,
+                            email: t.email || 'N/A',
+                            contact: t.phone || 'N/A',
+                            extra: `Depts: ${t.departments ? t.departments.map(d=>d.code).join(',') : 'None'}`
+                        });
+                    }
+                });
+
+                resultsBox.innerHTML = '';
+                if (matches.length === 0) {
+                    resultsBox.innerHTML = '<div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">No matches found</div>';
+                    resultsBox.style.display = 'block';
+                    return;
+                }
+
+                matches.slice(0, 5).forEach(m => {
+                    const item = document.createElement('div');
+                    item.style.cssText = `
+                        padding: 0.75rem 1rem;
+                        cursor: pointer;
+                        border-bottom: 1px solid rgba(0,0,0,0.05);
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        transition: all 0.2s ease;
+                    `;
+                    item.onmouseover = () => item.style.background = 'rgba(99, 102, 241, 0.05)';
+                    item.onmouseout = () => item.style.background = 'none';
+                    item.onclick = () => selectDirectoryProfile(m);
+
+                    item.innerHTML = `
+                        <div style="text-align: left;">
+                            <div style="font-weight:600; font-size:0.95rem; color:var(--text-main);">${m.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${m.sub}</div>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight:700; color:var(--primary); text-transform:uppercase; padding: 0.25rem 0.5rem; background:rgba(99,102,241,0.08); border-radius: 6px;">${m.type}</span>
+                    `;
+                    resultsBox.appendChild(item);
+                });
+                resultsBox.style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function selectDirectoryProfile(item) {
+            document.getElementById('directorySearchResults').style.display = 'none';
+            document.getElementById('directorySearchInput').value = '';
+
+            const card = document.getElementById('directoryProfileCard');
+            const avatar = document.getElementById('dirProfileAvatar');
+            const nameEl = document.getElementById('dirProfileName');
+            const subEl = document.getElementById('dirProfileSubtitle');
+            const contactEl = document.getElementById('dirProfileContact');
+            const extraEl = document.getElementById('dirProfileExtra');
+
+            nameEl.textContent = item.name;
+            subEl.textContent = item.sub;
+            contactEl.textContent = item.email !== 'N/A' ? item.email : item.contact;
+            extraEl.textContent = item.extra;
+
+            if (item.type === 'student') {
+                avatar.style.background = 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)';
+                avatar.innerHTML = '<i class="fas fa-user-graduate"></i>';
+            } else {
+                avatar.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                avatar.innerHTML = '<i class="fas fa-chalkboard-teacher"></i>';
+            }
+
+            card.style.display = 'block';
+        }
+
+        function closeDirectoryProfile() {
+            document.getElementById('directoryProfileCard').style.display = 'none';
+        }
+
+        // Close search results on click outside
+        document.addEventListener('click', (e) => {
+            const searchInput = document.getElementById('directorySearchInput');
+            const resultsBox = document.getElementById('directorySearchResults');
+            if (searchInput && resultsBox && e.target !== searchInput && !resultsBox.contains(e.target)) {
+                resultsBox.style.display = 'none';
+            }
+        });
 
         // Function to update recent activities
         async function updateRecentActivities() {
@@ -2040,14 +2665,19 @@
                         li.className = 'activity-item';
                         li.innerHTML = `
                             <div class="activity-icon"><i class="fas fa-clipboard-check"></i></div>
-                            <div class="activity-content">
-                                <div class="activity-title">${teacherName} took attendance</div>
-                                <div class="activity-details">
+                            <div class="activity-content" style="flex: 1;">
+                                <div class="activity-title" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                    <span style="font-weight: 700; color: var(--text-main);">${teacherName} took attendance</span>
+                                    <button onclick="viewAttendanceDetails('${activity.id}')" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
+                                <div class="activity-details" style="margin-top: 0.4rem;">
                                     <span class="activity-detail"><i class="fas fa-users"></i> ${activity.class || 'N/A'}</span>
                                     <span class="activity-detail"><i class="fas fa-book"></i> ${activity.subject || 'N/A'}</span>
                                     <span class="activity-detail"><i class="fas fa-clock"></i> ${activity.lectureType || 'N/A'}</span>
                                 </div>
-                                <div class="activity-time">${timeAgo}</div>
+                                <div class="activity-time" style="margin-top: 0.35rem;">${timeAgo}</div>
                             </div>
                         `;
                         activityList.appendChild(li);
@@ -2531,10 +3161,10 @@
 
             // Set today date and 7 days ago date
             const todayDate = new Date();
-            const todayStr = todayDate.toISOString().split('T')[0];
+            const todayStr = getLocalFormattedDate(todayDate);
             const startDate = new Date(todayDate);
             startDate.setDate(startDate.getDate() - 7);
-            const startDateStr = startDate.toISOString().split('T')[0];
+            const startDateStr = getLocalFormattedDate(startDate);
 
             if (document.getElementById('itrStartDate')) document.getElementById('itrStartDate').value = startDateStr;
             if (document.getElementById('itrEndDate')) document.getElementById('itrEndDate').value = todayStr;
@@ -2547,8 +3177,7 @@
             const dropdown = document.getElementById('itrReportTeacher');
             if (!dropdown || dropdown.options.length > 1) return;
             try {
-                const snap = await window.db.ref('teachers').once('value');
-                const teachers = snap.val();
+                const teachers = await getCachedData('teachers', 'teachers') || {};
                 if (teachers) {
                     const names = new Set();
                     Object.values(teachers).forEach(t => {
@@ -2578,8 +3207,7 @@
             try {
                 // If no filters selected, load all teachers fast from 'teachers' node
                 if (!deptFilter && !compFilter) {
-                    const snap = await window.db.ref('teachers').once('value');
-                    const teachers = snap.val() || {};
+                    const teachers = await getCachedData('teachers', 'teachers') || {};
                     const names = new Set();
                     Object.values(teachers).forEach(t => {
                         const name = t.name || `${t.firstName || ''} ${t.lastName || ''}`.trim();
@@ -2665,8 +3293,7 @@
             const deptFilter = document.getElementById('itrReportDept')?.value;
             if (!sel) return;
             try {
-                const snap = await window.db.ref('students').once('value');
-                const students = snap.val() || {};
+                const students = await getCachedData('students', 'students') || {};
                 const companies = new Set();
 
                 // Map the dropdown value to possible database values
@@ -2736,7 +3363,7 @@
             const resultsDiv = document.getElementById('itrReportResults');
             if (!startDate || !endDate) { alert('Please select a date range'); return; }
 
-            const cacheKey = `admin_itr_report_v3_${startDate}_${endDate}_${filterDept}_${filterCompany}_${filterTeacher}`;
+            const cacheKey = `admin_itr_report_v7_${startDate}_${endDate}_${filterDept}_${filterCompany}_${filterTeacher}`;
             const cachedBody = sessionStorage.getItem(cacheKey);
             if (cachedBody) {
                 resultsDiv.innerHTML = cachedBody;
@@ -2825,8 +3452,7 @@
                     return;
                 }
 
-                const studSnap = await window.db.ref('students').once('value');
-                const allStudents = studSnap.val() || {};
+                const allStudents = await getCachedData('students', 'students') || {};
 
                 const companyGroups = {};
                 Object.entries(studentStats).forEach(([studentId, stat]) => {
@@ -2908,8 +3534,12 @@
                 // Calculate sort and rendering.
                 detailedItrRecords.sort((a, b) => {
                     if (a.date !== b.date) return b.date.localeCompare(a.date); // Newest first
-                    if (a.companyName !== b.companyName) return a.companyName.localeCompare(b.companyName);
-                    return a.studentId.localeCompare(b.studentId);
+                    
+                    const rollA = parseInt((allStudents[a.studentId]?.rollNo || '').toString().replace(/\D/g, '')) || 0;
+                    const rollB = parseInt((allStudents[b.studentId]?.rollNo || '').toString().replace(/\D/g, '')) || 0;
+                    if (rollA !== rollB) return rollA - rollB;
+                    
+                    return a.companyName.localeCompare(b.companyName);
                 });
 
                 detailedItrRecords.forEach(record => {
@@ -2991,11 +3621,13 @@
                     });
                 });
 
-                // Sort flattened list by department, company, then roll no
+                // Sort flattened list by roll number, department, then company
                 allCombinedStudents.sort((a, b) => {
+                    const rollA = parseInt((a.rollNo || '').toString().replace(/\D/g, '')) || 0;
+                    const rollB = parseInt((b.rollNo || '').toString().replace(/\D/g, '')) || 0;
+                    if (rollA !== rollB) return rollA - rollB;
                     if (a.deptLabel !== b.deptLabel) return a.deptLabel.localeCompare(b.deptLabel);
-                    if (a.companyName !== b.companyName) return a.companyName.localeCompare(b.companyName);
-                    return (parseInt(a.rollNo) || 0) - (parseInt(b.rollNo) || 0);
+                    return a.companyName.localeCompare(b.companyName);
                 });
 
                 allCombinedStudents.forEach(s => {
@@ -3932,7 +4564,7 @@
             document.querySelector('a[onclick="showAttendanceCheck()"]').classList.add('active');
 
             // Set today's date as default
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalFormattedDate(new Date());
             document.getElementById('attendanceCheckDate').value = today;
         }
 
@@ -6126,6 +6758,414 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadBatchConfigurationsFromStorage();
         });
+
+        // --- 🎛️ DYNAMIC THEME SWITCHER CENTER ---
+        function changeTheme(themeName) {
+            console.log('🔄 Changing theme to:', themeName);
+            const body = document.body;
+            body.className = ''; // Reset body classes
+            
+            // Remove active state from all buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (themeName === 'cosmic') {
+                body.classList.add('cosmic-dark');
+                document.getElementById('themeBtnCosmic').classList.add('active');
+                localStorage.setItem('admin_dashboard_theme', 'cosmic');
+            } else if (themeName === 'aurora') {
+                body.classList.add('aurora-emerald');
+                document.getElementById('themeBtnAurora').classList.add('active');
+                localStorage.setItem('admin_dashboard_theme', 'aurora');
+            } else if (themeName === 'light') {
+                body.classList.add('light-glass');
+                document.getElementById('themeBtnLight').classList.add('active');
+                localStorage.setItem('admin_dashboard_theme', 'light');
+            }
+        }
+
+        // Initialize theme on load
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('admin_dashboard_theme') || 'cosmic';
+            changeTheme(savedTheme);
+        });
+
+        // --- 📢 ANNOUNCEMENTS BROADCASTING SYNC ---
+        async function publishBroadcast() {
+            const titleInput = document.getElementById('broadcastTitle');
+            const bodyInput = document.getElementById('broadcastBody');
+            const targetSelect = document.getElementById('broadcastTarget');
+            const prioritySelect = document.getElementById('broadcastPriority');
+            const sendBtn = document.getElementById('sendBroadcastBtn');
+
+            const title = titleInput.value.trim();
+            const body = bodyInput.value.trim();
+            const target = targetSelect.value;
+            const priority = prioritySelect.value;
+
+            if (!title || !body) {
+                showToast('Please fill out both title and body fields.', 'error');
+                return;
+            }
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Broadcasting...';
+
+            try {
+                await waitForFirebase();
+                const newNotification = {
+                    title: title,
+                    message: body,
+                    target: target,
+                    priority: priority,
+                    sender: 'Admin',
+                    timestamp: Date.now(),
+                    date: getLocalFormattedDate(new Date())
+                };
+
+                await window.db.ref('notifications').push(newNotification);
+                showToast('Notification broadcasted successfully!', 'success');
+                
+                // Clear input fields
+                titleInput.value = '';
+                bodyInput.value = '';
+            } catch (err) {
+                console.error('Error broadcasting notification:', err);
+                showToast('Failed to broadcast alert.', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish Live Alert';
+            }
+        }
+
+        async function loadBroadcastHistory() {
+            const historyList = document.getElementById('broadcastHistoryList');
+            if (!historyList) return;
+
+            try {
+                await waitForFirebase();
+                window.db.ref('notifications').on('value', (snap) => {
+                    historyList.innerHTML = '';
+                    const data = snap.val();
+                    if (!data) {
+                        historyList.innerHTML = '<div style="font-size:0.8rem; text-align:center; color:var(--text-muted); padding:0.5rem 0;">No active broadcasts found</div>';
+                        return;
+                    }
+
+                    // Convert to sorted array (newest first)
+                    const items = Object.entries(data).map(([key, value]) => ({
+                        key,
+                        ...value
+                    })).sort((a, b) => b.timestamp - a.timestamp);
+
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'broadcast-item';
+                        
+                        let priorityColor = '#6366f1';
+                        if (item.priority === 'urgent') priorityColor = '#ef4444';
+                        else if (item.priority === 'event') priorityColor = '#f59e0b';
+
+                        div.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:700; color:var(--text-main); font-size:0.85rem;">${item.title}</span>
+                                <button onclick="deleteBroadcast('${item.key}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            <div style="color:var(--text-muted); font-size:0.8rem; line-height:1.2; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; margin:0.25rem 0;">${item.message}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; font-weight:600; color:var(--text-muted); margin-top:0.2rem;">
+                                <span style="color:${priorityColor}; text-transform:uppercase; font-size:0.65rem; font-weight:700;"><i class="fas fa-exclamation-circle"></i> ${item.priority}</span>
+                                <span>Target: ${item.target} | ${item.date || 'N/A'}</span>
+                            </div>
+                        `;
+                        historyList.appendChild(div);
+                    });
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function deleteBroadcast(key) {
+            if (!confirm('Are you sure you want to delete this broadcast? It will be removed instantly from student and teacher dashboards.')) return;
+            try {
+                await window.db.ref('notifications/' + key).remove();
+                showToast('Broadcast deleted successfully.', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to delete broadcast.', 'error');
+            }
+        }
+
+        // Initialize broadcasting listener
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBroadcastHistory();
+        });
+
+        // --- ⚡ SYSTEM PERFORMANCE REAL-TIME MONITOR ---
+        function checkSystemPerformance() {
+            const latencyVal = document.getElementById('serverLatencyVal');
+            const storageVal = document.getElementById('storageSizeVal');
+            const usageBar = document.getElementById('storageUsageBar');
+            const statusInd = document.getElementById('firebaseStatusIndicator');
+
+            if (!latencyVal || !storageVal || !usageBar) return;
+
+            // 1. Measure Firebase network ping latency
+            const start = Date.now();
+            if (window.db && typeof window.db.ref === 'function') {
+                window.db.ref('.info/connected').once('value')
+                    .then(() => {
+                        const latency = Date.now() - start;
+                        latencyVal.textContent = latency + ' ms';
+                        latencyVal.style.color = latency < 100 ? '#10b981' : (latency < 250 ? '#f59e0b' : '#ef4444');
+                        statusInd.className = 'status-badge status-success';
+                        statusInd.innerHTML = '<span class="ping-pulse"></span> Connected';
+                    })
+                    .catch(() => {
+                        latencyVal.textContent = 'Offline';
+                        latencyVal.style.color = 'var(--danger)';
+                        statusInd.className = 'status-badge status-danger';
+                        statusInd.innerHTML = '<i class="fas fa-times-circle"></i> Disconnected';
+                    });
+            }
+
+            // 2. Measure Local Storage Consumption
+            try {
+                let totalBytes = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        totalBytes += (localStorage[key].length + key.length) * 2; // UTF-16 characters = 2 bytes
+                    }
+                }
+                const kb = (totalBytes / 1024).toFixed(2);
+                const percent = Math.min((totalBytes / (10 * 1024 * 1024)) * 100, 100); // Max 10MB
+                storageVal.textContent = `${kb} KB / 10,240 KB`;
+                usageBar.style.width = percent + '%';
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Run Performance updates every 7 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            checkSystemPerformance();
+            setInterval(checkSystemPerformance, 7000);
+        });
+
+        // --- 💾 DATABASE UTILITY BACKUPS EXPORTER ---
+        async function downloadDatabaseBackup() {
+            if (!confirm('Are you sure you want to download a complete backup of the database? This fetches students, teachers, and attendance logs.')) return;
+            showToast('Preparing backup logs, please wait...', 'info');
+
+            try {
+                await waitForFirebase();
+                const [students, teachers, attendance, clerks, systems] = await Promise.all([
+                    window.db.ref('students').once('value').then(s => s.val()),
+                    window.db.ref('teachers').once('value').then(s => s.val()),
+                    window.db.ref('attendance').once('value').then(s => s.val()),
+                    window.db.ref('clerks').once('value').then(s => s.val()),
+                    window.db.ref('systems').once('value').then(s => s.val())
+                ]);
+
+                const backupData = {
+                    metadata: {
+                        exportedBy: 'Admin',
+                        timestamp: Date.now(),
+                        dateString: new Date().toISOString(),
+                        version: '1.2.0'
+                    },
+                    students: students || {},
+                    teachers: teachers || {},
+                    attendance: attendance || {},
+                    clerks: clerks || {},
+                    systems: systems || {}
+                };
+
+                const blob = new Blob([JSON.stringify(backupData, null, 4)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bvit_attendance_backup_${getLocalFormattedDate(new Date())}.json`;
+                document.body.appendChild(a);
+                a.click();
+                
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Complete Database JSON downloaded successfully!', 'success');
+            } catch (err) {
+                console.error('Error exporting database backup:', err);
+                showToast('Failed to export database backup logs.', 'error');
+            }
+        }
+
+        // --- 📑 FLOATING ATTENDANCE SHEET DETAILS MODAL ---
+        let currentModalAttendanceData = null;
+
+        async function viewAttendanceDetails(recordId) {
+            console.log('🔍 Viewing attendance details for:', recordId);
+            showToast('Loading sheet details...', 'info');
+
+            try {
+                await waitForFirebase();
+                const recordSnap = await window.db.ref('attendance/' + recordId).once('value');
+                const record = recordSnap.val();
+                if (!record) {
+                    showToast('Attendance sheet not found.', 'error');
+                    return;
+                }
+
+                // Cache active sheet for sorting/filtering/exporting
+                currentModalAttendanceData = record;
+
+                // 1. Fetch related students and teachers list to match names
+                const [students, teachers] = await Promise.all([
+                    getCachedData('students', 'students') || {},
+                    getCachedData('teachers', 'teachers') || {}
+                ]);
+
+                const teacher = teachers[record.teacherId];
+                let teacherName = 'Teacher';
+                if (teacher) {
+                    if (teacher.firstName && teacher.lastName) teacherName = `${teacher.firstName} ${teacher.lastName}`;
+                    else if (teacher.firstName) teacherName = teacher.firstName;
+                }
+
+                // Update Modal Header Texts
+                document.getElementById('modalLectureTitle').innerHTML = `<i class="fas fa-clipboard-check" style="color:var(--primary);"></i> Attendance Sheet details`;
+                document.getElementById('modalLectureSubtitle').textContent = `Teacher: ${teacherName} | Subject: ${record.subject || 'N/A'} | Class: ${record.class || 'N/A'} (${record.lectureType || 'N/A'})`;
+
+                // 2. Count Present/Absent
+                const markedStudents = record.students || {};
+                const studentList = Object.keys(markedStudents);
+
+                let present = 0;
+                let absent = 0;
+
+                studentList.forEach(sid => {
+                    const status = markedStudents[sid];
+                    if (status === true || status === 'true' || status === 'Present') {
+                        present++;
+                    } else {
+                        absent++;
+                    }
+                });
+
+                const total = studentList.length;
+                const ratio = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
+
+                document.getElementById('modalPresentCount').textContent = present;
+                document.getElementById('modalAbsentCount').textContent = absent;
+                document.getElementById('modalPercentCount').textContent = ratio + '%';
+
+                // 3. Populate student table rows
+                const tableBody = document.getElementById('modalStudentTableBody');
+                tableBody.innerHTML = '';
+
+                // Build a combined list of student names, rolls, and statuses
+                const listItems = [];
+                studentList.forEach(sid => {
+                    const studentObj = students[sid] || {};
+                    const fullName = studentObj.firstName ? `${studentObj.firstName} ${studentObj.lastName || ''}`.trim() : `Student (${sid.slice(-4)})`;
+                    const roll = studentObj.rollNo || 'N/A';
+                    const status = markedStudents[sid];
+                    const isPresent = (status === true || status === 'true' || status === 'Present');
+
+                    listItems.push({
+                        roll,
+                        name: fullName,
+                        isPresent
+                    });
+                });
+
+                // Sort students by Roll number (ascending)
+                listItems.sort((a, b) => {
+                    const rollA = parseInt(a.roll) || 99999;
+                    const rollB = parseInt(b.roll) || 99999;
+                    return rollA - rollB;
+                });
+
+                // Inject rows
+                listItems.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'modal-student-row';
+                    tr.setAttribute('data-search', `${item.name.toLowerCase()} ${item.roll}`);
+
+                    const badgeClass = item.isPresent ? 'status-badge status-success' : 'status-badge status-danger';
+                    const badgeText = item.isPresent ? '<i class="fas fa-check"></i> Present' : '<i class="fas fa-times"></i> Absent';
+
+                    tr.innerHTML = `
+                        <td style="padding:0.75rem !important; border-bottom:1px solid var(--border) !important; font-weight:700;">${item.roll}</td>
+                        <td style="padding:0.75rem !important; border-bottom:1px solid var(--border) !important;">${item.name}</td>
+                        <td style="padding:0.75rem !important; border-bottom:1px solid var(--border) !important; text-align:center !important;">
+                            <span class="${badgeClass}">${badgeText}</span>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                // Clear search input and open modal
+                document.getElementById('modalStudentSearch').value = '';
+                document.getElementById('attendanceDetailsModal').style.display = 'flex';
+                
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load sheet details.', 'error');
+            }
+        }
+
+        function filterModalStudents() {
+            const query = document.getElementById('modalStudentSearch').value.trim().toLowerCase();
+            const rows = document.querySelectorAll('.modal-student-row');
+
+            rows.forEach(row => {
+                const searchData = row.getAttribute('data-search');
+                if (searchData.includes(query)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function closeAttendanceDetailsModal() {
+            document.getElementById('attendanceDetailsModal').style.display = 'none';
+            currentModalAttendanceData = null;
+        }
+
+        async function exportModalAttendanceCSV() {
+            if (!currentModalAttendanceData) return;
+            const record = currentModalAttendanceData;
+
+            try {
+                const students = await getCachedData('students', 'students') || {};
+                
+                let csv = 'Roll No,Student Name,Status\r\n';
+                const marked = record.students || {};
+
+                Object.entries(marked).forEach(([sid, status]) => {
+                    const s = students[sid] || {};
+                    const name = s.firstName ? `${s.firstName} ${s.lastName || ''}`.trim() : 'Unknown';
+                    const roll = s.rollNo || 'N/A';
+                    const isPresent = (status === true || status === 'true' || status === 'Present') ? 'Present' : 'Absent';
+                    csv += `"${roll}","${name}","${isPresent}"\r\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `attendance_sheet_${record.class}_${record.subject}_${getLocalFormattedDate(new Date())}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('CSV report exported successfully!', 'success');
+            } catch (err) {
+                console.error(err);
+            }
+        }
     </script>
     <script>
         // Sidebar Toggle Logic
@@ -6155,6 +7195,69 @@
             });
         });
     </script>
+
+    <!-- Attendance Details Floating Modal -->
+    <div id="attendanceDetailsModal" class="modal-backdrop" onclick="if(event.target===this) closeAttendanceDetailsModal()">
+        <div class="details-modal">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem;" id="modalLectureTitle">Lecture Details</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" id="modalLectureSubtitle">Date: -- | Subject: --</p>
+                </div>
+                <button onclick="closeAttendanceDetailsModal()" style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Quick stats row -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: rgba(16, 185, 129, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.15);">
+                    <div style="font-size: 1.35rem; font-weight: 800; color: #10b981;" id="modalPresentCount">0</div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase;">Present</span>
+                </div>
+                <div style="background: rgba(239, 68, 68, 0.08); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.15);">
+                    <div style="font-size: 1.35rem; font-weight: 800; color: #ef4444;" id="modalAbsentCount">0</div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444; text-transform: uppercase;">Absent</span>
+                </div>
+                <div style="background: var(--primary-light); padding: 0.75rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary);" id="modalPercentCount">0.0%</div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">Ratio</span>
+                </div>
+            </div>
+
+            <!-- Search student in modal -->
+            <div style="margin-bottom: 1rem; position: relative;">
+                <input type="text" id="modalStudentSearch" oninput="filterModalStudents()" placeholder="Search student name or roll..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.25rem !important; border: 1px solid var(--border) !important; border-radius: 10px !important; background: var(--bg-input) !important; color: var(--text-main) !important; outline: none !important; font-size: 0.9rem;">
+                <i class="fas fa-search" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+            </div>
+
+            <!-- Student Grid Table Scrollable -->
+            <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,0.15); padding: 0.5rem;">
+                <table style="width: 100% !important; margin-top: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important;">
+                    <thead>
+                        <tr style="background: transparent !important;">
+                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">Roll No</th>
+                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important;">Student Name</th>
+                            <th style="padding: 0.75rem !important; font-size: 0.75rem !important; background: transparent !important; color: var(--text-muted) !important; font-weight: 700 !important; border-bottom: 1px solid var(--border) !important; text-align: center !important;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalStudentTableBody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal footer export -->
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button onclick="exportModalAttendanceCSV()" class="btn btn-secondary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 10px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-input); color: var(--text-main);">
+                    <i class="fas fa-file-csv"></i> Export CSV Sheet
+                </button>
+                <button onclick="closeAttendanceDetailsModal()" class="btn btn-primary" style="padding: 0.5rem 1.5rem; font-size: 0.85rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; width: auto;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
