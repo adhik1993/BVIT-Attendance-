@@ -570,6 +570,92 @@
             background: rgba(99, 102, 241, 0.05);
             border-color: rgba(99, 102, 241, 0.2);
         }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .portal-container {
+                border-radius: 16px;
+            }
+            .portal-header {
+                padding: 20px 15px 15px;
+            }
+            .portal-header img {
+                width: 90px;
+                margin-bottom: 8px;
+            }
+            .portal-header h1 {
+                font-size: 1.25rem;
+            }
+            .portal-header p {
+                font-size: 0.75rem;
+            }
+            .tab-btn {
+                padding: 10px;
+                font-size: 0.8rem;
+                gap: 6px;
+            }
+            .portal-body {
+                padding: 16px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .input-wrapper {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .input-wrapper input {
+                padding-right: 16px !important;
+            }
+            .input-wrapper .btn-fetch {
+                position: static !important;
+                width: 100% !important;
+                height: 48px;
+                margin-top: 4px;
+            }
+            .dynamic-student-info {
+                margin-top: 16px;
+                padding-top: 16px;
+            }
+            .form-group {
+                margin-bottom: 16px;
+            }
+            .receipt-card {
+                padding: 16px;
+            }
+            .success-checkmark i {
+                font-size: 3rem;
+            }
+            .success-title {
+                font-size: 1.15rem;
+            }
+            .receipt-details {
+                padding: 12px 0;
+                gap: 10px;
+            }
+            .receipt-row {
+                font-size: 0.8rem;
+            }
+            .receipt-value {
+                max-width: 55%;
+            }
+            .receipt-note {
+                padding: 10px;
+                font-size: 0.75rem;
+            }
+            .tracker-card {
+                padding: 16px;
+            }
+        }
     </style>
 
     <!-- Firebase SDKs -->
@@ -586,7 +672,7 @@
         <!-- Header -->
         <div class="portal-header">
             <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
-            <h1>BVIT Bonafide Portal</h1>
+            <h1>BVIT BONAFIDE PORTAL</h1>
             <p>Apply or Track Certificate Requests Instantly</p>
         </div>
 
@@ -609,8 +695,10 @@
                         <div class="form-group">
                             <label for="studentRoll">Roll Number</label>
                             <div class="input-wrapper">
-                                <input type="text" id="studentRoll" placeholder="Enter Roll Number (e.g. 3019)" class="form-control" required style="padding-right: 120px;">
-                                <i class="fas fa-id-card input-icon"></i>
+                                <div style="position: relative; flex: 1; width: 100%;">
+                                    <input type="text" id="studentRoll" placeholder="Enter Roll Number (e.g. 3019)" class="form-control" required style="padding-right: 120px;">
+                                    <i class="fas fa-id-card input-icon"></i>
+                                </div>
                                 <button type="button" id="fetchBtn" class="btn btn-fetch" onclick="fetchStudentInfo()" style="position: absolute; right: 4px; top: 4px; bottom: 4px;">
                                     Fetch Details
                                 </button>
@@ -627,7 +715,7 @@
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="studentDept">Branch / Department</label>
                                     <div style="position: relative;">
@@ -644,7 +732,7 @@
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="studentEmail">Email ID</label>
                                     <div style="position: relative;">
@@ -762,8 +850,10 @@
                 <div class="form-group">
                     <label for="trackInput">Application ID / Roll Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="trackInput" placeholder="Enter Application ID or Roll Number" class="form-control" required>
-                        <i class="fas fa-search input-icon"></i>
+                        <div style="position: relative; flex: 1; width: 100%;">
+                            <input type="text" id="trackInput" placeholder="Enter Application ID or Roll Number" class="form-control" required>
+                            <i class="fas fa-search input-icon"></i>
+                        </div>
                         <button type="button" id="trackBtn" class="btn btn-fetch" onclick="trackStatus()">
                             Track Status
                         </button>
@@ -846,6 +936,37 @@
         // Global variables
         let activeStudent = null;
 
+        // High-Performance Caching Helpers
+        function getCachedData(key, expiryMs = 3 * 60 * 1000) {
+            try {
+                const cached = localStorage.getItem(key);
+                if (!cached) return null;
+                const { timestamp, value } = JSON.parse(cached);
+                if (Date.now() - timestamp > expiryMs) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return value;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setCachedData(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify({
+                    timestamp: Date.now(),
+                    value: value
+                }));
+            } catch (e) {}
+        }
+
+        function invalidateCache(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e) {}
+        }
+
         // Auto initialization
         window.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -902,17 +1023,24 @@
             activeStudent = null;
 
             try {
-                const snapshot = await window.db.ref('students').once('value');
-                const students = snapshot.val();
+                // Check cache first (cache for 10 minutes)
+                let students = getCachedData('portal_students', 10 * 60 * 1000);
+                
+                if (!students) {
+                    console.log('Fetching students from Firebase...');
+                    const snapshot = await window.db.ref('students').once('value');
+                    students = snapshot.val() || {};
+                    setCachedData('portal_students', students);
+                } else {
+                    console.log('Loaded students list from cache');
+                }
                 
                 let found = null;
-                if (students) {
-                    Object.values(students).forEach(student => {
-                        if (student && student.rollNo && student.rollNo.toString().toLowerCase() === rollInput.toLowerCase()) {
-                            found = student;
-                        }
-                    });
-                }
+                Object.values(students).forEach(student => {
+                    if (student && student.rollNo && student.rollNo.toString().toLowerCase() === rollInput.toLowerCase()) {
+                        found = student;
+                    }
+                });
 
                 if (found) {
                     activeStudent = found;
@@ -965,8 +1093,13 @@
             let count = 0;
             try {
                 if (window.db) {
-                    const snapshot = await window.db.ref('bonafideApplications').once('value');
-                    const apps = snapshot.val() || {};
+                    // Check application cache for sequential calculations
+                    let apps = getCachedData('portal_applications', 2 * 60 * 1000);
+                    if (!apps) {
+                        const snapshot = await window.db.ref('bonafideApplications').once('value');
+                        apps = snapshot.val() || {};
+                        setCachedData('portal_applications', apps);
+                    }
                     Object.keys(apps).forEach(key => {
                         if (key.startsWith(prefix)) {
                             count++;
@@ -1038,6 +1171,9 @@
                     type: 'bonafide',
                     firebaseKey: appId
                 });
+
+                // Clear cached applications so tracking works instantly
+                invalidateCache('portal_applications');
 
                 // Display Receipt data
                 document.getElementById('receiptId').textContent = appId;
@@ -1120,8 +1256,17 @@
             detailsArea.style.display = 'none';
 
             try {
-                const snapshot = await window.db.ref('bonafideApplications').once('value');
-                const apps = snapshot.val() || {};
+                // Check cache first (cache for 2 minutes)
+                let apps = getCachedData('portal_applications', 2 * 60 * 1000);
+                
+                if (!apps) {
+                    console.log('Fetching applications from Firebase for tracking...');
+                    const snapshot = await window.db.ref('bonafideApplications').once('value');
+                    apps = snapshot.val() || {};
+                    setCachedData('portal_applications', apps);
+                } else {
+                    console.log('Loaded applications from cache for tracking');
+                }
                 
                 const matched = [];
                 Object.values(apps).forEach(app => {
@@ -1171,13 +1316,24 @@
         // Handler for multi selection tracker click
         async function selectTrackRecord(appId) {
             try {
-                const snapshot = await window.db.ref('bonafideApplications').child(appId).once('value');
-                const app = snapshot.val();
+                // Check in cache first
+                let apps = getCachedData('portal_applications', 2 * 60 * 1000);
+                let app = apps ? apps[appId] : null;
+                
+                if (!app) {
+                    console.log('Fetching single application detail from Firebase...');
+                    const snapshot = await window.db.ref('bonafideApplications').child(appId).once('value');
+                    app = snapshot.val();
+                } else {
+                    console.log('Loaded single application detail from cache');
+                }
+                
                 if (app) {
                     displayTimeline(app);
                 }
             } catch (e) {
                 console.error(e);
+                showToast('Error loading application details', 'error');
             }
         }
 
