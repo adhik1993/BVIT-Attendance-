@@ -269,6 +269,7 @@
             const classCode = generateClassCode(year, department, division);
             console.log('Adding student with class code:', classCode);
 
+            const generatedPassword = generatePassword();
             const studentData = {
                 rollNo: document.getElementById('rollNo').value,
                 firstName: document.getElementById('firstName').value,
@@ -277,7 +278,7 @@
                 phone: document.getElementById('phone').value,
                 department: department,
                 year: year,
-
+                password: generatedPassword,
                 class: classCode,
                 division: division,
                 companyName: document.getElementById('companyName') ? document.getElementById('companyName').value : '',
@@ -313,7 +314,7 @@
                             studentsCache = null;
                             studentsCacheTime = 0;
                             loadStudents();
-                            alert('Student added successfully!');
+                            alert('Student added successfully!\nGenerated Password: ' + generatedPassword);
                         }
                     });
                 });
@@ -2758,6 +2759,117 @@
                 alert('An error occurred while parsing the Excel file.');
             } finally {
                 event.target.value = ''; // Reset input so it can be re-used
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            if (!toast || !toastIcon || !toastMessage) return;
+
+            toastMessage.textContent = message;
+            
+            // Clear classes
+            toast.className = 'toast show';
+            toastIcon.className = 'fas';
+
+            if (type === 'success') {
+                toast.style.background = '#10B981';
+                toastIcon.classList.add('fa-check-circle');
+            } else if (type === 'error') {
+                toast.style.background = '#EF4444';
+                toastIcon.classList.add('fa-exclamation-circle');
+            } else {
+                toast.style.background = '#3B82F6';
+                toastIcon.classList.add('fa-info-circle');
+            }
+
+            toast.style.display = 'flex';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '2.5rem';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.color = 'white';
+            toast.style.padding = '1rem 2rem';
+            toast.style.borderRadius = '50px';
+            toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+            toast.style.zIndex = '9999';
+            toast.style.alignItems = 'center';
+            toast.style.gap = '10px';
+            toast.style.fontWeight = '600';
+
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        async function exportData() {
+            try {
+                let students = studentsCache;
+                if (!students) {
+                    const snapshot = await firebase.database().ref('students').once('value');
+                    students = snapshot.val();
+                }
+
+                if (!students || Object.keys(students).length === 0) {
+                    alert('No student records found to export.');
+                    return;
+                }
+
+                // Convert to array of objects with the exact fields we want to export
+                const exportRows = Object.entries(students).map(([id, s]) => {
+                    const department = s.department || s.branch || 'N/A';
+                    let year = s.year || 'N/A';
+                    if (year === '1' || year === 'First' || year === 'First Year') year = 'FY';
+                    else if (year === '2' || year === 'Second' || year === 'Second Year') year = 'SY';
+                    else if (year === '3' || year === 'Third' || year === 'Third Year') year = 'TY';
+                    else if (year === '4' || year === 'Fourth' || year === 'Fourth Year') year = 'BE';
+
+                    return {
+                        'Roll No': s.rollNo || '',
+                        'First Name': s.firstName || (s.name ? s.name.split(' ')[0] : ''),
+                        'Last Name': s.lastName || (s.name ? s.name.split(' ').slice(1).join(' ') : ''),
+                        'Department': department,
+                        'Year': year,
+                        'Division': s.division || 'N/A',
+                        'Class Code': s.class || '',
+                        'Email': s.email || '',
+                        'Phone': s.phone || '',
+                        'Company Name': s.companyName || s.company || 'N/A',
+                        'Password': s.password || s.rollNo || 'student123'
+                    };
+                });
+
+                // Sort by roll no
+                exportRows.sort((a, b) => {
+                    const rA = parseInt(a['Roll No'].toString().replace(/\D/g, '')) || 0;
+                    const rB = parseInt(b['Roll No'].toString().replace(/\D/g, '')) || 0;
+                    return rA - rB;
+                });
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+
+                // Auto-fit column widths
+                const colWidths = Object.keys(exportRows[0] || {}).map(key => {
+                    let maxLen = key.length;
+                    exportRows.forEach(row => {
+                        const len = (row[key] || '').toString().length;
+                        if (len > maxLen) maxLen = len;
+                    });
+                    return { wch: Math.min(Math.max(maxLen + 2, 10), 40) };
+                });
+                ws['!cols'] = colWidths;
+
+                XLSX.utils.book_append_sheet(wb, ws, 'Students');
+                XLSX.writeFile(wb, 'Student_Database.xlsx');
+                
+                showToast('Database exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting database:', error);
+                alert('An error occurred while exporting the database: ' + error.message);
             }
         }
     </script>

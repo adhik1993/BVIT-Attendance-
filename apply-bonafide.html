@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Bonafide Portal - BVIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --bg-gradient: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 40%), #090d16;
+            --card-bg: rgba(17, 25, 40, 0.55);
+            --card-border: 1px solid rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --border-glow: rgba(99, 102, 241, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Abstract background meshes */
+        .bg-mesh {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(99, 102, 241, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bg-mesh-1 { top: 10%; left: 10%; }
+        .bg-mesh-2 { bottom: 10%; right: 10%; }
+
+        .portal-container {
+            width: 100%;
+            max-width: 580px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            z-index: 1;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .portal-header {
+            padding: 30px 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .portal-header img {
+            width: 110px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .portal-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .portal-header p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .portal-body {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: tabFade 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes tabFade {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Forms styling */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px 12px 42px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--border-glow);
+        }
+
+        .form-control.read-only {
+            background: rgba(15, 23, 42, 0.3);
+            border-color: rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .form-group i.input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            pointer-events: none;
+        }
+
+        .form-control:focus + i.input-icon {
+            color: var(--primary);
+        }
+
+        /* Buttons styling */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: rgba(99, 102, 241, 0.4);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-fetch {
+            width: auto;
+            white-space: nowrap;
+            padding: 0 20px;
+            font-size: 0.85rem;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        /* Form dynamic area */
+        .dynamic-student-info {
+            display: none;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            margin-top: 24px;
+            padding-top: 24px;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; overflow: hidden; }
+            to { opacity: 1; max-height: 500px; }
+        }
+
+        /* Success & Receipt Container */
+        .receipt-card {
+            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 10px;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        /* Receipt stub pattern cuts */
+        .receipt-card::before, .receipt-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-size: 15px 10px;
+            pointer-events: none;
+        }
+        .receipt-card::before {
+            top: -5px;
+            background-image: radial-gradient(circle, transparent 70%, rgba(15, 23, 42, 0.6) 70%);
+            background-position: center top;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-checkmark {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .success-checkmark i {
+            font-size: 3.5rem;
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .success-subtitle {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .receipt-details {
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 16px 0;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .receipt-label {
+            color: var(--text-muted);
+        }
+
+        .receipt-value {
+            font-weight: 600;
+            color: #fff;
+            text-align: right;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+
+        .receipt-value.highlight-id {
+            color: var(--warning);
+            font-family: monospace;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .receipt-note {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #a5b4fc;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        /* Tracker Section */
+        .tracker-card {
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 24px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tracker-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Timeline Tracker Styles */
+        .timeline-container {
+            margin-top: 20px;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-step {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -24px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #090d16;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-step.active .timeline-dot {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .timeline-step.rejected .timeline-dot {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+        }
+
+        .timeline-step.pending-step .timeline-dot {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .timeline-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .timeline-step.active .timeline-title {
+            color: #fff;
+        }
+        .timeline-step.rejected .timeline-title {
+            color: var(--danger);
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(17, 25, 40, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success { border-color: rgba(16, 185, 129, 0.3); }
+        .toast-success i { color: var(--success); }
+
+        .toast-error { border-color: rgba(239, 68, 68, 0.3); }
+        .toast-error i { color: var(--danger); }
+
+        .toast-warning { border-color: rgba(245, 158, 11, 0.3); }
+        .toast-warning i { color: var(--warning); }
+
+        /* Loader inside buttons */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Multi results list */
+        .results-list {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .result-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <div class="bg-mesh bg-mesh-1"></div>
+    <div class="bg-mesh bg-mesh-2"></div>
+
+    <div class="portal-container">
+        <!-- Header -->
+        <div class="portal-header">
+            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" alt="BVIT Logo">
+            <h1>BVIT Bonafide Portal</h1>
+            <p>Apply or Track Certificate Requests Instantly</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('apply')">
+                <i class="fas fa-file-signature"></i> Apply Online
+            </button>
+            <button class="tab-btn" onclick="switchTab('track')">
+                <i class="fas fa-map-marker-alt"></i> Track Status
+            </button>
+        </div>
+
+        <div class="portal-body">
+            <!-- Apply Certificate Tab -->
+            <div id="applyTab" class="tab-content active">
+                <div id="applyFormArea">
+                    <form id="bonafideForm" onsubmit="handleApplicationSubmit(event)">
+                        <!-- Roll Number Input -->
+                        <div class="form-group">
+                            <label for="studentRoll">Roll Number</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="studentRoll" placeholder="Enter Roll Number (e.g. 3019)" class="form-control" required style="padding-right: 120px;">
+                                <i class="fas fa-id-card input-icon"></i>
+                                <button type="button" id="fetchBtn" class="btn btn-fetch" onclick="fetchStudentInfo()" style="position: absolute; right: 4px; top: 4px; bottom: 4px;">
+                                    Fetch Details
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Auto-fill Section -->
+                        <div id="dynamicFields" class="dynamic-student-info">
+                            <div class="form-group">
+                                <label for="studentName">Student Full Name</label>
+                                <div style="position: relative;">
+                                    <input type="text" id="studentName" class="form-control read-only" readonly>
+                                    <i class="fas fa-user input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label for="studentDept">Branch / Department</label>
+                                    <div style="position: relative;">
+                                        <input type="text" id="studentDept" class="form-control read-only" readonly>
+                                        <i class="fas fa-graduation-cap input-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentClass">Class / Year</label>
+                                    <div style="position: relative;">
+                                        <input type="text" id="studentClass" class="form-control read-only" readonly>
+                                        <i class="fas fa-calendar input-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label for="studentEmail">Email ID</label>
+                                    <div style="position: relative;">
+                                        <input type="email" id="studentEmail" class="form-control read-only" readonly>
+                                        <i class="fas fa-envelope input-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentContact">Contact Number</label>
+                                    <div style="position: relative;">
+                                        <input type="tel" id="studentContact" class="form-control read-only" readonly>
+                                        <i class="fas fa-phone input-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Academic Year (Dropdown) -->
+                            <div class="form-group">
+                                <label for="academicYear">Academic Year</label>
+                                <div style="position: relative;">
+                                    <select id="academicYear" class="form-control" required style="padding-left: 42px; -webkit-appearance: none;">
+                                        <option value="2025-26" selected>2025-26</option>
+                                        <option value="2026-27">2026-27</option>
+                                    </select>
+                                    <i class="fas fa-calendar-check input-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Purpose Selection -->
+                            <div class="form-group">
+                                <label for="purpose">Purpose of Bonafide</label>
+                                <div style="position: relative;">
+                                    <select id="purpose" class="form-control" onchange="toggleOtherPurpose(this.value)" required style="padding-left: 42px; -webkit-appearance: none;">
+                                        <option value="">Select Purpose</option>
+                                        <option value="Scholarship Application">Scholarship Application</option>
+                                        <option value="Higher Education">Higher Education</option>
+                                        <option value="Bus Pass Application">Bus Pass Application</option>
+                                        <option value="Education Loan">Education Loan</option>
+                                        <option value="Passport Application">Passport Application</option>
+                                        <option value="Other">Other (Please Specify)</option>
+                                    </select>
+                                    <i class="fas fa-question-circle input-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Other Purpose Text Input -->
+                            <div id="otherPurposeGroup" class="form-group" style="display: none;">
+                                <label for="otherPurpose">Specify Purpose</label>
+                                <div style="position: relative;">
+                                    <input type="text" id="otherPurpose" class="form-control" placeholder="Specify your purpose here">
+                                    <i class="fas fa-pen input-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" id="submitBtn" class="btn" style="margin-top: 10px;">
+                                <i class="fas fa-paper-plane"></i> Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Digital Receipt View -->
+                <div id="receiptArea" class="receipt-card">
+                    <div class="success-checkmark">
+                        <i class="fas fa-circle-check"></i>
+                    </div>
+                    <h2 class="success-title">Application Submitted!</h2>
+                    <p class="success-subtitle">Your request is queued for clerk approval.</p>
+
+                    <div class="receipt-details">
+                        <div class="receipt-row">
+                            <span class="receipt-label">Application ID:</span>
+                            <span id="receiptId" class="receipt-value highlight-id">BF-CE-1001-2605-001</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Student Name:</span>
+                            <span id="receiptName" class="receipt-value">Sakpal Sankalp Sadanand</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Roll Number:</span>
+                            <span id="receiptRoll" class="receipt-value">1001</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Branch:</span>
+                            <span id="receiptBranch" class="receipt-value">Computer Engineering</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Purpose:</span>
+                            <span id="receiptPurpose" class="receipt-value">Scholarship</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Date & Time:</span>
+                            <span id="receiptTime" class="receipt-value">27/05/2026, 14:30:15</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Initial Status:</span>
+                            <span class="receipt-value" style="color: var(--warning); font-weight: 700;">PENDING</span>
+                        </div>
+                    </div>
+
+                    <div class="receipt-note">
+                        <i class="fas fa-camera" style="margin-right: 6px;"></i>
+                        <strong>Tip:</strong> Please take a screenshot of this receipt. You can track your certificate progress in the <strong>Track Status</strong> tab above using your Roll Number or Application ID.
+                    </div>
+
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">
+                        <i class="fas fa-arrow-left"></i> Apply for Another
+                    </button>
+                </div>
+            </div>
+
+            <!-- Track Application Tab -->
+            <div id="trackTab" class="tab-content">
+                <div class="form-group">
+                    <label for="trackInput">Application ID / Roll Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="trackInput" placeholder="Enter Application ID or Roll Number" class="form-control" required>
+                        <i class="fas fa-search input-icon"></i>
+                        <button type="button" id="trackBtn" class="btn btn-fetch" onclick="trackStatus()">
+                            Track Status
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tracker List Area -->
+                <div id="trackerListArea" class="results-list" style="display: none;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 5px;">SELECT APPLICATION TO VIEW TIMELINE:</div>
+                    <div id="trackerListContainer"></div>
+                </div>
+
+                <!-- Tracker Timeline Area -->
+                <div id="trackerDetailsArea" class="tracker-card">
+                    <div class="tracker-header">
+                        <span id="trackerHeaderId" style="color: var(--warning); font-family: monospace;">BF-CE-1001-2605-001</span>
+                        <span id="trackerHeaderStatus" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 8px; font-weight: bold; background: rgba(245, 158, 11, 0.1); color: var(--warning);">PENDING</span>
+                    </div>
+
+                    <div class="receipt-row" style="font-size: 0.85rem; margin-bottom: 5px;">
+                        <span class="receipt-label">Student Name:</span>
+                        <span id="trackerDetailName" class="receipt-value">N/A</span>
+                    </div>
+                    <div class="receipt-row" style="font-size: 0.85rem; margin-bottom: 5px;">
+                        <span class="receipt-label">Purpose:</span>
+                        <span id="trackerDetailPurpose" class="receipt-value">N/A</span>
+                    </div>
+                    
+                    <div id="rejectionCard" class="receipt-note" style="background: rgba(239, 68, 68, 0.1); border-left-color: var(--danger); color: #fecaca; margin-top: 15px; display: none;">
+                        <i class="fas fa-circle-xmark" style="margin-right: 6px; color: var(--danger);"></i>
+                        <strong>Rejection Reason:</strong> <span id="rejectionReasonText">N/A</span>
+                    </div>
+
+                    <div class="timeline-container">
+                        <!-- Step 1: Applied -->
+                        <div id="stepApplied" class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Applied & Submitted</div>
+                                <div id="timeApplied" class="timeline-date">Pending</div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Approved -->
+                        <div id="stepApproved" class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Approved by Clerk</div>
+                                <div id="timeApproved" class="timeline-date">Pending</div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Printed -->
+                        <div id="stepPrinted" class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Printed & Ready</div>
+                                <div id="timePrinted" class="timeline-date">Pending</div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Issued -->
+                        <div id="stepIssued" class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Issued to Student</div>
+                                <div id="timeIssued" class="timeline-date">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // Global variables
+        let activeStudent = null;
+
+        // Auto initialization
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await waitForFirebase();
+                console.log('Firebase ready on public portal.');
+            } catch (e) {
+                console.error(e);
+                showToast('Failed to initialize Firebase database connection', 'error');
+            }
+        });
+
+        // Switch Tabs visual and area
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'apply') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('applyTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('trackTab').classList.add('active');
+            }
+        }
+
+        // Switch custom specify purpose visibility
+        function toggleOtherPurpose(val) {
+            const group = document.getElementById('otherPurposeGroup');
+            const input = document.getElementById('otherPurpose');
+            if (val === 'Other') {
+                group.style.display = 'block';
+                input.required = true;
+            } else {
+                group.style.display = 'none';
+                input.required = false;
+                input.value = '';
+            }
+        }
+
+        // Fetch Student information by Roll Number
+        async function fetchStudentInfo() {
+            const rollInput = document.getElementById('studentRoll').value.trim();
+            const fetchBtn = document.getElementById('fetchBtn');
+            const dynamicFields = document.getElementById('dynamicFields');
+
+            if (!rollInput) {
+                showToast('Please enter your roll number first', 'warning');
+                return;
+            }
+
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+            dynamicFields.style.display = 'none';
+            activeStudent = null;
+
+            try {
+                const snapshot = await window.db.ref('students').once('value');
+                const students = snapshot.val();
+                
+                let found = null;
+                if (students) {
+                    Object.values(students).forEach(student => {
+                        if (student && student.rollNo && student.rollNo.toString().toLowerCase() === rollInput.toLowerCase()) {
+                            found = student;
+                        }
+                    });
+                }
+
+                if (found) {
+                    activeStudent = found;
+                    document.getElementById('studentName').value = found.name || found.firstName + ' ' + (found.lastName || '');
+                    document.getElementById('studentDept').value = found.branch || found.department || 'N/A';
+                    document.getElementById('studentClass').value = found.year || found.class || 'N/A';
+                    document.getElementById('studentEmail').value = found.email || 'N/A';
+                    document.getElementById('studentContact').value = found.phone || 'N/A';
+
+                    dynamicFields.style.display = 'block';
+                    showToast('Student record loaded successfully!', 'success');
+                } else {
+                    showToast('No student found with this roll number. Contact admin.', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Error querying database records.', 'error');
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerHTML = 'Fetch Details';
+            }
+        }
+
+        // Sequential ID Generator
+        async function generatePortalSmartId(department, rollNo) {
+            function getDeptCode(dept) {
+                const codes = {
+                    'Computer Science': 'CS',
+                    'Computer Engineering': 'CE',
+                    'Information Technology': 'IT',
+                    'Electronics': 'EC',
+                    'Electronics and Communication': 'EC',
+                    'Mechanical': 'ME',
+                    'Mechanical Engineering': 'ME',
+                    'Civil': 'CV',
+                    'Civil Engineering': 'CV',
+                    'Electrical': 'EE',
+                    'Electrical Engineering': 'EE',
+                    'Automobile': 'AU',
+                    'Automobile Engineering': 'AU'
+                };
+                return codes[dept] || 'GN';
+            }
+
+            const deptCode = getDeptCode(department);
+            const year = new Date().getFullYear().toString().slice(-2);
+            const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+            const prefix = `BF-${deptCode}-${rollNo}-${year}${month}-`;
+            
+            let count = 0;
+            try {
+                if (window.db) {
+                    const snapshot = await window.db.ref('bonafideApplications').once('value');
+                    const apps = snapshot.val() || {};
+                    Object.keys(apps).forEach(key => {
+                        if (key.startsWith(prefix)) {
+                            count++;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            
+            const suffix = (count + 1).toString().padStart(3, '0');
+            return prefix + suffix;
+        }
+
+        // Submit form handler
+        async function handleApplicationSubmit(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!activeStudent) {
+                showToast('Verification failed. Re-fetch details.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Request...';
+
+            try {
+                const formElement = document.getElementById('bonafideForm');
+                const rollNoVal = activeStudent.rollNo || '0000';
+                const appId = await generatePortalSmartId(activeStudent.branch || activeStudent.department, rollNoVal);
+                
+                const purposeSelect = document.getElementById('purpose').value;
+                const purposeVal = purposeSelect === 'Other' ? document.getElementById('otherPurpose').value : purposeSelect;
+                const currentDate = new Date();
+
+                const appData = {
+                    studentName: document.getElementById('studentName').value,
+                    rollNumber: rollNoVal,
+                    department: document.getElementById('studentDept').value,
+                    class: document.getElementById('studentClass').value,
+                    academicYear: document.getElementById('academicYear').value,
+                    email: document.getElementById('studentEmail').value,
+                    contactNumber: document.getElementById('studentContact').value,
+                    address: activeStudent.address || 'N/A',
+                    purpose: purposeVal,
+                    certificateType: 'Bonafide Certificate',
+                    applicationId: appId,
+                    submissionDate: currentDate.toISOString(),
+                    submissionTime: currentDate.toLocaleString('en-IN', {
+                        timeZone: 'Asia/Kolkata',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }),
+                    status: 'pending',
+                    priority: 'medium',
+                    studentId: activeStudent.email,
+                    studentUID: activeStudent.uid || activeStudent.email
+                };
+
+                // Save in Firebase RTDB nodes
+                await window.db.ref('bonafideApplications').child(appId).set(appData);
+                await window.db.ref('applications').child(appId).set({
+                    ...appData,
+                    type: 'bonafide',
+                    firebaseKey: appId
+                });
+
+                // Display Receipt data
+                document.getElementById('receiptId').textContent = appId;
+                document.getElementById('receiptName').textContent = appData.studentName;
+                document.getElementById('receiptRoll').textContent = appData.rollNumber;
+                document.getElementById('receiptBranch').textContent = appData.department;
+                document.getElementById('receiptPurpose').textContent = appData.purpose;
+                document.getElementById('receiptTime').textContent = appData.submissionTime;
+
+                // Toggle visibility
+                document.getElementById('applyFormArea').style.display = 'none';
+                document.getElementById('receiptArea').style.display = 'block';
+                showToast('Bonafide Application submitted successfully!', 'success');
+
+            } catch (e) {
+                console.error(e);
+                showToast('Error writing record to server.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+            }
+        }
+
+        // Reset apply form view
+        function resetForm() {
+            document.getElementById('bonafideForm').reset();
+            document.getElementById('dynamicFields').style.display = 'none';
+            document.getElementById('applyFormArea').style.display = 'block';
+            document.getElementById('receiptArea').style.display = 'none';
+            activeStudent = null;
+        }
+
+        // Format dates cleanly helper
+        function formatTimelineDate(timestamp) {
+            if (!timestamp) return 'Pending';
+            let date = new Date(timestamp);
+            
+            // Fallback parse DD/MM/YYYY
+            if (isNaN(date.getTime()) && typeof timestamp === 'string') {
+                const parts = timestamp.split(',');
+                const datePart = parts[0].trim();
+                const dateSubParts = datePart.split('/');
+                if (dateSubParts.length === 3) {
+                    const day = parseInt(dateSubParts[0], 10);
+                    const month = parseInt(dateSubParts[1], 10) - 1;
+                    const year = parseInt(dateSubParts[2], 10);
+                    date = new Date(year, month, day);
+                }
+            }
+
+            if (isNaN(date.getTime())) {
+                return timestamp;
+            }
+
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            }) + ' ' + date.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Track Application Status
+        async function trackStatus() {
+            const trackVal = document.getElementById('trackInput').value.trim();
+            const trackBtn = document.getElementById('trackBtn');
+            const listArea = document.getElementById('trackerListArea');
+            const detailsArea = document.getElementById('trackerDetailsArea');
+
+            if (!trackVal) {
+                showToast('Please enter an Application ID or Roll Number', 'warning');
+                return;
+            }
+
+            trackBtn.disabled = true;
+            trackBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            listArea.style.display = 'none';
+            detailsArea.style.display = 'none';
+
+            try {
+                const snapshot = await window.db.ref('bonafideApplications').once('value');
+                const apps = snapshot.val() || {};
+                
+                const matched = [];
+                Object.values(apps).forEach(app => {
+                    if (app) {
+                        const appId = (app.applicationId || '').toLowerCase();
+                        const roll = (app.rollNumber || app.rollNo || '').toLowerCase();
+                        const search = trackVal.toLowerCase();
+                        if (appId === search || roll === search) {
+                            matched.push(app);
+                        }
+                    }
+                });
+
+                if (matched.length === 0) {
+                    showToast('No application found with this reference', 'error');
+                } else if (matched.length === 1) {
+                    // Directly display details of single application
+                    displayTimeline(matched[0]);
+                } else {
+                    // Show selection list
+                    const container = document.getElementById('trackerListContainer');
+                    container.innerHTML = matched.map(app => `
+                        <div class="result-item" onclick="selectTrackRecord('${app.applicationId}')">
+                            <div>
+                                <strong style="color: var(--warning); font-family: monospace;">${app.applicationId}</strong>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                    Submitted: ${app.submissionTime?.split(',')[0] || 'N/A'} | Purpose: ${app.purpose}
+                                </div>
+                            </div>
+                            <span style="font-size: 0.8rem; padding: 4px 8px; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.05); text-transform: uppercase;">
+                                ${app.status}
+                            </span>
+                        </div>
+                    `).join('');
+                    listArea.style.display = 'block';
+                    showToast(`Found ${matched.length} requests for this roll number`, 'success');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Query error. Try again.', 'error');
+            } finally {
+                trackBtn.disabled = false;
+                trackBtn.innerHTML = 'Track Status';
+            }
+        }
+
+        // Handler for multi selection tracker click
+        async function selectTrackRecord(appId) {
+            try {
+                const snapshot = await window.db.ref('bonafideApplications').child(appId).once('value');
+                const app = snapshot.val();
+                if (app) {
+                    displayTimeline(app);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Display timeline layout
+        function displayTimeline(app) {
+            const detailsArea = document.getElementById('trackerDetailsArea');
+            
+            // Set header
+            document.getElementById('trackerHeaderId').textContent = app.applicationId;
+            const statusLabel = document.getElementById('trackerHeaderStatus');
+            statusLabel.textContent = app.status.toUpperCase();
+            
+            // Adjust status label style colors
+            if (app.status === 'approved') {
+                statusLabel.style.background = 'rgba(16, 185, 129, 0.1)';
+                statusLabel.style.color = 'var(--success)';
+            } else if (app.status === 'rejected') {
+                statusLabel.style.background = 'rgba(239, 68, 68, 0.1)';
+                statusLabel.style.color = 'var(--danger)';
+            } else if (app.status === 'printed' || app.status === 'issued') {
+                statusLabel.style.background = 'rgba(99, 102, 241, 0.15)';
+                statusLabel.style.color = 'var(--primary)';
+            } else {
+                statusLabel.style.background = 'rgba(245, 158, 11, 0.1)';
+                statusLabel.style.color = 'var(--warning)';
+            }
+
+            document.getElementById('trackerDetailName').textContent = app.studentName;
+            document.getElementById('trackerDetailPurpose').textContent = app.purpose;
+
+            // Rejection reason card handler
+            const rejCard = document.getElementById('rejectionCard');
+            if (app.status === 'rejected' && app.rejectionReason) {
+                document.getElementById('rejectionReasonText').textContent = app.rejectionReason;
+                rejCard.style.display = 'block';
+            } else {
+                rejCard.style.display = 'none';
+            }
+
+            // Timeline states resetting
+            const steps = {
+                applied: document.getElementById('stepApplied'),
+                approved: document.getElementById('stepApproved'),
+                printed: document.getElementById('stepPrinted'),
+                issued: document.getElementById('stepIssued')
+            };
+
+            Object.values(steps).forEach(s => {
+                s.className = 'timeline-step';
+            });
+
+            // Set default date text
+            document.getElementById('timeApplied').textContent = formatTimelineDate(app.submissionTime || app.submissionDate);
+            document.getElementById('timeApproved').textContent = 'Pending Approval';
+            document.getElementById('timePrinted').textContent = 'Pending Print';
+            document.getElementById('timeIssued').textContent = 'Pending Collection';
+
+            // Mark steps according to status
+            steps.applied.classList.add('active');
+
+            if (app.status === 'rejected') {
+                steps.approved.classList.add('rejected');
+                document.getElementById('timeApproved').textContent = 'Rejected on ' + formatTimelineDate(app.rejectedDate || app.processedDate);
+            } else {
+                if (app.approvedDate || app.status === 'approved' || app.status === 'printed' || app.status === 'issued') {
+                    steps.approved.classList.add('active');
+                    document.getElementById('timeApproved').textContent = formatTimelineDate(app.approvedDate || app.processedDate);
+                }
+                
+                if (app.printedDate || app.status === 'printed' || app.status === 'issued') {
+                    steps.printed.classList.add('active');
+                    document.getElementById('timePrinted').textContent = formatTimelineDate(app.printedDate);
+                }
+
+                if (app.issuedDate || app.status === 'issued') {
+                    steps.issued.classList.add('active');
+                    document.getElementById('timeIssued').textContent = formatTimelineDate(app.issuedDate);
+                }
+            }
+
+            detailsArea.style.display = 'block';
+            // Scroll to details
+            detailsArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Custom toast helper
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let icon = 'fa-circle-check';
+            if (type === 'error') icon = 'fa-circle-xmark';
+            if (type === 'warning') icon = 'fa-triangle-exclamation';
+
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 50);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
