@@ -1093,18 +1093,14 @@
             let count = 0;
             try {
                 if (window.db) {
-                    // Check application cache for sequential calculations
-                    let apps = getCachedData('portal_applications', 2 * 60 * 1000);
-                    if (!apps) {
-                        const snapshot = await window.db.ref('bonafideApplications').once('value');
-                        apps = snapshot.val() || {};
-                        setCachedData('portal_applications', apps);
-                    }
-                    Object.keys(apps).forEach(key => {
-                        if (key.startsWith(prefix)) {
-                            count++;
-                        }
-                    });
+                    // Optimized key prefix query - completely collision-free and fast
+                    const snapshot = await window.db.ref('bonafideApplications')
+                        .orderByKey()
+                        .startAt(prefix)
+                        .endAt(prefix + '\uf8ff')
+                        .once('value');
+                    const apps = snapshot.val() || {};
+                    count = Object.keys(apps).length;
                 }
             } catch (e) {
                 console.error(e);
@@ -1172,8 +1168,7 @@
                     firebaseKey: appId
                 });
 
-                // Clear cached applications so tracking works instantly
-                invalidateCache('portal_applications');
+                // (Cache invalidation not needed as we query live data)
 
                 // Display Receipt data
                 document.getElementById('receiptId').textContent = appId;
@@ -1256,29 +1251,51 @@
             detailsArea.style.display = 'none';
 
             try {
-                // Check cache first (cache for 2 minutes)
-                let apps = getCachedData('portal_applications', 2 * 60 * 1000);
-                
-                if (!apps) {
-                    console.log('Fetching applications from Firebase for tracking...');
-                    const snapshot = await window.db.ref('bonafideApplications').once('value');
-                    apps = snapshot.val() || {};
-                    setCachedData('portal_applications', apps);
-                } else {
-                    console.log('Loaded applications from cache for tracking');
-                }
-                
                 const matched = [];
-                Object.values(apps).forEach(app => {
+                const search = trackVal.trim();
+                const searchLower = search.toLowerCase();
+
+                if (searchLower.startsWith('bf-')) {
+                    // 1. Query single application node directly by key (100% live and instant)
+                    console.log('Querying single application by ID:', search);
+                    const snapshot = await window.db.ref('bonafideApplications').child(search).once('value');
+                    const app = snapshot.val();
                     if (app) {
-                        const appId = (app.applicationId || '').toLowerCase();
-                        const roll = (app.rollNumber || app.rollNo || '').toLowerCase();
-                        const search = trackVal.toLowerCase();
-                        if (appId === search || roll === search) {
-                            matched.push(app);
-                        }
+                        matched.push(app);
                     }
-                });
+                } else {
+                    // 2. Roll Number lookup: Find student locally in cached students node (free!)
+                    let students = getCachedData('portal_students', 10 * 60 * 1000);
+                    if (!students) {
+                        console.log('Fetching students list from Firebase for roll lookup...');
+                        const studentSnap = await window.db.ref('students').once('value');
+                        students = studentSnap.val() || {};
+                        setCachedData('portal_students', students);
+                    }
+                    
+                    let foundStudent = null;
+                    Object.values(students).forEach(student => {
+                        if (student && student.rollNo && student.rollNo.toString().toLowerCase() === searchLower) {
+                            foundStudent = student;
+                        }
+                    });
+
+                    if (foundStudent && foundStudent.email) {
+                        // Query bonafideApplications by indexed studentId (which is email)
+                        console.log('Querying applications by indexed studentId:', foundStudent.email);
+                        const appSnap = await window.db.ref('bonafideApplications')
+                            .orderByChild('studentId')
+                            .equalTo(foundStudent.email)
+                            .once('value');
+                        
+                        const apps = appSnap.val() || {};
+                        Object.values(apps).forEach(app => {
+                            if (app) {
+                                matched.push(app);
+                            }
+                        });
+                    }
+                }
 
                 if (matched.length === 0) {
                     showToast('No application found with this reference', 'error');
@@ -1316,18 +1333,9 @@
         // Handler for multi selection tracker click
         async function selectTrackRecord(appId) {
             try {
-                // Check in cache first
-                let apps = getCachedData('portal_applications', 2 * 60 * 1000);
-                let app = apps ? apps[appId] : null;
-                
-                if (!app) {
-                    console.log('Fetching single application detail from Firebase...');
-                    const snapshot = await window.db.ref('bonafideApplications').child(appId).once('value');
-                    app = snapshot.val();
-                } else {
-                    console.log('Loaded single application detail from cache');
-                }
-                
+                console.log('Fetching single application detail from Firebase...');
+                const snapshot = await window.db.ref('bonafideApplications').child(appId).once('value');
+                const app = snapshot.val();
                 if (app) {
                     displayTimeline(app);
                 }
