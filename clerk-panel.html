@@ -854,16 +854,16 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="#" id="nav-approve" class="nav-link">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Approve Certificates</span>
+                    <a href="#" id="nav-print" class="nav-link">
+                        <i class="fas fa-print"></i>
+                        <span>Print Certificates</span>
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a href="#" id="nav-print" class="nav-link">
-                        <i class="fas fa-print"></i>
-                        <span>Print Certificates</span>
+                    <a href="#" id="nav-approve" class="nav-link">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Approve Certificates</span>
                     </a>
                 </li>
                 
@@ -1307,6 +1307,98 @@
         </div>
     </div>
 
+    <!-- Certificate Preview Modal -->
+    <div id="certificatePreviewModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 650px; width: 100%; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-certificate"></i> Certificate Preview</h3>
+                <button onclick="closeCertificatePreviewModal()" class="modal-close">&times;</button>
+            </div>
+            
+            <div class="modal-body" style="overflow-y: auto; flex: 1; padding: 20px; display: flex; justify-content: center; align-items: flex-start; background: rgba(0, 0, 0, 0.25);">
+                <!-- Printable-look Certificate card -->
+                <div id="previewCertificateContent" style="background: white; color: #1f2937; font-family: 'Lora', Georgia, serif; width: 100%; max-width: 136mm; padding: 8mm 10mm; border: 3px double #1e3a8a; position: relative; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px; line-height: 1.4; font-size: 8.5pt;">
+                    <!-- Inner Gold Border -->
+                    <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #d97706; pointer-events: none;"></div>
+                    
+                    <!-- Second Inner Accent Border -->
+                    <div style="position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px solid rgba(30, 58, 138, 0.12); pointer-events: none;"></div>
+                    
+                    <!-- Corner Ornaments -->
+                    <div style="position: absolute; width: 15px; height: 15px; border-color: #d97706; border-style: solid; border-width: 1.5px 0 0 1.5px; top: 8px; left: 8px; pointer-events: none;"></div>
+                    <div style="position: absolute; width: 15px; height: 15px; border-color: #d97706; border-style: solid; border-width: 1.5px 1.5px 0 0; top: 8px; right: 8px; pointer-events: none;"></div>
+                    <div style="position: absolute; width: 15px; height: 15px; border-color: #d97706; border-style: solid; border-width: 0 0 1.5px 1.5px; bottom: 8px; left: 8px; pointer-events: none;"></div>
+                    <div style="position: absolute; width: 15px; height: 15px; border-color: #d97706; border-style: solid; border-width: 0 1.5px 1.5px 0; bottom: 8px; right: 8px; pointer-events: none;"></div>
+                    
+                    <!-- Watermark -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-family: 'Cinzel', Georgia, serif; font-size: 50pt; color: rgba(30, 58, 138, 0.03); font-weight: 700; z-index: 1; pointer-events: none; white-space: nowrap;">BVIT</div>
+                    
+                    <!-- Header -->
+                    <div style="text-align: center; margin-bottom: 4mm; border-bottom: 1.5px solid #1e3a8a; padding-bottom: 3mm; padding-top: 1mm;">
+                        <div style="width: 45mm; height: 16mm; margin: 0 auto 3mm; display: flex; align-items: center; justify-content: center;">
+                            <img src="https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <div style="font-family: 'Cinzel', Georgia, serif; font-size: 9.5pt; font-weight: 700; color: #1e3a8a; margin-bottom: 1mm; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2;">BHARATI VIDYAPEETH INSTITUTE OF TECHNOLOGY</div>
+                        <div style="font-family: 'Outfit', sans-serif; font-size: 7pt; color: #4b5563; margin-bottom: 1mm; font-weight: 600; letter-spacing: 0.8px;">SEC-7, CBD BELAPUR, NAVI MUMBAI - 400614</div>
+                        <div style="font-family: 'Lora', Georgia, serif; font-size: 6.5pt; color: #6b7280; font-style: italic;">(An Autonomous Institute affiliated to University of Mumbai)</div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin: 4mm 0;">
+                        <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, #d97706, transparent);"></div>
+                        <div style="font-family: 'Cinzel', Georgia, serif; font-size: 10.5pt; font-weight: 800; color: #b91c1c; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;">BONAFIDE CERTIFICATE</div>
+                        <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, #d97706, transparent);"></div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div style="font-family: 'Lora', Georgia, serif; font-size: 8.2pt; color: #1f2937; text-align: left; margin-bottom: 6mm; line-height: 1.6; padding: 0 2mm;">
+                        This is to certify that <span class="preview-student-name" style="display: inline; font-weight: 700; color: #1e3a8a;">[STUDENT NAME]</span>, 
+                        Roll No. <span class="preview-roll-no" style="display: inline; font-weight: 700; color: #1e3a8a;">[ROLL]</span> 
+                        is a bonafide student of this institute studying in 
+                        <span class="preview-class-year" style="display: inline; font-weight: 700; color: #1e3a8a;">[CLASS]</span> year 
+                        <span class="preview-department" style="display: inline; font-weight: 700; color: #1e3a8a;">[DEPT]</span> department 
+                        during the Academic Year <span class="preview-academic-year" style="display: inline; font-weight: 700; color: #1e3a8a;">[ACADEMIC YEAR]</span>.
+                        <br><br>
+                        This certificate is issued for the purpose of 
+                        <span class="preview-purpose" style="display: inline; font-weight: 700; color: #1e3a8a;">[PURPOSE]</span> 
+                        as requested by the student.
+                        <br><br>
+                        The student bears good moral character and conduct during the period of study in this institute.
+                    </div>
+                    
+                    <!-- Date -->
+                    <div class="preview-date" style="font-family: 'Lora', Georgia, serif; text-align: left; margin-left: 2mm; margin-top: 3mm; margin-bottom: 3mm; font-weight: 600; color: #1e3a8a; font-size: 8pt;">
+                        Date: [DATE]
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="display: flex; justify-content: space-between; margin-top: 8mm; padding: 0 2mm; width: 100%; box-sizing: border-box;">
+                        <div style="text-align: center; flex: 1; max-width: 45mm;">
+                            <div style="border-bottom: 1px solid #4b5563; width: 30mm; margin: 5mm auto 1mm;"></div>
+                            <div style="font-family: 'Outfit', sans-serif; font-size: 7.5pt; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Clerk In-Charge</div>
+                            <div class="preview-clerk-name" style="font-family: 'Outfit', sans-serif; font-size: 7.5pt; font-weight: 600; color: #4b5563; margin-top: 1mm;">([CLERK])</div>
+                        </div>
+                        <div style="text-align: center; flex: 1; max-width: 45mm;">
+                            <div style="border-bottom: 1px solid #4b5563; width: 30mm; margin: 5mm auto 1mm;"></div>
+                            <div style="font-family: 'Outfit', sans-serif; font-size: 7.5pt; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Principal</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seal -->
+                    <div style="position: absolute; bottom: 12mm; left: 50%; transform: translateX(-50%) rotate(-12deg); width: 18mm; height: 18mm; border: 1.5px dashed #b91c1c; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(185, 28, 28, 0.03); font-family: 'Outfit', sans-serif; font-size: 5.5pt; font-weight: 700; color: #b91c1c; text-align: center; line-height: 1.25; box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.03);">
+                        ★ BVIT ★<br>OFFICIAL<br>SEAL
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 1.25rem 1.75rem; border-top: var(--card-border); display: flex; gap: 10px; justify-content: flex-end; background: var(--modal-bg);">
+                <button onclick="closeCertificatePreviewModal()" class="btn btn-secondary">Close</button>
+                <button id="previewPrintBtn" class="btn btn-primary"><i class="fas fa-print"></i> Print</button>
+                <button id="previewDownloadBtn" class="btn" style="background: rgba(16, 185, 129, 0.15); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.2);"><i class="fas fa-download"></i> Download PDF</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -1605,6 +1697,14 @@
                     }
                 });
             }
+            const certificatePreviewModal = document.getElementById('certificatePreviewModal');
+            if (certificatePreviewModal) {
+                certificatePreviewModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'certificatePreviewModal') {
+                        closeCertificatePreviewModal();
+                    }
+                });
+            }
         }
 
         // Navigation active state management
@@ -1819,17 +1919,13 @@
                                                 <button class="btn btn-primary" onclick="approveApplication('${app.id}')" style="padding: 5px 10px; font-size: 0.8rem;">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
-                                                <button class="btn" onclick="rejectApplication('${app.id}')" style="padding: 5px 10px; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);">
+                                                <button class="btn" onclick="rejectApplication('${app.id}')" style="padding: 5px 10px; font-size: 0.8rem; background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);">
                                                     <i class="fas fa-times"></i> Reject
                                                 </button>
-                                            ` : app.status === 'approved' ? `
-                                                <button class="btn" onclick="printBonafideCertificate(updateCertificateAcademicYear({...allApplications.find(a => a.id === '${app.id}')}))" style="padding: 5px 10px; font-size: 0.8rem; background: rgba(99, 102, 241, 0.15); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2);">
-                                                    <i class="fas fa-print"></i> Print
-                                                </button>
-                                                <button class="btn btn-primary" onclick="generatePDFCertificate(updateCertificateAcademicYear({...allApplications.find(a => a.id === '${app.id}')}))" style="padding: 5px 10px; font-size: 0.8rem;">
-                                                    <i class="fas fa-file-pdf"></i> PDF
-                                                </button>
                                             ` : ''}
+                                            <button class="btn" onclick="deleteApplication('${app.id}')" style="padding: 5px 10px; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -1976,12 +2072,9 @@
                                 <button onclick="closeApplicationModal()" class="btn btn-secondary">Close</button>
                                 ${app.status === 'pending' ? `
                                     <button onclick="closeApplicationModal(); approveApplication('${app.id}')" class="btn btn-primary">✅ Approve</button>
-                                    <button onclick="closeApplicationModal(); rejectApplication('${app.id}')" class="btn" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);">❌ Reject</button>
+                                    <button onclick="closeApplicationModal(); rejectApplication('${app.id}')" class="btn" style="background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);">❌ Reject</button>
                                 ` : ''}
-                                ${app.status === 'approved' ? `
-                                    <button onclick="closeApplicationModal(); printBonafideCertificate(updateCertificateAcademicYear({...app}))" class="btn btn-primary" style="background: linear-gradient(135deg, var(--secondary) 0%, rgba(16, 185, 129, 0.75) 100%); box-shadow: 0 4px 15px var(--secondary-glow);">🖨️ Print Certificate</button>
-                                    <button onclick="closeApplicationModal(); generatePDFCertificate(updateCertificateAcademicYear({...app}))" class="btn btn-primary">📄 Generate PDF</button>
-                                ` : ''}
+                                <button onclick="closeApplicationModal(); deleteApplication('${app.id}')" class="btn" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);"><i class="fas fa-trash-alt"></i> Delete</button>
                             </div>
                         </div>
                     </div>
@@ -2126,21 +2219,7 @@
                         clearCache('clerk_print_queue');
                         clearCache('clerk_stats');
                         
-                        // Ask if user wants to print certificate immediately
-                        const printChoice = confirm('Application approved successfully!\n\nChoose printing option:\n\nOK = Print Certificate\nCancel = Generate PDF');
-                        
-                        if (printChoice) {
-                            const updatedApp = updateCertificateAcademicYear({...app});
-                            printBonafideCertificate(updatedApp);
-                        } else {
-                            const pdfChoice = confirm('Generate PDF Certificate?\n\nOK = Generate PDF\nCancel = Skip for now');
-                            if (pdfChoice) {
-                                const updatedApp = updateCertificateAcademicYear({...app});
-                                generatePDFCertificate(updatedApp);
-                            } else {
-                                alert('Certificate has been created and is ready for printing.\nYou can print it later from the Print Certificates section.');
-                            }
-                        }
+                        alert('Application approved successfully! Certificate is now in the print queue and ready for printing.');
                         
                         // Refresh the active view
                         if (document.getElementById('applicationsSection').style.display !== 'none') {
@@ -2747,6 +2826,84 @@
                 }
             }
         }
+
+        // Delete application with write-through Firebase update and complete cache invalidation
+        async function deleteApplication(applicationId) {
+            if (confirm('🚨 Warning: Are you sure you want to delete this application?\\n\\nThis will permanently remove it from the system and Firebase.')) {
+                try {
+                    // Wait for Firebase to initialize
+                    await waitForFirebase();
+                    
+                    if (window.db) {
+                        // 1. Delete from bonafideApplications node
+                        await window.db.ref(`bonafideApplications/${applicationId}`).remove();
+                        
+                        // 2. Delete from applications node
+                        await window.db.ref(`applications/${applicationId}`).remove();
+                        
+                        // 3. Find and delete associated certificate if any (by scanning the certificates node)
+                        const certSnap = await window.db.ref('certificates').once('value');
+                        const certs = certSnap.val();
+                        if (certs) {
+                            for (let key in certs) {
+                                if (certs[key] && (certs[key].id === applicationId || certs[key].applicationId === applicationId)) {
+                                    await window.db.ref(`certificates/${key}`).remove();
+                                    console.log('Associated certificate deleted in Firebase:', key);
+                                }
+                            }
+                        }
+                        
+                        // 4. Find and delete from printQueue if any
+                        const printSnap = await window.db.ref('printQueue').once('value');
+                        const printItems = printSnap.val();
+                        if (printItems) {
+                            for (let key in printItems) {
+                                if (printItems[key] && (printItems[key].id === applicationId || printItems[key].applicationId === applicationId)) {
+                                    await window.db.ref(`printQueue/${key}`).remove();
+                                    console.log('Associated print queue entry deleted in Firebase:', key);
+                                }
+                            }
+                        }
+                        
+                        // 5. Find and delete from certificateHistory if any
+                        const histSnap = await window.db.ref('certificateHistory').once('value');
+                        const histItems = histSnap.val();
+                        if (histItems) {
+                            for (let key in histItems) {
+                                if (histItems[key] && (histItems[key].id === applicationId || histItems[key].applicationId === applicationId)) {
+                                    await window.db.ref(`certificateHistory/${key}`).remove();
+                                    console.log('Associated history entry deleted in Firebase:', key);
+                                }
+                            }
+                        }
+
+                        console.log('Application and all related database entries deleted successfully in Firebase');
+                    }
+                    
+                    // Update local arrays
+                    allApplications = allApplications.filter(a => a.id !== applicationId);
+                    
+                    // Clear caches
+                    clearCache('clerk_applications');
+                    clearCache('clerk_certificates');
+                    clearCache('clerk_print_queue');
+                    clearCache('clerk_stats');
+                    clearCache('clerk_history');
+                    
+                    alert('Application and all its associated certificates/records deleted successfully!');
+                    
+                    // Refresh view
+                    if (document.getElementById('applicationsSection').style.display !== 'none') {
+                        filterApplications();
+                    }
+                    
+                    loadDashboardData();
+                } catch (error) {
+                    console.error('Error deleting application:', error);
+                    alert('Error deleting application. Please try again.');
+                }
+            }
+        }
         
         // Certificates functionality
         let allCertificates = [];
@@ -2937,21 +3094,11 @@
             loadCertificatesData();
         }
         
-        // View certificate details frosted popup
+        // View certificate details in premium preview modal
         function viewCertificate(certificateId) {
             const cert = allCertificates.find(c => c.id === certificateId);
             if (cert) {
-                const formatDate = (timestamp) => {
-                    if (!timestamp) return 'N/A';
-                    const date = new Date(timestamp);
-                    return date.toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                };
-                
-                alert(`Certificate Details:\n\nCertificate ID: ${getDisplayId(cert)}\nStudent Name: ${cert.studentName}\nRoll No: ${cert.rollNumber || cert.rollNo}\nDepartment: ${cert.department}\nClass/Year: ${cert.class || cert.year}\nPurpose: ${cert.purpose}\nContact: ${cert.contactNumber}\nEmail: ${cert.email}\nStatus: ${cert.status.toUpperCase()}\nApproved On: ${cert.approvedDate || formatDate(cert.createdDate)}\nApproved By: ${cert.processedBy || 'Clerk Admin'}`);
+                showCertificatePreview(cert);
             }
         }
         
@@ -3274,26 +3421,11 @@
             loadPrintCertificatesData();
         }
         
-        // View print certificate details
+        // View print certificate details in premium preview modal
         function viewPrintCertificate(certificateId) {
             const cert = allPrintCertificates.find(c => c.id === certificateId);
             if (cert) {
-                const formatDate = (timestamp) => {
-                    const date = new Date(timestamp);
-                    return date.toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                };
-                
-                let details = `Certificate Print Details:\n\nCertificate ID: ${getDisplayId(cert)}\nStudent: ${cert.studentName}\nRoll No: ${cert.rollNumber || cert.rollNo}\nDepartment: ${cert.department}\nClass/Year: ${cert.class || cert.year}\nPurpose: ${cert.purpose}\nContact: ${cert.contactNumber}\nEmail: ${cert.email}\nPriority: ${(cert.priority || 'medium').toUpperCase()}\nStatus: ${cert.status.toUpperCase()}\nApproved: ${cert.approvedDate || formatDate(cert.createdDate)}\nApproved By: ${cert.processedBy || 'Clerk Admin'}`;
-                
-                if (cert.status === 'printed') {
-                    details += `\nPrinted: ${formatDate(cert.printedDate)}\nPrinted By: ${cert.printedBy}`;
-                }
-                
-                alert(details);
+                showCertificatePreview(cert);
             }
         }
         
@@ -3754,45 +3886,11 @@
             loadHistoryData();
         }
         
-        // View history record details in alert format
+        // View history record details in premium preview modal
         function viewHistoryRecord(recordId) {
             const record = allHistoryRecords.find(r => r.id === recordId);
             if (record) {
-                const formatDateStr = (timestamp) => {
-                    if (!timestamp) return 'N/A';
-                    const date = new Date(timestamp);
-                    return date.toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                };
-                
-                let details = `Certificate History Details:\n\n` +
-                    `Certificate ID: ${getDisplayId(record)}\n` +
-                    `Student Name: ${record.studentName}\n` +
-                    `Roll Number: ${record.rollNumber || record.rollNo || 'N/A'}\n` +
-                    `Department: ${record.department}\n` +
-                    `Class/Year: ${record.class || record.year || 'N/A'}\n` +
-                    `Purpose: ${record.purpose}\n` +
-                    `Contact: ${record.contactNumber || 'N/A'}\n` +
-                    `Email: ${record.email || record.studentEmail || 'N/A'}\n` +
-                    `Status: ${record.status.toUpperCase()}\n\n` +
-                    `Timeline:\n` +
-                    `- Applied On: ${formatDateStr(record.submissionDate || record.applicationDate)}\n` +
-                    `- Approved On: ${formatDateStr(record.approvedDate || record.processedDate)} by ${record.processedBy || 'Clerk Admin'}`;
-                
-                if (record.printedDate) {
-                    details += `\n- Printed On: ${formatDateStr(record.printedDate)} by ${record.printedBy || 'Clerk Admin'}`;
-                }
-                
-                if (record.issuedDate) {
-                    details += `\n- Issued On: ${formatDateStr(record.issuedDate)} by ${record.issuedBy || 'Clerk Admin'}`;
-                }
-                
-                alert(details);
+                showCertificatePreview(record);
             }
         }
         
@@ -3867,37 +3965,284 @@
             }
         }
 
-        // Download high-resolution QR Code image
+        // Helper to load image as promise
+        function loadImg(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = (e) => reject(e);
+                img.src = url;
+            });
+        }
+
+        // Download high-resolution QR Code flyer poster
         async function downloadQRCode() {
+            let downloadBtn = document.querySelector('button[onclick="downloadQRCode()"]');
+            let originalHTML = '';
+            if (downloadBtn) {
+                originalHTML = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating Flyer...`;
+                downloadBtn.disabled = true;
+            }
+
             try {
                 const currentPath = window.location.href;
                 const portalUrl = currentPath.includes('clerk-panel.html') 
                     ? currentPath.replace('clerk-panel.html', 'apply-bonafide.html')
                     : window.location.origin + '/apply-bonafide.html';
                     
-                const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(portalUrl)}`;
+                const logoUrl = 'https://i.postimg.cc/7YtqgV7g/Adobe-Express-20231230-0106150-009053291427646104.png';
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(portalUrl)}`;
                 
-                // Fetch the image as blob to bypass cross-origin browser opening
-                const response = await fetch(qrImageUrl);
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
+                // Load images in parallel
+                let logoImg, qrImg;
+                try {
+                    [logoImg, qrImg] = await Promise.all([
+                        loadImg(logoUrl),
+                        loadImg(qrUrl)
+                    ]);
+                } catch (e) {
+                    console.error('Failed to load images for flyer, downloading raw QR code as fallback', e);
+                    // Fallback to raw download if images fail to load (e.g. offline)
+                    window.open(qrUrl, '_blank');
+                    if (downloadBtn) {
+                        downloadBtn.innerHTML = originalHTML;
+                        downloadBtn.disabled = false;
+                    }
+                    return;
+                }
+
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = 600;
+                canvas.height = 850;
+                const ctx = canvas.getContext('2d');
+
+                // 1. Background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 2. Thick Navy Blue Border
+                ctx.lineWidth = 12;
+                ctx.strokeStyle = '#1e3a8a';
+                ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+
+                // 3. Inner Gold Border
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#d97706';
+                ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+
+                // Corner Ornaments (Lines)
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 2.5;
+                // Top-left corner
+                ctx.beginPath();
+                ctx.moveTo(18, 40); ctx.lineTo(18, 18); ctx.lineTo(40, 18);
+                ctx.stroke();
+                // Top-right corner
+                ctx.beginPath();
+                ctx.moveTo(canvas.width - 18, 40); ctx.lineTo(canvas.width - 18, 18); ctx.lineTo(canvas.width - 40, 18);
+                ctx.stroke();
+                // Bottom-left corner
+                ctx.beginPath();
+                ctx.moveTo(18, canvas.height - 40); ctx.lineTo(18, canvas.height - 18); ctx.lineTo(40, canvas.height - 18);
+                ctx.stroke();
+                // Bottom-right corner
+                ctx.beginPath();
+                ctx.moveTo(canvas.width - 18, canvas.height - 40); ctx.lineTo(canvas.width - 18, canvas.height - 18); ctx.lineTo(canvas.width - 40, canvas.height - 18);
+                ctx.stroke();
+
+                // 4. Logo drawing (centered)
+                ctx.drawImage(logoImg, canvas.width / 2 - 80, 45, 160, 56);
+
+                // 5. College Name Header
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#1e3a8a';
+                ctx.font = 'bold 16px "Outfit", Arial, sans-serif';
+                ctx.fillText('BHARATI VIDYAPEETH INSTITUTE OF TECHNOLOGY', canvas.width / 2, 125);
+
+                ctx.fillStyle = '#4b5563';
+                ctx.font = '600 11px "Outfit", Arial, sans-serif';
+                ctx.fillText('SEC-7, CBD BELAPUR, NAVI MUMBAI - 400614', canvas.width / 2, 145);
+
+                ctx.fillStyle = '#6b7280';
+                ctx.font = 'italic 10px Georgia, serif';
+                ctx.fillText('(An Autonomous Institute affiliated to MSBTE)', canvas.width / 2, 162);
+
+                // Gold Line divider
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(80, 180);
+                ctx.lineTo(canvas.width - 80, 180);
+                ctx.stroke();
+
+                // 6. Poster Title
+                ctx.fillStyle = '#b91c1c';
+                ctx.font = 'bold 22px "Outfit", Georgia, serif';
+                ctx.fillText('STUDENT BONAFIDE PORTAL', canvas.width / 2, 215);
+
+                // 7. QR Code Rounded Box Background
+                ctx.fillStyle = '#f8fafc';
+                ctx.strokeStyle = 'rgba(30, 58, 138, 0.1)';
+                ctx.lineWidth = 1.5;
+                // Draw rounded rect
+                const rx = canvas.width / 2 - 160;
+                const ry = 250;
+                const rw = 320;
+                const rh = 320;
+                const radius = 16;
+                ctx.beginPath();
+                ctx.moveTo(rx + radius, ry);
+                ctx.lineTo(rx + rw - radius, ry);
+                ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+                ctx.lineTo(rx + rw, ry + rh - radius);
+                ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+                ctx.lineTo(rx + radius, ry + rh);
+                ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+                ctx.lineTo(rx, ry + radius);
+                ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw QR Code
+                ctx.drawImage(qrImg, canvas.width / 2 - 130, 280, 260, 260);
+
+                // 8. Instructions Section
+                ctx.fillStyle = '#1e3a8a';
+                ctx.font = 'bold 15px "Outfit", Arial, sans-serif';
+                ctx.fillText('SCAN TO APPLY & TRACK STATUS INSTANTLY', canvas.width / 2, 605);
+
+                // Instructions body
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#1f2937';
+                ctx.font = 'bold 13px "Inter", Arial, sans-serif';
+                const startX = 65;
+                ctx.fillText('How to use this portal:', startX, 640);
                 
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = 'BVIT_Student_Bonafide_QR.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
+                ctx.font = '400 12px "Inter", Arial, sans-serif';
+                ctx.fillStyle = '#374151';
+                ctx.fillText('• Step 1: Scan this QR code using your mobile phone camera or scanner app.', startX + 10, 668);
+                ctx.fillText('• Step 2: Fetch student details by entering your Roll Number & complete the form.', startX + 10, 693);
+                ctx.fillText('• Step 3: Instantly track your certificate status using the tracking code on the portal.', startX + 10, 718);
+
+                // 9. Footer
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 9px "Outfit", Arial, sans-serif';
+                ctx.fillText('★ OFFICIAL BVIT BONAFIDE PORTAL NOTICE ★', canvas.width / 2, 785);
+
+                // Create PDF using jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                
+                // Save PDF
+                pdf.save('BVIT_Student_Bonafide_QR_Notice.pdf');
+
             } catch (error) {
-                console.error('Error downloading QR code:', error);
-                // Fallback: open image in new tab if fetch fails due to internet/CORS
-                const currentPath = window.location.href;
-                const portalUrl = currentPath.includes('clerk-panel.html') 
-                    ? currentPath.replace('clerk-panel.html', 'apply-bonafide.html')
-                    : window.location.origin + '/apply-bonafide.html';
-                const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(portalUrl)}`;
-                window.open(qrImageUrl, '_blank');
+                console.error('Error generating QR flyer poster:', error);
+                alert('Error generating QR flyer poster. Opening raw QR code instead.');
+                // Fallback to raw download
+                try {
+                    const currentPath = window.location.href;
+                    const portalUrl = currentPath.includes('clerk-panel.html') 
+                        ? currentPath.replace('clerk-panel.html', 'apply-bonafide.html')
+                        : window.location.origin + '/apply-bonafide.html';
+                    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(portalUrl)}`;
+                    window.open(qrImageUrl, '_blank');
+                } catch (e) {
+                    console.error('Final fallback failed', e);
+                }
+            } finally {
+                if (downloadBtn) {
+                    downloadBtn.innerHTML = originalHTML;
+                    downloadBtn.disabled = false;
+                }
+            }
+        }
+        
+        // Global variables for preview certificate
+        let activePreviewCert = null;
+
+        function showCertificatePreview(cert) {
+            if (!cert) return;
+            activePreviewCert = cert;
+            
+            // Format dates and clerk name
+            const currentDate = new Date().toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit', 
+                year: 'numeric'
+            });
+            
+            let loggedInClerkName = '';
+            if (cert.processedBy && cert.processedBy !== 'Clerk Admin') {
+                loggedInClerkName = cert.processedBy;
+            } else {
+                loggedInClerkName = `${clerkData.firstName || ''} ${clerkData.lastName || ''}`.trim();
+            }
+            if (!loggedInClerkName) {
+                loggedInClerkName = 'Clerk Admin';
+            }
+            
+            const certDate = cert.issuedDate || cert.printedDate || cert.approvedDate || cert.processedDate || cert.submissionDate || new Date();
+            const formattedDate = formatDate(certDate);
+            
+            const modal = document.getElementById('certificatePreviewModal');
+            if (modal) {
+                // Set fields
+                modal.querySelector('.preview-student-name').textContent = cert.studentName || 'N/A';
+                modal.querySelector('.preview-roll-no').textContent = cert.rollNumber || cert.rollNo || 'N/A';
+                modal.querySelector('.preview-class-year').textContent = cert.class || cert.year || 'N/A';
+                modal.querySelector('.preview-department').textContent = cert.department || 'N/A';
+                modal.querySelector('.preview-academic-year').textContent = cert.academicYear || getCurrentAcademicYear();
+                modal.querySelector('.preview-purpose').textContent = cert.purpose || 'Official Purpose';
+                modal.querySelector('.preview-date').textContent = `Date: ${formattedDate}`;
+                modal.querySelector('.preview-clerk-name').textContent = `(${loggedInClerkName})`;
+                
+                // Show modal
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeCertificatePreviewModal() {
+            const modal = document.getElementById('certificatePreviewModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            activePreviewCert = null;
+        }
+
+        // Initialize preview actions
+        function initializePreviewActions() {
+            const printBtn = document.getElementById('previewPrintBtn');
+            const downloadBtn = document.getElementById('previewDownloadBtn');
+            
+            if (printBtn) {
+                printBtn.addEventListener('click', () => {
+                    if (activePreviewCert) {
+                        const updatedApp = updateCertificateAcademicYear({...activePreviewCert});
+                        printBonafideCertificate(updatedApp);
+                    }
+                });
+            }
+            
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    if (activePreviewCert) {
+                        const updatedApp = updateCertificateAcademicYear({...activePreviewCert});
+                        generatePDFCertificate(updatedApp);
+                    }
+                });
             }
         }
         
@@ -3908,6 +4253,7 @@
             initializeNavigation();
             initializePasswordForm();
             initializeModalHandlers();
+            initializePreviewActions();
             renderPortalQRCode();
         });
 
